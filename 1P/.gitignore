@@ -1,0 +1,24 @@
+# Dependencias y versiones compiladas
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+
+# Variables y credenciales locales
+.env
+.env.*
+!.env.example
+
+# Archivos de trabajo y revisión
+tmp/
+*.log
+*.tmp
+~$*
+
+# Archivos del sistema y configuración personal del editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
