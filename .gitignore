@@ -22,3 +22,22 @@ Thumbs.db
 Desktop.ini
 .idea/
 .vscode/
+
+# Godot y comprobaciones locales
+.godot/
+.godot-mcp-check/
+.tarea2-build/
+.diseno-vj-build/
+.exposicion-mecanicas/
+
+# Cachés de las utilidades Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Salidas de exportación del proyecto Godot
+/2P/Desarrollo/juego/exportaciones/
+
+# Cargas Figma regenerables y registro de una migración ya aplicada
+/2P/Desarrollo/Diseno/figma-src/cargas_preparadas/
+/2P/Desarrollo/Diseno/figma-src/estado-lumIntegration.json

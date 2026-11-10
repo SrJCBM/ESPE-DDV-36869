@@ -1,6 +1,6 @@
 # Tres propuestas de videojuego: blackjack con progresión roguelite
 
-Documento de conceptualización para discusión grupal. Fecha: 4 de octubre de 2026. Demostración prevista: 5 de octubre de 2026.
+Documento de conceptualización. Propuestas originales: 4 de octubre de 2026. Decisión técnica actualizada: 12 de octubre de 2026. Motor elegido: Godot 4 con GDScript. El prototipo web anterior se conserva como referencia histórica y está descartado como base de desarrollo.
 
 Los nombres son provisionales. Las cifras de economía y balance son hipótesis de diseño que deberán probarse con jugadores, no resultados de pruebas realizadas.
 
@@ -66,7 +66,7 @@ La sustitución necesita una ventana de decisión explícita antes de declarar u
 
 **Riesgo principal:** que los objetivos dependan demasiado del azar. Mitigación: apuestas limitadas, información previa y consumibles que aporten control.
 
-**Tecnología propuesta:** Phaser + TypeScript + Vite. Es la alternativa recomendada si el equipo ya conoce JavaScript y desea presentar en navegador.
+**Tecnología elegida:** Godot 4 con GDScript. El juego se implementará mediante escenas, nodos de interfaz y señales. El prototipo web está descartado como base; solo se revisarán reglas, casos y recursos reutilizables.
 
 ## 3. Propuesta B — Veintiuno: Pacto de Ceniza
 
@@ -106,7 +106,7 @@ Ciclo: observar intención del enemigo → jugar mano → resolver daño → esc
 
 **Riesgo principal:** combates repetitivos o demasiado largos. Mitigación: vida reducida, intenciones claras y enemigos con una sola regla especial.
 
-**Tecnología propuesta:** Godot con GDScript si se prefiere trabajar con escenas y un editor visual. Phaser también sirve si el grupo quiere conservar la misma base web.
+**Tecnología para el trabajo:** Godot 4 con GDScript, de acuerdo con la decisión técnica vigente.
 
 ## 4. Propuesta C — Protocolo 21
 
@@ -146,7 +146,7 @@ Ciclo: estudiar protocolo → jugar o intervenir → resolver mano y sospecha �
 
 **Riesgo principal:** sobrecargar al jugador con dos sistemas de riesgo. Mitigación: comenzar con un tutorial de blackjack y presentar la sospecha en la segunda mesa.
 
-**Tecnología propuesta:** Phaser + TypeScript + Vite. La interfaz de cartas, registro y medidores encaja en una aplicación 2D de navegador.
+**Tecnología para el trabajo:** Godot 4 con GDScript. Las cartas, registros y medidores se representarían con escenas y nodos Control.
 
 ## 5. Comparación y recomendación
 
@@ -157,36 +157,34 @@ Ciclo: estudiar protocolo → jugar o intervenir → resolver mano y sospecha �
 | Cercanía al blackjack clásico | Alta | Media | Media |
 | Complejidad relativa estimada | Baja a media | Media | Media a alta |
 | Mayor trabajo adicional | Economía y tienda | Daño y enemigos | Intervenciones y claridad de interfaz |
-| Demo básica reutilizable | Directamente | Reutiliza reglas de cartas | Reutiliza reglas de cartas |
+| Referencia histórica reutilizable | Reglas y casos, tras revisión | Reglas de cartas, tras revisión | Reglas de cartas, tras revisión |
 
-**Recomendación:** La Última Mesa. Comunica la idea con pocas explicaciones y permite convertir la demo de blackjack en el juego final por incrementos pequeños. Pacto de Ceniza es preferible si el equipo disfruta diseñar enemigos. Protocolo 21 ofrece una decisión adicional interesante, pero requiere más pruebas de comprensión.
+**Recomendación:** La Última Mesa. Comunica la idea con pocas explicaciones y permite desarrollar el juego en Godot por incrementos pequeños. El prototipo anterior no se utilizará como base técnica. Pacto de Ceniza es preferible si el equipo disfruta diseñar enemigos. Protocolo 21 ofrece una decisión adicional interesante, pero requiere más pruebas de comprensión.
 
-## 6. Herramientas y organización técnica inicial
+## 6. Herramientas y organización técnica vigente
 
-| Herramienta | Función | Cuándo elegirla |
+| Herramienta | Función | Estado |
 |---|---|---|
-| HTML, CSS y JavaScript | Prototipo de mesa y reglas | Para demostrar mañana con pocas dependencias. |
-| Phaser + TypeScript | Framework 2D y lógica tipada | Para continuar como juego web con animaciones y escenas. |
-| Vite | Servidor de desarrollo y empaquetado | Acompaña la opción web; no es un motor de juego. |
-| Godot + GDScript | Motor con editor de escenas y herramientas 2D | Si el equipo conoce Godot o prioriza un ejecutable de escritorio. |
-| Git | Historial y colaboración | Desde el inicio, con cambios pequeños y revisables. |
+| Godot 4 | Motor, editor de escenas, interfaz 2D y exportación | Elegido para implementar el juego. |
+| GDScript | Reglas, turnos, economía y efectos de objetos | Lenguaje del proyecto. |
+| Resources y señales | Datos de objetos y comunicación entre componentes | Organización prevista. |
+| Git | Historial y colaboración | Cambios pequeños y revisables. |
+| Prototipo web anterior | Referencia de reglas, casos y recursos | Descartado como base de desarrollo. |
 
-Phaser está orientado a juegos 2D en navegador y permite JavaScript y TypeScript: [documentación oficial](https://docs.phaser.io/phaser/getting-started/what-is-phaser). Godot proporciona herramientas 2D y 3D: [sitio oficial](https://godotengine.org/). Vite facilita desarrollo y generación de archivos estáticos: [guía oficial](https://vite.dev/guide/).
+Godot ofrece escenas reutilizables y herramientas de interfaz: [características oficiales](https://godotengine.org/features/) y [nodos Control](https://docs.godotengine.org/en/stable/classes/class_control.html). La [licencia MIT del motor](https://godotengine.org/license/) permite publicar el juego conservando los avisos correspondientes. Una eventual versión web deberá exportarse desde Godot y no implementarse con otro framework.
 
-No hace falta un servidor de cuentas ni una base de datos para el alcance inicial. El guardado de ajustes y desbloqueos puede ser local. Tampoco hace falta añadir React si la interfaz del juego queda resuelta con Phaser.
+No se requieren cuentas ni base de datos para el alcance inicial. Los ajustes y desbloqueos podrán guardarse localmente en Godot.
 
-Separación propuesta para facilitar cambios:
+- **Reglas:** implementar mazo, barajado, puntuación, naturales y resolución en GDScript, sin depender de botones.
+- **Estado:** saldo, manos, turno y acciones permitidas.
+- **Presentación:** escenas de mesa y cartas, nodos Control, mensajes y audio.
+- **Contenido:** Resources con identificador, momento de activación, efecto y límite.
 
-- **Reglas:** creación del mazo, barajado, puntuación, blackjack y resolución; sin depender de dibujos ni botones.
-- **Estado:** saldo, manos, fase actual y acciones permitidas.
-- **Presentación:** cartas, controles, mensajes y sonidos.
-- **Contenido futuro:** amuletos y consumibles definidos como datos con identificador, momento de activación, efecto y límite.
+Los efectos seguirán un orden definido: acción, cambio de cartas, evaluación, resultado base, bonificaciones y actualización visual. Una bonificación no podrá activarse a sí misma.
 
-Los efectos se resolverán en un orden fijo: acción → cambio de cartas → evaluación → resultado base → bonificaciones → actualización visual. Una bonificación no volverá a dispararse a sí misma. Cada pantalla explicará la regla especial vigente.
+## 7. Referencia histórica del prototipo descartado
 
-## 7. Diseño concreto de la demo para mañana
-
-**Estado: prototipo básico implementado en `prototipo/index.html` tras la aprobación del alcance.** Las instrucciones y la verificación están en `prototipo/README.md`.
+**Estado: prototipo web descartado como base de desarrollo.** Esta sección documenta su comportamiento histórico para seleccionar reglas, casos de prueba y criterios de interfaz. La implementación Godot deberá validarse por separado. Ver `prototipo/README.md` y `../DECISION_GODOT.md`.
 
 Una mesa de blackjack individual, en español, usable en un navegador de computadora. Apariencia de casino nocturno compatible con La Última Mesa. Duración de la demostración: 2–3 minutos.
 
@@ -228,28 +226,27 @@ Se proponen dos bloques de exposición que el grupo puede repartir internamente.
 | Tiempo | Responsable | Contenido visual y discurso |
 |---|---|---|
 | 0:00–1:00 | Expositor 1 | Necesidad del proyecto, objetivo y decisión básica del blackjack. |
-| 1:00–2:30 | Expositor 1 | Tres propuestas: una frase de historia, recurso principal y diferencia jugable de cada una. |
+| 1:00–2:30 | Expositor 1 | Propuestas originales: historia, recurso principal y diferencia jugable. |
 | 2:30–4:00 | Expositor 1 | Propuesta recomendada: historia, ambientación, público y condición de victoria. |
 | 4:00–5:30 | Expositor 2 | Ciclo de juego; diferencia entre consumible y amuleto; una sinergia concreta. |
 | 5:30–6:30 | Expositor 2 | Herramientas, alcance inicial y fases del desarrollo. |
-| 6:30–9:00 | Expositor 2 | Demostración de una o dos manos con explicación de decisiones. |
+| 6:30–9:00 | Expositor 2 | Estado del desarrollo en Godot y casos de prueba previstos. El prototipo web se presenta únicamente como antecedente descartado. |
 | 9:00–10:00 | Ambos | Preguntas y cierre sobre qué se implementará después. |
 
 **Apertura sugerida:** «Nuestro proyecto parte de una decisión fácil de entender: pedir otra carta o plantarse antes de superar veintiuno. Queremos convertir esa decisión en una aventura breve, donde los objetos obtenidos cambien la estrategia de cada partida».
 
 **Defensa de la originalidad:** «La referencia a Balatro está en combinar efectos y construir estrategias. Nuestro juego conserva el enfrentamiento contra un crupier y desarrolla una historia de escape, una economía propia y objetos diseñados alrededor del riesgo del blackjack».
 
-**Cierre sugerido:** «La primera entrega demuestra que la mecánica central funciona. Después incorporaremos una tienda, pocos objetos bien diferenciados y crupieres con reglas especiales. Así podremos comprobar cada ampliación antes de aumentar el contenido».
+**Cierre sugerido:** «El proyecto se implementará en Godot. Primero validaremos una mano completa y después incorporaremos tienda, objetos y encuentros. El prototipo web está descartado y solo aporta referencias que deberán revisarse».
 
 ## 9. Plan posterior a la exposición
 
 Hitos propuestos, sujetos al calendario real de la asignatura:
 
-1. Base: validar blackjack, controles y lectura de resultados.
+1. Base: implementar y validar blackjack, controles y resultados en Godot con GDScript.
 2. Primer recorrido: conectar tres encuentros y una condición final de victoria o derrota.
 3. Objetos: implementar dos amuletos y dos consumibles, medir sus interacciones y después ampliar el catálogo.
 4. Presentación: integrar arte, sonido, tutorial breve y guardado de ajustes.
 5. Evaluación: observar jugadores nuevos, registrar confusiones y ajustar dificultad y duración.
 
 Criterios de aceptación del proyecto: reglas sin errores conocidos, efectos explicables, una partida completa, controles claros, recursos gráficos con procedencia documentada y una compilación local reproducible. El número final de objetos importa menos que su utilidad y claridad.
-

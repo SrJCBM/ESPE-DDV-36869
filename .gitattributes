@@ -1,0 +1,14 @@
+# Conservar documentos y recursos sin conversiones de finales de línea.
+*.pdf binary
+*.docx binary
+*.pptx binary
+*.xlsx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ttf binary
+*.otf binary
+
+# Transcripción recibida: conservar el archivo original.
+1P/Diseno_Videojuego/Exposicion/Guion_Exposicion.txt -text

@@ -1,0 +1,22 @@
+{
+  "tool": "image_gen (built-in)",
+  "status": "Ilustraciones integradas en Figma Education y revisadas visualmente; aceptación del equipo pendiente",
+  "prompts": [
+    {
+      "key": "velas",
+      "prompt": "Original game illustration asset for the supernatural casino game La Última Mesa. One isolated vertical emblem, NOT a complete playing card and NOT UI. Antique copperplate engraving with dense fine crosshatching, expressive hand-cut shapes and dramatic silhouette, aged ivory and tarnished gold with deep green-black shadows. No generic outline icon, no flat clipart. Rich detailed central illustration contained within an elongated oval silhouette, transparent outside, generous clean edges so it can sit in an editable card frame. No text, no letters, no numerals, no border, no watermark, no existing franchise characters. Portrait 2:3 composition. Subject: a single tall ritual candle of melted ivory wax growing from a crown-shaped brass candlestick, wax drips shaped like long reaching fingers, a flame bending into a crescent, curling smoke forming the silhouette of a small moth. Restrained ember orange and oxblood accents, strong readable candle silhouette. Supernatural and elegant, not gore."
+    },
+    {
+      "key": "llaves",
+      "prompt": "Original game illustration asset for the supernatural casino game La Última Mesa. One isolated vertical emblem, NOT a complete playing card and NOT UI. Antique copperplate engraving with dense fine crosshatching, expressive hand-cut shapes and dramatic silhouette, aged ivory and tarnished gold with deep green-black shadows. No generic outline icon, no flat clipart. Rich detailed central illustration contained within an elongated oval silhouette, transparent outside, generous clean edges so it can sit in an editable card frame. No text, no letters, no numerals, no border, no watermark, no existing franchise characters. Portrait 2:3 composition. Subject: one elaborate antique key with a birdcage-shaped bow containing an empty tiny chair, a long crooked shaft shaped like a finger bone and intricate asymmetric wards, suspended from a broken velvet ribbon with two small brass bells. Distinctive emerald patina, warm ivory and dull gold. Strong readable key silhouette, detailed engraved metal, supernatural elegance, not gore."
+    },
+    {
+      "key": "relojes",
+      "prompt": "Original game illustration asset for the supernatural casino game La Última Mesa. One isolated vertical emblem, NOT a complete playing card and NOT UI. Antique copperplate engraving with dense fine crosshatching, expressive hand-cut shapes and dramatic silhouette, aged ivory and tarnished gold with deep green-black shadows. No generic outline icon, no flat clipart. Rich detailed central illustration contained within an elongated oval silhouette, transparent outside, generous clean edges so it can sit in an editable card frame. No text, no letters, no numerals, no border, no watermark, no existing franchise characters. Portrait 2:3 composition. Subject: a fractured pocket watch cradled by two curving ornamental hands of tarnished brass, its broken face opens into an impossible spiral of tiny gears, a thin trail of sand falls from the crack into an hourglass-shaped shadow. Ivory clock face with blank hour ticks only, absolutely no numerals. Muted blue-gray and antique gold accents. Strong readable watch silhouette, spectral mechanical mood."
+    },
+    {
+      "key": "mascaras",
+      "prompt": "Original game illustration asset for the supernatural casino game La Última Mesa. One isolated vertical emblem, NOT a complete playing card and NOT UI. Antique copperplate engraving with dense fine crosshatching, expressive hand-cut shapes and dramatic silhouette, aged ivory and tarnished gold with deep green-black shadows. No generic outline icon, no flat clipart. Rich detailed central illustration contained within an elongated oval silhouette, transparent outside, generous clean edges so it can sit in an editable card frame. No text, no letters, no numerals, no border, no watermark, no existing franchise characters. Portrait 2:3 composition. Subject: two asymmetrical theatrical masks fused at the temple, one serene ivory face and one dark cracked face, a broad silk ribbon flows through their hollow eye openings, brass moth antennae and small filigree bells above. The empty eyes conceal all expression. Restrained dusty plum and oxblood accents with aged ivory gold. Strong readable mask silhouette, uncanny and elegant, not horror gore."
+    }
+  ]
+}

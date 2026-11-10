@@ -1,3 +1,5 @@
+> **Material histórico descartado como base de desarrollo.** Desde el 12 de octubre de 2026 el juego se implementará en Godot con GDScript. Las instrucciones y verificaciones siguientes describen exclusivamente el prototipo web anterior. Pueden consultarse sus reglas, casos de prueba y recursos, pero no acreditan una implementación Godot. Ver [decisión vigente](../DECISION_GODOT.md).
+
 # Plan de implementación — La Última Mesa
 
 Objetivo: ejecutar el blackjack básico aprobado en PROPUESTAS_BLACKJACK.md, sección 7.

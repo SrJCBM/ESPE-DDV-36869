@@ -1,0 +1,553 @@
+{
+  "file": "https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq",
+  "status": "Prototipo preparado y revisado; aceptación del equipo pendiente",
+  "readme": "Pendiente de la siguiente indicación del usuario",
+  "sessionId": "a1186f0a-adbb-4c7e-8796-dd1375135858",
+  "screens": {
+    "inicio": "13:103",
+    "mano1": "13:183",
+    "mascara1": "13:312",
+    "puntos102": "13:456",
+    "mano2": "21:736",
+    "mascara2": "21:918",
+    "quiebra2": "13:600",
+    "mano3": "21:1225",
+    "llave3": "21:1407",
+    "diecisiete": "21:1606",
+    "victoria": "13:742",
+    "retorno1": "21:1927",
+    "retorno1pedir": "21:2129",
+    "retorno1valida": "21:2348",
+    "retorno1quiebra": "21:2530",
+    "retorno1quiebra2": "21:2729",
+    "riesgo1": "21:2945",
+    "riesgo1quiebra": "21:3181",
+    "riesgo1quiebra2": "21:3397",
+    "temprano1": "21:3630",
+    "temprano2": "21:3812",
+    "temprano3": "21:3994",
+    "temprano4": "21:4176",
+    "riesgo2": "21:4375",
+    "riesgo2quiebra": "21:4611",
+    "riesgo2revela": "21:4844",
+    "riesgo3": "21:5060",
+    "retorno3": "21:5293",
+    "victoria214": "21:5492",
+    "cuatrovelas": "21:5691",
+    "victoria207": "21:5907",
+    "velasquiebra": "21:6123",
+    "ultima": "21:6356",
+    "sinCamp": "21:6507",
+    "derrota": "13:889",
+    "ultimaVictoria": "21:6780",
+    "victoriaCero": "21:6996"
+  },
+  "dialogs": {
+    "ayuda": "21:7212",
+    "patrones": "21:7232",
+    "reinicio": "21:7252",
+    "llave1": "21:7272",
+    "llave3": "21:7292",
+    "score_puntos102": "21:7312",
+    "score_quiebra2": "21:7325",
+    "score_victoria": "21:7338",
+    "score_retorno1valida": "21:7351",
+    "score_retorno1quiebra": "21:7364",
+    "score_retorno1quiebra2": "21:7377",
+    "score_riesgo1quiebra": "21:7390",
+    "score_riesgo1quiebra2": "21:7403",
+    "score_temprano1": "21:7416",
+    "score_temprano2": "21:7429",
+    "score_temprano3": "21:7442",
+    "score_temprano4": "21:7455",
+    "score_riesgo2quiebra": "21:7468",
+    "score_riesgo2revela": "21:7481",
+    "score_riesgo3": "21:7494",
+    "score_victoria214": "21:7507",
+    "score_victoria207": "21:7520",
+    "score_velasquiebra": "21:7533",
+    "score_derrota": "21:7546",
+    "score_victoriaCero": "21:7559",
+    "reglas_palos": "32:4609",
+    "reglas_riesgo": "32:4804"
+  },
+  "cardInspection": {
+    "L_4": "22:2101",
+    "R_6": "22:2132",
+    "X": "22:2163",
+    "M_8": "22:2214",
+    "V_6": "22:2245",
+    "R_7": "22:2276",
+    "M_10": "22:2307",
+    "V_2": "22:2338",
+    "V_4": "22:2369",
+    "L_3": "22:2400",
+    "V_8": "22:2431",
+    "V_1": "22:2462",
+    "V_10": "22:2493"
+  },
+  "catalog": "22:2703",
+  "cardMasters": [
+    {
+      "id": "13:52",
+      "name": "Grabado / Carta / Velas",
+      "width": 190,
+      "height": 286
+    },
+    {
+      "id": "13:2",
+      "name": "Grabado / Carta / Llaves",
+      "width": 190,
+      "height": 286
+    },
+    {
+      "id": "13:21",
+      "name": "Grabado / Carta / Relojes",
+      "width": 190,
+      "height": 286
+    },
+    {
+      "id": "13:69",
+      "name": "Grabado / Carta / Máscara",
+      "width": 190,
+      "height": 286
+    },
+    {
+      "id": "13:86",
+      "name": "Grabado / Carta / Máscara oculta",
+      "width": 190,
+      "height": 286
+    },
+    {
+      "id": "20:446",
+      "name": "Grabado / Carta / Reverso",
+      "width": 190,
+      "height": 286
+    }
+  ],
+  "structuralAudit": {
+    "problems": [],
+    "screenCount": 37,
+    "dialogCount": 40,
+    "controlCount": 185,
+    "flowStarts": [
+      {
+        "nodeId": "13:103",
+        "name": "01 · Mesa del Custodio · recorrido principal"
+      },
+      {
+        "nodeId": "13:183",
+        "name": "02 · Decisiones y devolución de Llave"
+      },
+      {
+        "nodeId": "21:6356",
+        "name": "03 · Terminar sin campanadas"
+      },
+      {
+        "nodeId": "21:6780",
+        "name": "04 · Victoria con cero campanadas"
+      }
+    ],
+    "catalog": [
+      {
+        "id": "22:2706",
+        "name": "Velas / 1",
+        "rank": "1"
+      },
+      {
+        "id": "22:2723",
+        "name": "Velas / 2",
+        "rank": "2"
+      },
+      {
+        "id": "22:2740",
+        "name": "Velas / 4",
+        "rank": "4"
+      },
+      {
+        "id": "22:2757",
+        "name": "Velas / 6",
+        "rank": "6"
+      },
+      {
+        "id": "22:2774",
+        "name": "Velas / 8",
+        "rank": "8"
+      },
+      {
+        "id": "22:2791",
+        "name": "Velas / 10",
+        "rank": "10"
+      },
+      {
+        "id": "22:2808",
+        "name": "Llaves / 1",
+        "rank": "1"
+      },
+      {
+        "id": "22:2825",
+        "name": "Llaves / 2",
+        "rank": "2"
+      },
+      {
+        "id": "22:2842",
+        "name": "Llaves / 3",
+        "rank": "3"
+      },
+      {
+        "id": "22:2859",
+        "name": "Llaves / 4",
+        "rank": "4"
+      },
+      {
+        "id": "22:2876",
+        "name": "Llaves / 5",
+        "rank": "5"
+      },
+      {
+        "id": "22:2893",
+        "name": "Llaves / 9",
+        "rank": "9"
+      },
+      {
+        "id": "22:2910",
+        "name": "Relojes / 1",
+        "rank": "1"
+      },
+      {
+        "id": "22:2927",
+        "name": "Relojes / 2",
+        "rank": "2"
+      },
+      {
+        "id": "22:2944",
+        "name": "Relojes / 4",
+        "rank": "4"
+      },
+      {
+        "id": "22:2961",
+        "name": "Relojes / 6",
+        "rank": "6"
+      },
+      {
+        "id": "22:2978",
+        "name": "Relojes / 7",
+        "rank": "7"
+      },
+      {
+        "id": "22:2995",
+        "name": "Relojes / 9",
+        "rank": "9"
+      },
+      {
+        "id": "22:3012",
+        "name": "Máscaras / 1",
+        "rank": "1"
+      },
+      {
+        "id": "22:3029",
+        "name": "Máscaras / 3",
+        "rank": "3"
+      },
+      {
+        "id": "22:3046",
+        "name": "Máscaras / 5",
+        "rank": "5"
+      },
+      {
+        "id": "22:3063",
+        "name": "Máscaras / 7",
+        "rank": "7"
+      },
+      {
+        "id": "22:3080",
+        "name": "Máscaras / 8",
+        "rank": "8"
+      },
+      {
+        "id": "22:3097",
+        "name": "Máscaras / 10",
+        "rank": "10"
+      }
+    ],
+    "checked": [
+      "inicio",
+      "mano1",
+      "mascara1",
+      "puntos102",
+      "mano2",
+      "mascara2",
+      "quiebra2",
+      "mano3",
+      "llave3",
+      "diecisiete",
+      "victoria",
+      "retorno1",
+      "retorno1pedir",
+      "retorno1valida",
+      "retorno1quiebra",
+      "retorno1quiebra2",
+      "riesgo1",
+      "riesgo1quiebra",
+      "riesgo1quiebra2",
+      "temprano1",
+      "temprano2",
+      "temprano3",
+      "temprano4",
+      "riesgo2",
+      "riesgo2quiebra",
+      "riesgo2revela",
+      "riesgo3",
+      "retorno3",
+      "victoria214",
+      "cuatrovelas",
+      "victoria207",
+      "velasquiebra",
+      "ultima",
+      "sinCamp",
+      "derrota",
+      "ultimaVictoria",
+      "victoriaCero"
+    ]
+  },
+  "ruleAudit": [],
+  "limitations": [
+    "Repartos preparados y ramas alternativas con reinicio; sin simulación de todas las manos futuras",
+    "Implementación en Godot pendiente",
+    "Prueba manual con usuarios, Tab y lectores de pantalla pendiente"
+  ],
+  "visualChecks": [
+    "baraja-final.png",
+    "catalogo-final.png",
+    "mesa-final.png",
+    "confirmacion-final.png",
+    "reloj-ampliado.png",
+    "mascara-ampliada.png",
+    "victoria-revisada.png",
+    "cinco-cartas.png",
+    "ayuda-revisada.png",
+    "puntos-214.png",
+    "cero-campanadas.png"
+  ],
+  "lum": {
+    "cardSet": "31:2713",
+    "actionSet": "31:2774",
+    "variants": {
+      "Primario_Reposo": "31:2714",
+      "Primario_Hover": "31:2721",
+      "Primario_Foco": "31:2728",
+      "Primario_Deshabilitado": "31:2737",
+      "Secundario_Reposo": "31:2744",
+      "Secundario_Hover": "31:2751",
+      "Secundario_Foco": "31:2758",
+      "Secundario_Deshabilitado": "31:2767"
+    },
+    "properties": {
+      "label": "Etiqueta#31:0",
+      "detail": "Detalle#31:9"
+    },
+    "controls": {
+      "inicio": {
+        "primary": "32:2900",
+        "stand": "32:2908",
+        "key": "32:2915"
+      },
+      "mano1": {
+        "primary": "32:2922",
+        "stand": "32:2930",
+        "key": "32:2938"
+      },
+      "mascara1": {
+        "primary": "32:2946",
+        "stand": "32:2954",
+        "key": "32:2962"
+      },
+      "puntos102": {
+        "primary": "32:2969",
+        "stand": "32:2977",
+        "key": "32:2985"
+      },
+      "mano2": {
+        "primary": "32:3061",
+        "stand": "32:3069",
+        "key": "32:3077"
+      },
+      "mascara2": {
+        "primary": "32:3084",
+        "stand": "32:3092",
+        "key": "32:3100"
+      },
+      "quiebra2": {
+        "primary": "32:2992",
+        "stand": "32:3000",
+        "key": "32:3008"
+      },
+      "mano3": {
+        "primary": "32:3107",
+        "stand": "32:3115",
+        "key": "32:3123"
+      },
+      "llave3": {
+        "primary": "32:3130",
+        "stand": "32:3138",
+        "key": "32:3146"
+      },
+      "diecisiete": {
+        "primary": "32:3154",
+        "stand": "32:3162",
+        "key": "32:3170"
+      },
+      "victoria": {
+        "primary": "32:3015",
+        "stand": "32:3023",
+        "key": "32:3031"
+      },
+      "retorno1": {
+        "primary": "32:3177",
+        "stand": "32:3185",
+        "key": "32:3193"
+      },
+      "retorno1pedir": {
+        "primary": "32:3200",
+        "stand": "32:3208",
+        "key": "32:3216"
+      },
+      "retorno1valida": {
+        "primary": "32:3223",
+        "stand": "32:3231",
+        "key": "32:3239"
+      },
+      "retorno1quiebra": {
+        "primary": "32:3246",
+        "stand": "32:3254",
+        "key": "32:3262"
+      },
+      "retorno1quiebra2": {
+        "primary": "32:3269",
+        "stand": "32:3277",
+        "key": "32:3285"
+      },
+      "riesgo1": {
+        "primary": "32:3292",
+        "stand": "32:3300",
+        "key": "32:3308"
+      },
+      "riesgo1quiebra": {
+        "primary": "32:3315",
+        "stand": "32:3323",
+        "key": "32:3331"
+      },
+      "riesgo1quiebra2": {
+        "primary": "32:3338",
+        "stand": "32:3346",
+        "key": "32:3354"
+      },
+      "temprano1": {
+        "primary": "32:3361",
+        "stand": "32:3369",
+        "key": "32:3377"
+      },
+      "temprano2": {
+        "primary": "32:3384",
+        "stand": "32:3392",
+        "key": "32:3400"
+      },
+      "temprano3": {
+        "primary": "32:3407",
+        "stand": "32:3415",
+        "key": "32:3423"
+      },
+      "temprano4": {
+        "primary": "32:3430",
+        "stand": "32:3438",
+        "key": "32:3446"
+      },
+      "riesgo2": {
+        "primary": "32:3453",
+        "stand": "32:3461",
+        "key": "32:3469"
+      },
+      "riesgo2quiebra": {
+        "primary": "32:3476",
+        "stand": "32:3484",
+        "key": "32:3492"
+      },
+      "riesgo2revela": {
+        "primary": "32:3499",
+        "stand": "32:3507",
+        "key": "32:3515"
+      },
+      "riesgo3": {
+        "primary": "32:3522",
+        "stand": "32:3530",
+        "key": "32:3538"
+      },
+      "retorno3": {
+        "primary": "32:3545",
+        "stand": "32:3553",
+        "key": "32:3561"
+      },
+      "victoria214": {
+        "primary": "32:3568",
+        "stand": "32:3576",
+        "key": "32:3584"
+      },
+      "cuatrovelas": {
+        "primary": "32:3591",
+        "stand": "32:3599",
+        "key": "32:3607"
+      },
+      "victoria207": {
+        "primary": "32:3614",
+        "stand": "32:3622",
+        "key": "32:3630"
+      },
+      "velasquiebra": {
+        "primary": "32:3637",
+        "stand": "32:3645",
+        "key": "32:3653"
+      },
+      "ultima": {
+        "primary": "32:3660",
+        "stand": "32:3668",
+        "key": "32:3675"
+      },
+      "sinCamp": {
+        "primary": "32:3682",
+        "stand": "32:3689",
+        "key": "32:3697"
+      },
+      "derrota": {
+        "primary": "32:3038",
+        "stand": "32:3046",
+        "key": "32:3054"
+      },
+      "ultimaVictoria": {
+        "primary": "32:3704",
+        "stand": "32:3711",
+        "key": "32:3719"
+      },
+      "victoriaCero": {
+        "primary": "32:3726",
+        "stand": "32:3734",
+        "key": "32:3742"
+      }
+    },
+    "problems": []
+  },
+  "rulesChapters": {
+    "mesa": "21:7212",
+    "palos": "32:4609",
+    "puntos": "21:7232",
+    "riesgo": "32:4804"
+  },
+  "ruleScope": {
+    "initialCards": 24,
+    "perSuit": 6,
+    "minimumAfterRemoval": 12,
+    "additionalCardsDefined": false,
+    "lanCardsPerPlayerPerRound": 24,
+    "nearThresholdPattern": "Al filo"
+  },
+  "preparedLoads": "figma-src/cargas_preparadas/manifest.json"
+}

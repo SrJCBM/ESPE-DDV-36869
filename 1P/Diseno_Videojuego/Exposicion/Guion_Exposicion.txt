@@ -1,0 +1,103 @@
+=== PAGINA 1 ===
+Guion de Presentación: La Última Mesa 
+Equipo: Ariel Llumiquinga, Julio Blacio, Kenned Sigcha Materia: Desarrollo de 
+Videojuegos (Docente: Héctor Paul Pinto Pachacama) 
+INTERVENCIÓN 1: ARIEL LLUMIQUINGA 
+(Enfoque: Introducción, Historia y Concepto General) 
+[Diapositiva 1: Portada] Ariel: Buenos días, ingeniero Héctor Pinto y compañeros. 
+Nosotros somos el equipo conformado por Ariel Llumiquinga, Julio Blacio y Kenned 
+Sigcha. El día de hoy les presentaremos el documento de diseño de nuestro videojuego 
+titulado "La Última Mesa" , una experiencia que combina la estrategia de cartas con la 
+exploración en un entorno sobrenatural. 
+[Diapositiva 2: Índice] Ariel: Para esta presentación, hemos estructurado nuestro 
+mapa de diseño en siete puntos clave. Empezaremos hablando de la historia y la 
+información general, pasaremos a las características y mecánicas, conoceremos a los 
+personajes y la interfaz, y finalmente profundizaremos en el sistema de herramientas y 
+el diseño sonoro que da vida a nuestro casino. 
+[Diapositiva 3: Diseño de la historia] Ariel: Todo comienza con una invitación. 
+Nuestro protagonista, un visitante, queda atrapado en un casino sin ventanas donde el 
+tiempo se ha detenido. Para escapar al amanecer, no basta con encontrar la puerta; 
+debe superar las mesas de los crupieres antes de que se agoten sus "campanadas" . 
+Narrativamente, el jugador avanza enfrentando al Custodio, al Recaudador, a la 
+Coleccionista y finalmente al Dueño de la Casa. A nivel de diseño, evolucionamos de 
+un concepto básico de blackjack a un sistema propio de "umbrales" y riesgo calculado. 
+[Diapositiva 4: Información general del juego] Ariel: La filosofía central de "La Última 
+Mesa" es la toma de decisiones de riesgo comprensibles. El jugador explora un entorno 
+2D con vista cenital para preparar su estrategia, y luego se sienta a jugar por turnos. 
+Está desarrollado en Godot 4 con GDScript, pensado para partidas de 20 a 35 minutos 
+en PC. Nuestro factor diferenciador, inspirado en juegos como Balatro, es cómo 
+combinamos el orden en que se roban las cartas con efectos asimétricos para cada 
+palo, recompensando la planificación sobre el azar. A continuación, mi compañero 
+Julio les detallará las características y mecánicas. 
+INTERVENCIÓN 2: JULIO BLACIO 
+(Enfoque: Mecánicas, Loop de Juego, Personajes e Interfaz) 
+[Diapositiva 5: Conjunto de características (Parte I)] Julio: Gracias, Ariel. Entrando en 
+las características, el juego ofrece dos pilares: la campaña de exploración 2D de la que 
+ya hablamos, y un robusto modo Multijugador LAN 1 contra 1. En este modo 
+competitivo, dos jugadores se conectan por IP local sin necesidad de servidores 
+
+=== PAGINA 2 ===
+externos. Ambos compiten en 3 rondas con umbrales ascendentes (17, 21 y 25), 
+iniciando con barajas separadas y 10 campanadas. El anfitrión valida las reglas de 
+manera invisible para evitar trampas, manteniendo la tensión de las cartas ocultas. 
+[Diapositiva 6: Conjunto de características (Parte II)] Julio: ¿Cómo se juega 
+exactamente? Nuestro gameplay loop sigue este orden: Primero, la Exploración por el 
+casino. Segundo, la Preparación, donde usamos la tienda para modificar nuestra 
+baraja. Tercero, las Acciones, donde gastamos nuestras "Campanadas" para iniciar 
+manos o pedir cartas. Cuarto, la Puntuación, que premia patrones como llegar al punto 
+exacto o hacer escaleras. Y finalmente, Superar el umbral de la mesa para ganar fichas 
+y avanzar. Todo esto se implementará en tres fases, priorizando primero el sistema de 
+cartas y luego la red LAN y la campaña. 
+[Diapositiva 7: Personajes del juego] Julio: En cuanto a los personajes, el jugador 
+controla a un visitante sin clases predefinidas; tu "clase" es la baraja que construyes. 
+En su camino interactuará con la Anfitriona, que administra la tienda. Luego enfrentará 
+a los antagonistas: El Custodio (que enseña las reglas), el Recaudador (que presiona tu 
+economía cobrando por cada carta extra), la Coleccionista (que altera tu mazo 
+reteniendo tus mejores cartas), y el Dueño de la Casa, el jefe final cuyo umbral se 
+reduce tras cada mano, obligándote a adaptar tu estrategia constantemente. 
+[Diapositiva 8: Interfaz de usuario (Parte I)] Julio: La interfaz está diseñada para tener 
+transiciones limpias. Durante la exploración, es minimalista: un prompt dinámico para 
+interactuar, un inventario fluido y un indicador discreto de sellos y fichas para no 
+estorbar la inmersión. Pero al sentarse a la mesa, la UI se vuelve puramente táctica: 
+mostramos el progreso, las campanadas restantes en los botones de acción, y las 
+cartas con sus intervalos de valor si están ocultas. 
+[Diapositiva 9: Interfaz de usuario (Parte II)] Julio: Para el multijugador, la pantalla de 
+conexión es directa y muestra el estado de ambos jugadores. Durante el duelo, la UI 
+esconde el valor de las cartas del rival hasta el momento exacto de la resolución. 
+Además, la interfaz de la tienda tiene un soporte visual redundante (símbolo, color y 
+texto) para asegurar la accesibilidad al comprar mejoras. Ahora, Kennet les explicará 
+cómo funcionan estas herramientas en la mesa. 
+INTERVENCIÓN 3: KENNED SIGCHA 
+(Enfoque: Herramientas, Resolución, Audio y Conclusión) 
+[Diapositiva 10: Armas o herramientas (Parte I)] Kenned: Gracias, Julio. En nuestro 
+casino, las armas son las cartas y los recursos. Nuestra baraja tiene 4 palos, cada uno 
+con una mecánica única: Las Velas aumentan el multiplicador de puntos; los Relojes 
+reducen su valor impreso en 1 para evitar pasarse del umbral; las Llaves permiten 
+devolver una carta indeseada y reemplazarla; y las Máscaras son la mecánica de riesgo 
+
+=== PAGINA 3 ===
+principal, ya que su valor se mantiene oculto hasta el final. Además, contamos con 
+amuletos como la Corona del Riesgo o la Moneda Mellada, que potencian ciertos 
+estilos de juego. 
+[Diapositiva 11: Armas o herramientas (Parte II)] Kenned: El orden en que se 
+resuelven estas mecánicas es vital y funciona como una maquinaria. Primero se valida 
+el turno cobrando una campanada. Luego se roba la carta. Aquí entra la fase de 
+decisión: ¿Usamos una llave? ¿Usamos el consumible "Lente de humo" para espiar las 
+Máscaras? ¿Pedimos otra o nos plantamos? Al plantarse, se revelan las cartas ocultas y 
+se evalúa el umbral. Si nos pasamos, ocurre una "Quiebra" y ganamos 0 puntos. Si es 
+válido, se aplican los multiplicadores y patrones. 
+[Diapositiva 12: Partituras musicales y efectos de sonido] Kenned: Toda esta tensión 
+táctica está envuelta en nuestro apartado sonoro. Hemos diseñado una estética de 
+"jazz sombrío" con piano y contrabajo. La música evoluciona dinámicamente desde el 
+lobby hasta las mesas finales. Además, usamos sonido 3D en la exploración para 
+elementos estáticos como los relojes, y un diseño de efectos de sonido muy funcional: 
+el latido de un reloj al gastar una campanada, el roce de las cartas, o un golpe grave e 
+imponente cuando el jugador sufre una Quiebra. 
+[Diapositiva 13: Síntesis: La estrategia completa] Kenned: Para concluir, "La Última 
+Mesa" se sostiene sobre tres engranajes. Primero, las Mecánicas: la gestión del límite 
+donde el azar se convierte en probabilidad matemática. Segundo, la Historia: un 
+entorno donde el casino no te quita dinero, sino oportunidades y tiempo. Y tercero, la 
+Atmósfera: una presión sensorial constante. No estamos haciendo solo un juego de 
+cartas, sino un simulador de tensión donde la única forma de escapar, es dominar a la 
+casa bajo sus propias reglas. Muchas gracias por su atención. 
+ 
