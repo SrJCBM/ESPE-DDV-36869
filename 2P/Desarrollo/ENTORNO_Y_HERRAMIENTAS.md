@@ -64,7 +64,7 @@ Aceptación: importación sin errores y tests del incremento sin fallos ni error
 | --- | --- | --- | --- | --- | --- | --- |
 | Ariel | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Por decidir |
 | Julio | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Configuración previa detectada; repetir con 4.7.2 |
-| Kenned | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Por decidir |
+| Kenned | 4.7.2.stable.official.ed1daf0bf (13 nov 2026; zip verificado con SHA-512) | 4.7.2.stable instaladas (solo Windows) | GUT 9.7.1 incorporado | Importación, arranque y 4 pruebas pasan (CLI); fallo preparado detectado | Exportación Windows generada y abierta (CLI); apertura visual humana pendiente | Por decidir; Context7 no se usó |
 
 Una consulta del MCP durante esta preparación devolvió 4.7.1 y se encontraron archivos con ese nombre. Eso no cambia la versión elegida ni acredita una instalación nueva. Se comprobará expresamente el ejecutable 4.7.2 que cada integrante vaya a utilizar.
 

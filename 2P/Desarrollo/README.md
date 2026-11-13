@@ -2,7 +2,7 @@
 
 **Siguiente objetivo:** implementar una primera mano del Custodio en Godot y, desde esa base, completar la mesa local con victoria, derrota y reinicio.
 
-**Estado actual:** el prototipo de Figma, la baraja inicial, el reglamento y las familias LUM están preparados y revisados técnica y visualmente. La aceptación del equipo sigue pendiente. Todavía no existe un `project.godot` en `2P`; las instalaciones de los tres equipos y la implementación no están verificadas.
+**Estado actual:** el prototipo de Figma, la baraja inicial, el reglamento y las familias LUM están preparados y revisados técnica y visualmente. La aceptación del equipo sigue pendiente. Existe la base `juego/project.godot` (I1-00, ver [ENTREGA_I1_00.md](ENTREGA_I1_00.md)); solo está verificada en el equipo de Kenned. Las instalaciones de Ariel y Julio, la revisión cruzada y la implementación del juego siguen pendientes.
 
 **Versión acordada:** Godot 4.7.2 estándar con GDScript y plantillas coincidentes. Su comprobación corresponde a I1-00.
 
@@ -44,7 +44,7 @@ No se cambia un estado por intención de empezar ni por haber preparado una capt
 
 | ID | Tarea | Responsable | Revisor | Estado | Entrega que permite avanzar |
 | --- | --- | --- | --- | --- | --- |
-| I1-00 | Crear la base y comprobar los tres entornos | Kenned coordina; cada integrante comprueba su equipo | Revisión cruzada | Pendiente | Un solo proyecto común abre, ejecuta, exporta y corre el runner de pruebas; versiones registradas |
+| I1-00 | Crear la base y comprobar los tres entornos | Kenned coordina; cada integrante comprueba su equipo | Revisión cruzada | En curso | Un solo proyecto común abre, ejecuta, exporta y corre el runner de pruebas; versiones registradas |
 | I1-01 | Aceptar el diseño del Custodio y sus reglas | Julio | Ariel; Kenned revisa viabilidad | Por revisar | Coinciden acciones, costes, información oculta y puntuación con el GDD; observaciones registradas |
 | I1-02 | Implementar catálogo y datos del intento | Ariel | Kenned | Pendiente | Se crean las 24 cartas sin duplicados y se conservan correctamente entre mano, mazo y descarte |
 | I1-03 | Implementar comandos y fases | Kenned | Ariel | Pendiente | Las acciones legales avanzan y pagan una sola vez; las rechazadas no cambian el estado |
