@@ -1,6 +1,5 @@
 extends GutTest
-## Pruebas de arranque de la base I1-00: la escena principal existe,
-## carga y se puede instanciar.
+## El punto de entrada debe cargar una mesa jugable conectada al controlador.
 
 func _escena_principal() -> String:
 	return ProjectSettings.get_setting("application/run/main_scene")
@@ -20,10 +19,14 @@ func test_la_escena_principal_carga() -> void:
 	assert_is(escena, PackedScene)
 
 
-func test_la_escena_principal_se_instancia_e_identifica_la_base() -> void:
+func test_la_escena_principal_abre_la_mesa_jugable() -> void:
 	var escena: PackedScene = load(_escena_principal())
 	var instancia: Control = escena.instantiate()
 	add_child_autofree(instancia)
 	assert_not_null(instancia)
-	assert_eq(instancia.get_node("Contenedor/Titulo").text, "La Última Mesa")
-	assert_string_contains(instancia.get_node("Contenedor/Subtitulo").text, "I1-00")
+	var mesa := instancia.get_node_or_null("Mesa")
+	assert_not_null(mesa, "El arranque debe mostrar el Custodio, no solo la etiqueta de la base")
+	if mesa == null: return
+	assert_not_null(mesa.controlador)
+	assert_eq(mesa.controlador.obtener_vista().meta, 200)
+	assert_false(mesa.boton_iniciar_pedir.disabled)

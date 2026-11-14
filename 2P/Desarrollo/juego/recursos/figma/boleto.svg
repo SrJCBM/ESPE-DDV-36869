@@ -1,0 +1,15 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="238" height="237" viewBox="0 0 238 237" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Boleto troquelado" clip-path="url(#clip0_0_43)">
+<path id="Vector" d="M7 0H231L238 7V72C235.613 72 233.324 72.9482 231.636 74.636C229.948 76.3239 229 78.6131 229 81C229 83.3869 229.948 85.6761 231.636 87.364C233.324 89.0518 235.613 90 238 90V230L231 237H7L0 230V90C2.38695 90 4.67613 89.0518 6.36396 87.364C8.05179 85.6761 9 83.3869 9 81C9 78.6131 8.05179 76.3239 6.36396 74.636C4.67613 72.9482 2.38695 72 0 72L0 7L7 0Z" fill="#EBDDBF"/>
+<path id="Vector_2" opacity="0.4" d="M14 12H224V225H14V12Z" stroke="#263A2B"/>
+<g id="Vector_3" opacity="0.35">
+<path d="M24 137H214Z" fill="black"/>
+<path d="M24 137H214" stroke="#263A2B"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_43">
+<rect width="238" height="237" fill="white"/>
+</clipPath>
+</defs>
+</svg>

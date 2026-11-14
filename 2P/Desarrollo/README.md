@@ -1,80 +1,55 @@
 # La Última Mesa · coordinación del desarrollo
 
-**Siguiente objetivo:** implementar una primera mano del Custodio en Godot y, desde esa base, completar la mesa local con victoria, derrota y reinicio.
+La mesa local del Custodio está implementada en `juego/`: 24 cartas, acciones y costes, cuatro palos, cinco patrones, resolución, victoria, derrota y reinicio. Versión **0.1.0**, Godot **4.7.2 estándar con GDScript**. La base de Kenned (`5d73d50`) se conserva en el historial.
 
-**Estado actual:** el prototipo de Figma, la baraja inicial, el reglamento y las familias LUM están preparados y revisados técnica y visualmente. La aceptación del equipo sigue pendiente. Existe la base `juego/project.godot` (I1-00, ver [ENTREGA_I1_00.md](ENTREGA_I1_00.md)); solo está verificada en el equipo de Kenned. Las instalaciones de Ariel y Julio, la revisión cruzada y la implementación del juego siguen pendientes.
+El reglamento visual «El libro del Custodio» organiza ayuda, palos, puntuación y controles en cuatro páginas. Usa las ilustraciones originales y ejemplos preparados. La mesa mantiene información oculta, foco por teclado, confirmaciones y movimiento reducido durante la sesión.
 
-**Versión acordada:** Godot 4.7.2 estándar con GDScript y plantillas coincidentes. Su comprobación corresponde a I1-00.
+La implementación se integra en `main` local. El piloto I1-07 y la aceptación humana siguen pendientes; una revisión técnica no sustituye esas actividades. [Resultados técnicos y límites](REVISION_I1.md).
 
-## Material que ya tenemos
+## Responsabilidades
 
-| Material | Estado | Evidencia |
+| Integrante | Responsabilidad | Entrega para revisión |
 | --- | --- | --- |
-| Prototipo de interacción, cartas y reglamento | Completado como material de diseño; revisión de equipo pendiente | [Figma](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=13-103), [alcance y comprobaciones](Diseno/FIGMA.md) |
-| Baraja inicial y recursos visuales | Preparado para implementar | 24 cartas iniciales, cuatro ilustraciones de palos, Máscara oculta y reverso; recursos en `Diseno/recursos/` |
-| Biblioteca LUM | Preparada para implementar | Seis variantes de cartas y ocho de acciones en Figma; no son componentes de Godot todavía |
-| Plan, arquitectura y casos de aceptación | Preparados | [Iteración 01](ITERACION_01.md), [patrones](ARQUITECTURA_Y_PATRONES.md), [entorno](ENTORNO_Y_HERRAMIENTAS.md) |
+| **Kenned Sigcha** | Base, acciones, costes, estados e integración | I1-00, I1-03, I1-06 e I1-08 |
+| **Ariel Llumiquinga** | Baraja, datos, efectos, patrones y puntuación | I1-02 e I1-04 completadas; revisión de cálculos en la entrega integrada |
+| **Julio Blacio** | Interfaz, cartas, controles, ayuda y experiencia de uso | I1-01 e I1-05; moderar y registrar I1-07 |
 
-El prototipo usa repartos preparados. Sus comprobaciones no acreditan código, exportación, balance ni usabilidad del juego implementado.
-
-## Responsabilidades de esta iteración
-
-| Persona | Responsabilidad | Entrega concreta | Revisor |
-| --- | --- | --- | --- |
-| **Ariel Llumiquinga** | Datos de cartas y reglas de evaluación | Catálogo exacto, identidades de cartas, fábrica, estado de datos por intento y evaluador de valores, patrones y puntuación, con sus pruebas | Kenned; Julio comprueba que el desglose sea comprensible |
-| **Kenned Sigcha** | Base del proyecto, acciones, estados e integración | Proyecto común; comandos de iniciar, pedir, devolver y plantarse; costes y legalidad; vista pública; victoria, derrota, reinicio y exportación | Ariel revisa reglas; Julio revisa el recorrido y los mensajes |
-| **Julio Blacio** | Interfaz, recursos y experiencia de uso | Escenas de mesa y carta, tema común, ayuda, selección, controles, foco y desglose; primero con datos simulados y después con el controlador | Kenned revisa integración; Ariel revisa fidelidad al GDD |
-
-Las pruebas acompañan al trabajo de cada responsable. Julio organiza el piloto de usabilidad y mantiene el tablero; Kenned coordina la integración y Ariel comprueba los cálculos de la versión integrada. Las fechas se fijarán según la disponibilidad real de los tres.
-
-### Límites para evitar trabajo duplicado
-
-- **Ariel:** `datos/`, fábrica, modelo de cartas y evaluador. Define la estructura de `EstadoPartida` antes de que los demás dependan de ella. Los Resources de definición no se alteran al cambiar un intento.
-- **Kenned:** `dominio/comandos/`, `dominio/estados/` y `mesa/controlador_mesa.gd`. Aquí se aceptan o rechazan acciones y se descuentan campanadas una sola vez. La devolución de Llave pertenece al comando; Ariel revisa y prueba sus condiciones.
-- **Julio:** escenas y scripts de presentación en `mesa/` y `cartas/`, temas y recursos. La UI solicita acciones y representa la vista del controlador; no modifica por su cuenta puntos, campanadas ni cartas.
-- Kenned coordina los cambios de `project.godot`, entradas y configuración de exportación. Antes de editar archivos compartidos, avisar al equipo. Integrar cambios pequeños revisados.
-
-Las rutas corresponden al proyecto previsto en `2P/Desarrollo/juego/`; todavía no son archivos implementados. El contrato de integración está en [ITERACION_01.md](ITERACION_01.md#contrato-mínimo-de-integración).
+Las responsabilidades se mantienen aunque haya colaboración. La UI solicita acciones y representa la vista del controlador; no cambia cartas, puntos ni campanadas por su cuenta. La devolución de Llave corresponde al comando de Kenned y Ariel revisa sus condiciones.
 
 ## Tablero de trabajo
 
-**Pendiente:** no iniciado. **En curso:** trabajo iniciado por su responsable. **Por revisar:** existe una entrega que puede revisar otra persona. **Completado:** cumple el criterio, está integrado y tiene revisión y evidencia. **Bloqueado:** se registra el impedimento y quién puede resolverlo.
+**Pendiente:** falta realizar. **En curso:** iniciado. **Por revisar:** existe una entrega para revisar. **Completado:** entrega técnica comprobada. **Bloqueado:** impedimento identificado. La aceptación de la iteración completa exige además el piloto y la prueba en otro equipo.
 
-No se cambia un estado por intención de empezar ni por haber preparado una captura. Mantener una tarea principal en curso por integrante.
+| ID | Tarea | Responsable | Estado | Evidencia o pendiente |
+| --- | --- | --- | --- | --- |
+| I1-00 | Base y comprobación de los tres entornos | Kenned coordina; cada integrante verifica su equipo | En curso | Base recibida e integrada; faltan comprobación de Ariel y aceptación humana. [Registro histórico](ENTREGA_I1_00.md) |
+| I1-01 | Aceptar diseño y reglas del Custodio | Julio; Ariel y Kenned revisan | Por revisar | Figma, implementación y contraste técnico con GDD disponibles; aceptación del equipo pendiente |
+| I1-02 | Catálogo y datos del intento | Ariel | **Completado** | 24 cartas exactas, identidades, fábrica, zonas, reciclaje e independencia comprobados |
+| I1-03 | Comandos y fases | Kenned | Por revisar | Iniciar, pedir, devolver y plantarse implementados; costes y rechazos probados |
+| I1-04 | Efectos y puntuación | Ariel | **Completado** | Cuatro palos, cinco patrones, Quiebra y ejemplos 102/119 comprobados |
+| I1-05 | Interfaz en Godot | Julio | Por revisar | Mesa conectada, cartas, libro de ayuda, desglose, confirmaciones, teclado y movimiento reducido |
+| I1-06 | Encuentro y reinicio | Kenned | Por revisar | Victoria, derrota, prioridad de meta y reinicio probados; recorrido 221 puntos / 3 campanadas |
+| I1-07 | Piloto y correcciones de usabilidad | Julio modera; otro integrante toma notas | **Pendiente** | Julio realizará las sesiones con tres participantes y registrará hallazgos |
+| I1-08 | Exportación y cierre | Kenned; Ariel prueba otro equipo y Julio UI | Por revisar | Exportación técnica local; faltan juego en otro equipo, hallazgos del piloto y cierre de aceptación |
 
-| ID | Tarea | Responsable | Revisor | Estado | Entrega que permite avanzar |
-| --- | --- | --- | --- | --- | --- |
-| I1-00 | Crear la base y comprobar los tres entornos | Kenned coordina; cada integrante comprueba su equipo | Revisión cruzada | En curso | Un solo proyecto común abre, ejecuta, exporta y corre el runner de pruebas; versiones registradas |
-| I1-01 | Aceptar el diseño del Custodio y sus reglas | Julio | Ariel; Kenned revisa viabilidad | Por revisar | Coinciden acciones, costes, información oculta y puntuación con el GDD; observaciones registradas |
-| I1-02 | Implementar catálogo y datos del intento | Ariel | Kenned | Pendiente | Se crean las 24 cartas sin duplicados y se conservan correctamente entre mano, mazo y descarte |
-| I1-03 | Implementar comandos y fases | Kenned | Ariel | Pendiente | Las acciones legales avanzan y pagan una sola vez; las rechazadas no cambian el estado |
-| I1-04 | Implementar efectos y puntuación | Ariel | Kenned | Pendiente | Cuatro palos y cinco patrones verificados; Kenned implementa la devolución y Ariel revisa sus casos |
-| I1-05 | Construir la interfaz en Godot | Julio | Kenned; Ariel revisa reglas | Pendiente | Mesa, cartas y ayuda funcionan con vistas simuladas y después con la vista real del controlador |
-| I1-06 | Integrar encuentro y reinicio | Kenned | Ariel y Julio | Pendiente | Victoria, derrota y reinicio funcionan; la meta se comprueba antes de declarar derrota con cero |
-| I1-07 | Ejecutar piloto y corregir dificultades | Julio modera; Kenned toma notas | Los tres | Pendiente | Tres participantes, revisión con teclado y corrección comprobada de bloqueos; Ariel apoya las correcciones de reglas |
-| I1-08 | Exportar y cerrar el incremento | Kenned | Ariel prueba en otro equipo; Julio revisa UI | Pendiente | Ejecutable Windows, evidencia del segundo equipo y registro de cierre con versión o commit |
+Solo I1-02 e I1-04 pasan a Completado. Las demás entregas implementadas permanecen Por revisar para los compañeros; la revisión técnica registrada no se atribuye a una aprobación humana.
 
-Cada entrega registra: responsable, revisor, versión o commit, pasos, resultado esperado, resultado observado y pendientes. Una revisión de diseño no marca como completadas las tareas de implementación.
+## Cómo probarlo
 
-## Orden para empezar
+1. Abrir Godot 4.7.2 e importar `juego/project.godot`.
+2. Pulsar **F5**. Se abre la mesa del Custodio y comienza un intento normal con baraja mezclada.
+3. Usar **Cómo jugar** o **H** para consultar el libro. Tab / Mayús+Tab recorre los controles; Enter o Espacio activa y Esc vuelve a la mesa.
+4. Para revisar resultados repetibles, activar **Demostración guiada** y confirmar. Es una baraja preparada, distinta de la partida normal.
 
-1. **Kenned prepara la base común (I1-00).** Ariel y Julio la obtienen del repositorio y registran la comprobación de su propio entorno. Acordar el contrato de datos, acciones y vista antes de conectar módulos.
-2. **Ariel revisa el diseño con Julio (I1-01) y comienza I1-02.** Confirmar el catálogo, los costes y el ejemplo de 102 puntos. Kenned prepara el diagrama de estados y las interfaces de comandos; su implementación se conecta después al modelo de datos.
-3. **Julio avanza con la UI usando vistas simuladas (I1-05).** Puede construirla mientras Ariel desarrolla las reglas y Kenned las acciones. Los datos simulados respetan el contrato y no se confunden con un evaluador funcional.
-4. **Integrar una primera mano en cuanto estén disponibles las partes necesarias.** Usar el ejemplo R11 descrito debajo. Corregir diferencias entre datos, acciones, cálculo y presentación antes de ampliar el recorrido.
-5. **Completar el encuentro.** Añadir los casos restantes, las manos de Quiebra, las Llaves, los cierres y el reinicio. Después realizar el piloto y la exportación en otro equipo.
+La secuencia guiada es: iniciar, pedir, plantarse → 102; iniciar, pedir, plantarse → Quiebra; iniciar, pedir dos veces, plantarse → 119. Termina con **221 puntos, victoria y tres campanadas**. Reiniciar devuelve al juego normal.
 
-### Primera demostración que deben conseguir
+Los comandos de pruebas y exportación están en [juego/README.md](juego/README.md). El protocolo de I1-07 y la tabla para anotar cada sesión están en [ITERACION_01.md](ITERACION_01.md#piloto-de-usabilidad). No anticipar la solución al participante antes de observar su intento.
 
-**Iniciar → Llaves 4 y Relojes 6 → pedir una Máscara 8 oculta → plantarse → 102 puntos.**
+## Documentos y materiales
 
-- Iniciar reduce las campanadas de 10 a 9; pedir las reduce a 8; plantarse es gratis.
-- Antes de resolver se muestran `9 + ?` y el intervalo `10–19`, sin filtrar el 8.
-- Al resolver, los valores efectivos son 4, 5 y 8. Punto exacto y Ascenso producen `17 × (1 + 3 + 2) = 102`.
-- La interfaz muestra el resultado calculado por el dominio y conserva recursos coherentes.
+- [Iteración 01 y criterios R01–R20](ITERACION_01.md).
+- [Revisión técnica y pendientes de cierre](REVISION_I1.md).
+- [Plan general](PLAN_DE_TRABAJO.md), [arquitectura](ARQUITECTURA_Y_PATRONES.md) y [entorno](ENTORNO_Y_HERRAMIENTAS.md).
+- [Figma y alcance del prototipo](Diseno/FIGMA.md): referencia de diseño; sus repartos preparados no sustituyen pruebas del juego.
 
-Esta demostración comprueba la conexión entre los tres trabajos; aún no cierra la iteración. Para aceptarla completa deben pasar R01–R20, el recorrido de tres manos con 221 puntos y tres campanadas restantes, victoria, derrota, reinicio, revisión de UI, piloto y prueba del ejecutable en otro equipo.
-
-## Siguiente incremento
-
-Después de aceptar la mesa local, el siguiente objetivo será una ronda por LAN con el mismo núcleo. La campaña, tienda, amuletos y nuevas salas siguen el orden del [plan general](PLAN_DE_TRABAJO.md). El acabado visual puede mejorar en cada ciclo según las pruebas.
+Después de aceptar I1, el siguiente incremento será una ronda por LAN con el mismo núcleo. Campaña, tienda, amuletos y otras mesas pertenecen a incrementos posteriores.

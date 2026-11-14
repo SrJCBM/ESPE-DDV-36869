@@ -1,0 +1,152 @@
+[gd_resource type="Resource" script_class="CatalogoCartas" load_steps=27 format=3]
+
+[ext_resource type="Script" path="res://datos/cartas/catalogo_cartas.gd" id="1_catalogo"]
+[ext_resource type="Script" path="res://datos/cartas/carta_def.gd" id="2_carta"]
+
+[sub_resource type="Resource" id="velas_01"]
+script = ExtResource("2_carta")
+id = "velas_01"
+palo = "velas"
+valor_impreso = 1
+
+[sub_resource type="Resource" id="velas_02"]
+script = ExtResource("2_carta")
+id = "velas_02"
+palo = "velas"
+valor_impreso = 2
+
+[sub_resource type="Resource" id="velas_04"]
+script = ExtResource("2_carta")
+id = "velas_04"
+palo = "velas"
+valor_impreso = 4
+
+[sub_resource type="Resource" id="velas_06"]
+script = ExtResource("2_carta")
+id = "velas_06"
+palo = "velas"
+valor_impreso = 6
+
+[sub_resource type="Resource" id="velas_08"]
+script = ExtResource("2_carta")
+id = "velas_08"
+palo = "velas"
+valor_impreso = 8
+
+[sub_resource type="Resource" id="velas_10"]
+script = ExtResource("2_carta")
+id = "velas_10"
+palo = "velas"
+valor_impreso = 10
+
+[sub_resource type="Resource" id="llaves_01"]
+script = ExtResource("2_carta")
+id = "llaves_01"
+palo = "llaves"
+valor_impreso = 1
+
+[sub_resource type="Resource" id="llaves_02"]
+script = ExtResource("2_carta")
+id = "llaves_02"
+palo = "llaves"
+valor_impreso = 2
+
+[sub_resource type="Resource" id="llaves_03"]
+script = ExtResource("2_carta")
+id = "llaves_03"
+palo = "llaves"
+valor_impreso = 3
+
+[sub_resource type="Resource" id="llaves_04"]
+script = ExtResource("2_carta")
+id = "llaves_04"
+palo = "llaves"
+valor_impreso = 4
+
+[sub_resource type="Resource" id="llaves_05"]
+script = ExtResource("2_carta")
+id = "llaves_05"
+palo = "llaves"
+valor_impreso = 5
+
+[sub_resource type="Resource" id="llaves_09"]
+script = ExtResource("2_carta")
+id = "llaves_09"
+palo = "llaves"
+valor_impreso = 9
+
+[sub_resource type="Resource" id="relojes_01"]
+script = ExtResource("2_carta")
+id = "relojes_01"
+palo = "relojes"
+valor_impreso = 1
+
+[sub_resource type="Resource" id="relojes_02"]
+script = ExtResource("2_carta")
+id = "relojes_02"
+palo = "relojes"
+valor_impreso = 2
+
+[sub_resource type="Resource" id="relojes_04"]
+script = ExtResource("2_carta")
+id = "relojes_04"
+palo = "relojes"
+valor_impreso = 4
+
+[sub_resource type="Resource" id="relojes_06"]
+script = ExtResource("2_carta")
+id = "relojes_06"
+palo = "relojes"
+valor_impreso = 6
+
+[sub_resource type="Resource" id="relojes_07"]
+script = ExtResource("2_carta")
+id = "relojes_07"
+palo = "relojes"
+valor_impreso = 7
+
+[sub_resource type="Resource" id="relojes_09"]
+script = ExtResource("2_carta")
+id = "relojes_09"
+palo = "relojes"
+valor_impreso = 9
+
+[sub_resource type="Resource" id="mascaras_01"]
+script = ExtResource("2_carta")
+id = "mascaras_01"
+palo = "mascaras"
+valor_impreso = 1
+
+[sub_resource type="Resource" id="mascaras_03"]
+script = ExtResource("2_carta")
+id = "mascaras_03"
+palo = "mascaras"
+valor_impreso = 3
+
+[sub_resource type="Resource" id="mascaras_05"]
+script = ExtResource("2_carta")
+id = "mascaras_05"
+palo = "mascaras"
+valor_impreso = 5
+
+[sub_resource type="Resource" id="mascaras_07"]
+script = ExtResource("2_carta")
+id = "mascaras_07"
+palo = "mascaras"
+valor_impreso = 7
+
+[sub_resource type="Resource" id="mascaras_08"]
+script = ExtResource("2_carta")
+id = "mascaras_08"
+palo = "mascaras"
+valor_impreso = 8
+
+[sub_resource type="Resource" id="mascaras_10"]
+script = ExtResource("2_carta")
+id = "mascaras_10"
+palo = "mascaras"
+valor_impreso = 10
+
+[resource]
+script = ExtResource("1_catalogo")
+cartas = Array[ExtResource("2_carta")]([SubResource("velas_01"), SubResource("velas_02"), SubResource("velas_04"), SubResource("velas_06"), SubResource("velas_08"), SubResource("velas_10"), SubResource("llaves_01"), SubResource("llaves_02"), SubResource("llaves_03"), SubResource("llaves_04"), SubResource("llaves_05"), SubResource("llaves_09"), SubResource("relojes_01"), SubResource("relojes_02"), SubResource("relojes_04"), SubResource("relojes_06"), SubResource("relojes_07"), SubResource("relojes_09"), SubResource("mascaras_01"), SubResource("mascaras_03"), SubResource("mascaras_05"), SubResource("mascaras_07"), SubResource("mascaras_08"), SubResource("mascaras_10")])

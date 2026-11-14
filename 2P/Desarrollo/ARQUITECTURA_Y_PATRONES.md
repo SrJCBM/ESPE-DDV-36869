@@ -1,6 +1,6 @@
 # Arquitectura y patrones de La Última Mesa
 
-Estas decisiones guían la implementación en **Godot 4.7.2 con GDScript**. Se prepararon el 9 de noviembre de 2026 a partir del diseño v2.4 y de los tres PDF del curso. Todavía son decisiones de diseño pendientes de implementar y comprobar.
+Estas decisiones guían la implementación en **Godot 4.7.2 con GDScript**, conforme al diseño v2.4 y los tres PDF del curso. Estado al **13 de noviembre de 2026**: State, Command, Observer mediante señales y la fábrica simple están implementados y probados. Los módulos del dominio no dependen de la UI. [Revisión y evidencia](REVISION_I1.md).
 
 ## Material del curso y aplicación
 
@@ -90,14 +90,14 @@ Godot advierte que Autoload **no impide crear otra instancia**. Facilita un serv
 
 ## Revisión de arquitectura por tarea
 
-- [ ] La regla puede comprobarse sin abrir la escena visual.
-- [ ] La UI recibe una vista y emite una intención; no consulta ni modifica el mazo privado.
-- [ ] Una solicitud ilegal deja el estado igual.
-- [ ] Las transiciones de State tienen una causa y una guarda verificables.
-- [ ] Las señales comunican resultados y no provocan cobros o puntuaciones duplicados.
-- [ ] Un intento nuevo tiene estado propio y conserva el catálogo.
-- [ ] Los patrones implementados coinciden con su nombre; las simplificaciones se reconocen.
-- [ ] La versión del motor y de los addons coincide con la guía de entorno.
+- [x] La regla puede comprobarse sin abrir la escena visual.
+- [x] La UI recibe una vista y emite una intención; no consulta ni modifica el mazo privado.
+- [x] Una solicitud ilegal deja el estado igual.
+- [x] Las transiciones de State tienen una causa y una guarda verificables.
+- [x] Las señales comunican resultados y no provocan cobros o puntuaciones duplicados.
+- [x] Un intento nuevo tiene estado propio y conserva el catálogo.
+- [x] Los patrones implementados coinciden con su nombre; las simplificaciones se reconocen.
+- [x] La versión del motor y de los addons coincide con la guía de entorno.
 
 La primera iteración se acepta con State, Observer, Command y la fábrica simple. Strategy, Prototype y el posible servicio global quedan ubicados en el plan de evolución; incorporarlos exige una necesidad y sus pruebas, no solo una mención en un diagrama.
 

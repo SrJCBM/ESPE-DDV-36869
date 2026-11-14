@@ -1,0 +1,45 @@
+[gd_resource type="Theme" load_steps=7 format=3]
+
+[ext_resource type="FontFile" path="res://recursos/fuentes/DMSans.ttf" id="1"]
+[ext_resource type="FontFile" path="res://recursos/fuentes/CormorantGaramond.ttf" id="2"]
+
+[sub_resource type="StyleBoxFlat" id="Focus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.945, 0.894, 0.788, 1)
+expand_margin_left = 3.0
+expand_margin_top = 3.0
+expand_margin_right = 3.0
+expand_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+
+[sub_resource type="FontVariation" id="Display"]
+base_font = ExtResource("2")
+variation_opentype = {"wght": 600.0}
+
+[sub_resource type="FontVariation" id="SansBold"]
+base_font = ExtResource("1")
+variation_opentype = {"wght": 700.0, "opsz": 14.0}
+
+[resource]
+default_font = ExtResource("1")
+default_font_size = 18
+Label/colors/font_color = Color(0.945, 0.894, 0.788, 1)
+Button/colors/font_color = Color(0.945, 0.894, 0.788, 1)
+Button/colors/font_hover_color = Color(0.835, 0.710, 0.471, 1)
+Button/colors/font_pressed_color = Color(0.945, 0.894, 0.788, 1)
+Button/colors/font_disabled_color = Color(0.725, 0.769, 0.659, 1)
+Button/fonts/font = SubResource("SansBold")
+Button/styles/normal = SubResource("Empty")
+Button/styles/hover = SubResource("Empty")
+Button/styles/pressed = SubResource("Empty")
+Button/styles/disabled = SubResource("Empty")
+Button/styles/focus = SubResource("Focus")
+DisplayLabel/base_type = &"Label"
+DisplayLabel/fonts/font = SubResource("Display")
+BoldLabel/base_type = &"Label"
+BoldLabel/fonts/font = SubResource("SansBold")

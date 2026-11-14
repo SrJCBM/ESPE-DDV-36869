@@ -1,6 +1,6 @@
 # Entorno común y herramientas del equipo
 
-Guía preparada el **9 de noviembre de 2026** para los tres integrantes de La Última Mesa. La versión acordada con Julio es **Godot 4.7.2 estándar con GDScript**. Este documento recomienda y describe instalaciones; no acredita que se hayan realizado en los tres equipos.
+Guía preparada el **9 de noviembre de 2026**; actualizada el **13 de noviembre de 2026**. Versión acordada: **Godot 4.7.2 estándar con GDScript**. Kenned entregó la base; la mesa jugable actual se comprobó técnicamente en Julio. La homologación de los tres equipos y la aceptación humana siguen pendientes. [Revisión actual](REVISION_I1.md) y [antecedente I1-00](ENTREGA_I1_00.md).
 
 ## Qué necesita cada equipo
 
@@ -9,7 +9,7 @@ Guía preparada el **9 de noviembre de 2026** para los tres integrantes de La Ú
 | Godot estándar para Windows | Los tres desarrolladores | **4.7.2**, misma versión exacta. Abrir y consultar Acerca de; usar la edición estándar para GDScript |
 | Plantillas de exportación | Los tres para poder verificar una entrega | **4.7.2**, coincidentes con el editor; comprobar exportación Windows |
 | Git para Windows y acceso a GitHub | Los tres | Versión estable y acceso propio a [SrJCBM/ESPE-DDV-36869](https://github.com/SrJCBM/ESPE-DDV-36869); registrar versión y comprobar lectura/escritura autorizada del repositorio |
-| GUT dentro del proyecto | Los tres al clonar el proyecto | **9.7.1** como base propuesta de la rama 9.7 para Godot 4.7; fijar la versión tras el test de homologación |
+| GUT dentro del proyecto | Los tres al clonar el proyecto | **9.7.1**, incorporado y fijado en la base `5d73d50`; cuatro pruebas de arranque pasan en Kenned y Julio; falta la comprobación de Ariel |
 | Navegador | Los tres | Acceso al tablero de tareas, documentación y bocetos compartidos |
 | Figma | Principalmente quien diseña y quienes revisan | Aplicación web suficiente para el flujo propuesto; acceso al archivo compartido |
 | Cliente de IA con soporte MCP | Quienes decidan usar asistencia con herramientas | Codex es el cliente usado en esta sesión; cada persona configura su cuenta y permisos |
@@ -25,12 +25,12 @@ La edición estándar de Godot se distribuye como archivo para extraer y ejecuta
 1. Descargar y extraer Godot 4.7.2 desde el sitio oficial. Mantener juntos el ejecutable gráfico y el de consola. Cada persona registra dónde lo extrajo; esa ubicación es local.
 2. Instalar las plantillas 4.7.2 desde el gestor de plantillas de exportación del editor.
 3. Instalar Git si falta, configurar identidad propia y obtener el repositorio. La carpeta de trabajo del segundo parcial es **2P**.
-4. Durante I1-00, Kenned crea una sola base del proyecto en `2P/Desarrollo/juego/`, con GDScript y renderer Compatibility como propuesta inicial para este 2D. Ariel y Julio obtienen esa misma base del repositorio. Comprobarla en los tres equipos antes de fijar la configuración.
-5. Incorporar una sola copia de GUT 9.7.1 al proyecto y registrar su procedencia y versión. Los demás reciben esa copia a través de Git; evitar que cada integrante descargue una versión distinta.
+4. Obtener la base que Kenned publicó en `feat/i1-00-base` (`5d73d50`), en `2P/Desarrollo/juego/`, con GDScript y renderer Compatibility. Ariel y Julio verifican esa misma entrega; no crear proyectos separados. Comprobarla en los tres equipos y revisar antes de integrar en `main`.
+5. Usar la copia de GUT 9.7.1 ya incorporada con procedencia y licencia. Los demás la reciben por Git; evitar que cada integrante descargue una versión distinta.
 6. Ejecutar una prueba que pase y un fallo preparado para comprobar el runner. Corregir o retirar el fallo preparado antes de integrar la tarea.
 7. Ejecutar una escena mínima, crear un preset Windows y abrir su exportación en otro equipo. Registrar editor, plantillas, addon, commit y resultado.
 
-Las comprobaciones anteriores son tareas pendientes del primer ciclo. La compatibilidad declarada de una dependencia no sustituye la comprobación en el proyecto.
+Kenned registró importación, arranque, pruebas y exportación por CLI; su observación visual humana sigue pendiente. Julio repitió importación, arranque, las cuatro pruebas y el fallo temporal; el primer intento de exportación falló por plantillas ausentes. Tras instalar las plantillas Windows 4.7.2 y verificar el SHA-512 oficial, la exportación y el ejecutable en modos headless y gráfico pasan. Se inspeccionaron visualmente editor, escena y ejecutable mediante herramientas; la aceptación humana sigue pendiente. Ariel aún no registra comprobaciones. La tarea sigue En curso; la compatibilidad declarada de una dependencia no sustituye la comprobación en cada equipo.
 
 ### Comandos de comprobación
 
@@ -49,31 +49,31 @@ node --version
 npm --version
 ```
 
-Después de crear el proyecto, incorporar GUT y escribir tests:
+Con la base de Kenned y su copia de GUT:
 
 ```powershell
 & $GodotExe --headless --editor --path '2P/Desarrollo/juego' --import
 & $GodotExe --headless --path '2P/Desarrollo/juego' -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
 ```
 
-Aceptación: importación sin errores y tests del incremento sin fallos ni errores inesperados. El comando de pruebas todavía no se ha ejecutado porque no existe el proyecto de juego. GUT ofrece ejecución de tests GDScript y runner de consola; la rama 9.7 incorpora compatibilidad con Godot 4.7. [GUT](https://github.com/bitwes/Gut), [releases](https://github.com/bitwes/Gut/releases), [runner](https://github.com/bitwes/Gut/blob/main/documentation/docs/Command-Line.md).
+Aceptación: importación sin errores y tests del incremento sin fallos ni errores inesperados. La base actual ya ejecuta cuatro pruebas de arranque con siete aserciones en Kenned y Julio; las pruebas de reglas R01–R20 todavía no existen. GUT ofrece ejecución de tests GDScript y runner de consola; la rama 9.7 incorpora compatibilidad con Godot 4.7. [GUT](https://github.com/bitwes/Gut), [releases](https://github.com/bitwes/Gut/releases), [runner](https://github.com/bitwes/Gut/blob/main/documentation/docs/Command-Line.md).
 
 ### Registro que completa cada integrante
 
 | Persona | Godot 4.7.2 | Plantillas 4.7.2 | GUT fijado | Proyecto y tests | Exportación | MCP, si usa |
 | --- | --- | --- | --- | --- | --- | --- |
 | Ariel | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Por decidir |
-| Julio | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Configuración previa detectada; repetir con 4.7.2 |
+| Julio | 4.7.2.stable.official.ed1daf0bf, comprobado por CLI y MCP el 13 nov 2026 | Windows 4.7.2.stable instaladas; archivo oficial verificado con SHA-512 | GUT 9.7.1 recibido por Git y ejecutado | Base: 4/4 pruebas y fallo temporal detectado; incremento actual: suite de reglas, vista, UI y arranque aprobada, con recuento en REVISION_I1.md | Primer fallo por plantillas resuelto; exportación y `.exe` headless/gráfico: código 0; ventana inspeccionada | Godot MCP local compilado; devuelve 4.7.2, nombre correcto y UID; editor, ejecución, depuración y parada verificados. Documentación consultada con Context7 |
 | Kenned | 4.7.2.stable.official.ed1daf0bf (13 nov 2026; zip verificado con SHA-512) | 4.7.2.stable instaladas (solo Windows) | GUT 9.7.1 incorporado | Importación, arranque y 4 pruebas pasan (CLI); fallo preparado detectado | Exportación Windows generada y abierta (CLI); apertura visual humana pendiente | Por decidir; Context7 no se usó |
 
-Una consulta del MCP durante esta preparación devolvió 4.7.1 y se encontraron archivos con ese nombre. Eso no cambia la versión elegida ni acredita una instalación nueva. Se comprobará expresamente el ejecutable 4.7.2 que cada integrante vaya a utilizar.
+La consulta histórica del MCP devolvió 4.7.1. En esta revisión se invocó explícitamente Godot **4.7.2** por CLI en el equipo de Julio; el resultado histórico del MCP no describe el ejecutable usado para estas pruebas. La versión de cada integrante y la del MCP, si lo usa, se verifican por separado.
 
 ## Plugins y herramientas investigados
 
 | Opción | Utilidad concreta | Decisión para este proyecto |
 | --- | --- | --- |
 | **UI nativa de Godot**: Control, Containers y Theme | Distribución adaptable, tema compartido y estados de foco/botones | Base de la primera iteración; ya forma parte del motor |
-| **GUT** | Repetir pruebas de cartas, patrones, costes, estados y reinicio | Adoptar al preparar el entorno y comprobar la versión elegida |
+| **GUT** | Repetir pruebas de cartas, patrones, costes, estados y reinicio | 9.7.1 incorporado; arranque comprobado en Kenned y Julio. Reglas, estados, privacidad y UI comprobados en la versión actual de Julio; ver REVISION_I1.md |
 | **Figma y su plugin para Codex** | Bocetos y revisión de la mesa y sus estados antes de implementarlos | Usar como apoyo de diseño. El catálogo de esta sesión lo muestra instalado; cada integrante necesita sus propios permisos de acceso |
 | **ThemeGen** | Generar temas Godot mediante GDScript y reutilizar colores y estilos | Candidato opcional. La documentación declara soporte Godot 4, pero no se ha probado aquí con 4.7.2; hacer una prueba acotada antes de incorporarlo |
 | **Context7 MCP** | Consultar documentación actual al implementar APIs y revisar compatibilidad | Recomendado para quienes usen IA con MCP; disponible en esta sesión |
@@ -97,9 +97,11 @@ Comprobación: pedir documentación de Godot indicando versión y tema; el clien
 
 ### Godot MCP local
 
-La configuración existente en esta máquina utiliza el paquete `@coding-solo/godot-mcp`. El registro npm consultado publica **0.1.1** y declara **Node >=18**; se propone fijar esa versión como punto de partida y repetir la comprobación con Godot 4.7.2. Esto no certifica su compatibilidad completa ni convierte al servidor comunitario en un componente oficial de Godot.
+En el equipo de Julio se usa una copia local del [servidor Coding-Solo/godot-mcp](https://github.com/Coding-Solo/godot-mcp), compilada desde el commit `1209744` (paquete **0.1.1**), con Node **22.20.0** y Godot **4.7.2**. Se verificaron conexión, nombre del proyecto, versión, UID de un script, apertura del editor, ejecución, salida de depuración sin errores y detención. Se corrigió localmente la lectura del nombre del proyecto del servidor y se añadieron dos pruebas de regresión; ese cambio pertenece al repositorio de la herramienta, fuera del juego. El servidor es comunitario y no forma parte del ejecutable distribuido.
 
-Ejemplo de configuración de usuario para Codex, basado en su [documentación MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli):
+Para usar una copia local, clonar el servidor fuera del repositorio del juego, ejecutar `npm ci` y `npm run build`, y configurar el cliente con `node`, la ruta absoluta a `build/index.js` y `GODOT_PATH` del editor 4.7.2. Reiniciar la conexión después del cambio. Cada integrante configura sus rutas personales; no se versiona esa configuración dentro del juego. [Instrucciones del servidor](https://github.com/Coding-Solo/godot-mcp#readme).
+
+Como alternativa a la copia local, este ejemplo usa el paquete npm fijado. Configuración de usuario para Codex basada en su [documentación MCP](https://learn.chatgpt.com/docs/extend/mcp?surface=cli):
 
 ```toml
 [mcp_servers.context7]
@@ -117,7 +119,7 @@ GODOT_PATH = 'C:\Herramientas\Godot\4.7.2\Godot_v4.7.2-stable_win64.exe'
 
 Cada persona adapta `GODOT_PATH` al ejecutable real y reinicia la conexión del cliente. La configuración pertenece a su entorno; no se copian claves o rutas personales al repositorio. El servidor documenta esa variable y los requisitos de Node/npm en su [README](https://github.com/Coding-Solo/godot-mcp). La versión del paquete se contrastó con el [registro npm](https://registry.npmjs.org/@coding-solo%2fgodot-mcp/latest).
 
-Comprobación: el MCP devuelve 4.7.2; después abre la escena mínima, la ejecuta, recoge la salida y la detiene. Hacerlo con el proyecto de prueba de I1-00. No se necesita instalar otro Godot MCP distinto en cada equipo: elegir y registrar el mismo servidor facilita comparar resultados.
+Comprobación: el MCP debe devolver 4.7.2; después abre la escena mínima, la ejecuta, recoge la salida y la detiene. Estas operaciones se comprobaron en la base I1-00 del equipo de Julio. La consulta de información cuenta también escenas y scripts de GUT; esos totales no representan funcionalidades del juego implementadas. No se necesita instalar otro Godot MCP distinto en cada equipo: elegir y registrar el mismo servidor facilita comparar resultados.
 
 El mínimo recomendado para asistencia es **Context7 + Godot MCP**. Figma se añade para revisar diseños cuando la persona tenga acceso. Otros MCP de navegador, bases de datos o servicios en nube se incorporarán solo si una tarea concreta los necesita.
 

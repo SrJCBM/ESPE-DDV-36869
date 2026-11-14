@@ -1,10 +1,5 @@
 extends Control
-## Escena principal mínima de la base I1-00.
-## Solo identifica la base; no contiene reglas ni interfaz del juego.
-
-const ETIQUETA_BASE := "I1-00"
-
+## Punto de entrada del encuentro local del Custodio.
 
 func _ready() -> void:
-	$Contenedor/Titulo.text = "La Última Mesa"
-	$Contenedor/Subtitulo.text = "Base común %s" % ETIQUETA_BASE
+	get_window().min_size = Vector2i(1024, 576)

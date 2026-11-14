@@ -2,7 +2,7 @@
 
 **Objetivo:** que una persona pueda completar una mesa local del Custodio, comprender sus decisiones y reiniciar la partida.
 
-**Estado:** prototipo de Figma preparado y revisado técnica y visualmente; aceptación del equipo, implementación, comprobación de instalaciones y pruebas del juego pendientes. Fecha de preparación: 9 de noviembre de 2026.
+**Estado al 13 de noviembre de 2026:** implementación jugable y revisión técnica disponibles, versión 0.1.0. I1-02 e I1-04 (Ariel) Completado; I1-01, I1-03, I1-05, I1-06 e I1-08 Por revisar. I1-00 sigue En curso por la verificación del tercer equipo; I1-07 queda Pendiente y lo realizará Julio. La base de Kenned `5d73d50` se conserva en el historial y el incremento se integra en `main` local. [Resultados y límites](REVISION_I1.md).
 
 **Coordinación actual:** [README con responsables, estados y primera demostración](README.md).
 
@@ -10,7 +10,7 @@
 
 **Arquitectura:** un controlador coordina la mesa; un núcleo independiente de la interfaz valida acciones y calcula resultados. Las acciones se representan con Command, las fases con State y las notificaciones con Observer mediante señales. Los datos de definición permanecen separados del estado de cada intento.
 
-**Tecnologías acordadas:** Godot **4.7.2 estándar**, GDScript, Windows y plantillas de exportación **4.7.2**. GUT 9.7.1 es el candidato para pruebas y requiere la comprobación de entorno de la tarea I1-00.
+**Tecnologías acordadas:** Godot **4.7.2 estándar**, GDScript, Windows y plantillas de exportación **4.7.2**. GUT **9.7.1** ya está incorporado con licencia y procedencia; sus pruebas de arranque pasan con Godot 4.7.2 en Kenned y Julio. Queda pendiente completar la homologación de I1-00.
 
 **Especificación:** [diseño v2.4](../../1P/Diseno_Videojuego/Documento_Diseno_La_Ultima_Mesa_v2_4.docx).
 
@@ -39,30 +39,33 @@ La revisión de alcance no cambia por sí sola umbral, meta ni reglas. Un result
 - La exploración, tienda, amuletos, Lente, otras mesas y duelo LAN corresponden a incrementos posteriores. El núcleo queda preparado para recibir acciones desde la futura red.
 - Los repartos preparados se usan para pruebas. La partida normal baraja; no se fuerza una victoria al jugador.
 - Godot administra su Game Loop. Las campanadas se descuentan al aceptar acciones y nunca por frame, animación o conexiones de señales duplicadas.
-- I1-01 tiene material listo para revisión. Las tareas de implementación y comprobación de entorno siguen pendientes. El código del prototipo web es un antecedente; sus pruebas no acreditan esta implementación.
+- I1-00 tiene una base técnica entregada y comprobaciones parciales; I1-01 tiene material listo para revisión. Las reglas y la UI jugable siguen pendientes. Las cuatro pruebas actuales cubren el arranque, no R01–R20. El código del prototipo web es un antecedente; sus pruebas no acreditan esta implementación.
 
 ## Organización del equipo
 
-| Integrante | Responsabilidad propuesta | Revisión principal |
-| --- | --- | --- |
-| Ariel Llumiquinga | Catálogo, identidades, fábrica, modelo de datos del intento y evaluador de puntuación; pruebas de sus reglas | Kenned revisa reglas y límites; Julio comprueba su explicación visual |
-| Julio Blacio | Flujo de usuario, mesa, cartas, ayuda y navegación | Ariel revisa correspondencia con reglas; Kenned comprueba integración |
-| Kenned Sigcha | Base común, comandos, legalidad y costes de acciones, fases, controlador, integración, cierre y exportación | Ariel revisa estados y reglas; Julio revisa reinicio y mensajes |
+| Integrante | Responsabilidad en la iteración | Primera entrega | Revisor |
+| --- | --- | --- | --- |
+| **Kenned Sigcha** | Base del proyecto, acciones, costes, estados e integración | **I1-00:** proyecto común, escena mínima, pruebas y exportación; comprobarlo en los tres equipos. Después, **I1-03:** iniciar, pedir, devolver Llave y plantarse | Ariel revisa reglas; Julio revisa el recorrido y los mensajes |
+| **Ariel Llumiquinga** | Baraja, datos del intento, efectos, patrones y puntuación | **I1-02 e I1-04:** catálogo exacto de 24 cartas, identidades, fábrica, conservación de cartas y evaluación de una mano, con pruebas | Kenned; Julio comprueba que el desglose sea comprensible |
+| **Julio Blacio** | Interfaz, cartas, controles, ayuda y experiencia de uso | **I1-01:** revisión del diseño; **I1-05:** mesa en Godot basada en Figma, primero con vistas simuladas y después con la vista real del controlador | Kenned revisa integración; Ariel revisa fidelidad al GDD |
 
-El reparto se acuerda al inicio y se puede ajustar. Quien implementa no es la única persona que acepta el resultado. La revisión puede hacerse en pareja si el equipo no usa pull requests.
+La responsabilidad cubre toda la iteración. La base de Kenned y los módulos jugables ya están disponibles; el [tablero](README.md#tablero-de-trabajo) distingue entregas técnicas de aceptación humana. Devolver Llave pertenece a Kenned y Ariel revisa sus condiciones. Progresión, objetos, exploración y LAN corresponden a incrementos posteriores.
 
-La devolución de Llaves se implementa en los comandos de Kenned; Ariel revisa sus casos y mantiene las pruebas de evaluación. El controlador de Kenned publica una vista que oculta las Máscaras; Julio solo representa esa vista. El descuento de campanadas ocurre en un único punto de aceptación de la acción. El [README](README.md) detalla archivos, estados actuales y orden de integración.
+Quien implementa no es la única persona que acepta el resultado. La devolución de Llaves se implementa en los comandos de Kenned; Ariel revisa sus casos y mantiene las pruebas de evaluación. El controlador de Kenned publica una vista que oculta las Máscaras; Julio solo representa esa vista. El descuento de campanadas ocurre en un único punto de aceptación de la acción. El [README](README.md) detalla archivos, estados y orden de integración.
 
-Usar un tablero con **Pendiente → En curso → En revisión → Terminado**. Cada tarea registra ID, responsable, revisor, dependencias, criterio de aceptación y evidencia. Mantener como máximo una tarea principal en curso por integrante. Al empezar una sesión, dedicar unos minutos a comunicar avance, siguiente acción y bloqueo; si surge un bloqueo, comunicarlo en ese momento.
+Usar un tablero con **Pendiente → En curso → Por revisar → Completado**. Cada tarea registra ID, responsable, revisor, dependencias, criterio de aceptación y evidencia. Mantener como máximo una tarea principal en curso por integrante. Al empezar una sesión, dedicar unos minutos a comunicar avance, siguiente acción y bloqueo; si surge un bloqueo, comunicarlo en ese momento.
 
 ## Archivos previstos
 
-Esta estructura es una propuesta para implementar; todavía no se han creado el proyecto ni los scripts.
+La estructura siguiente está implementada. La base de Kenned se amplió con datos, dominio, controlador, mesa, cartas, temas, recursos y pruebas. El libro de ayuda se encuentra en `mesa/guia_custodio.gd`; [juego/README.md](juego/README.md) explica cómo ejecutar y exportar.
 
 ```text
 2P/Desarrollo/juego/
   project.godot
   export_presets.cfg
+  principal/principal.tscn           # escena mínima existente de I1-00
+  principal/principal.gd             # identificación de la base; sin reglas
+  tests/test_arranque.gd             # cuatro pruebas existentes de arranque
   addons/gut/                       # dependencia común, versión fijada
   datos/cartas/carta_def.gd          # definición estática Resource
   datos/cartas/baraja_inicial.tres   # catálogo de 24 cartas
@@ -101,6 +104,8 @@ Cada comando concreto encapsula una operación y la solicita al estado receptor;
 
 ## Secuencia de trabajo
 
+**Estado:** consultar el [tablero actualizado](README.md#tablero-de-trabajo). Los criterios conservan el alcance de aceptación; el código y la evidencia técnica no sustituyen el piloto ni la prueba en otro equipo.
+
 | ID | Responsable propuesto / revisor | Depende de | Resultado que se acepta |
 | --- | --- | --- | --- |
 | I1-00 | Kenned coordina; los tres comprueban su equipo / revisión cruzada | Acuerdo de disponibilidad | Godot 4.7.2 y plantillas coinciden; proyecto mínimo abre, ejecuta y exporta en Windows; GUT ejecuta una prueba y detecta un fallo preparado |
@@ -113,7 +118,7 @@ Cada comando concreto encapsula una operación y la solicita al estado receptor;
 | I1-07 | Julio y otro integrante / equipo | I1-06 | Piloto de usabilidad, revisión con teclado, ventanas y corrección de bloqueos observados |
 | I1-08 | Kenned / Julio y Ariel | I1-07 | Ejecutable Windows abre en un segundo equipo; demostración y registro de cierre completados |
 
-La revisión de Figma puede avanzar mientras se comprueban los entornos. Después de la base común y del acuerdo del contrato, la UI trabaja con vistas simuladas mientras Ariel construye los datos y el evaluador y Kenned prepara los estados y comandos. Integrar una primera mano en cuanto las partes necesarias estén disponibles; continuar desde esa versión común. La primera demostración será R11: 102 puntos y ocho campanadas restantes.
+Las siguientes actividades humanas son la prueba de Ariel, la revisión del equipo y el piloto I1-07 que realizará Julio. La mesa integrada ya permite revisar R01–R20 y la demostración 102 → Quiebra → 119 = 221 puntos con tres campanadas. Después del piloto se corrigen los hallazgos y se registra el cierre de I1-08.
 
 Para cada tarea de reglas: escribir primero un caso que falle por la funcionalidad ausente, comprobar ese fallo, implementar, volver a ejecutar y solicitar revisión. La UI requiere comprobación visual y manual además de pruebas de estado. Registrar un commit de alcance pequeño al completar una parte revisable; publicar solo los archivos de la tarea.
 
@@ -150,19 +155,19 @@ Para R14 se prueban estas condiciones por separado:
 - Mano larga: cinco cartas conservadas o más.
 - Racha: las tres últimas cartas conservadas tienen el mismo palo.
 
-Los tests pueden agruparse por tema: `test_baraja.gd` (R01,R17,R19), `test_acciones_estados.gd` (R02–R05,R07,R08,R10,R16,R18,R20), `test_puntuacion.gd` (R06,R11–R16), `test_vista.gd` (R09). Cuando un caso tenga condiciones diferentes, crear un test por condición para identificar el fallo.
+Los tests se agrupan por tema: `test_baraja.gd` (R01,R17,R19), `test_acciones_estados.gd` (R02–R05,R07,R08,R10,R16,R18,R20), `test_puntuacion.gd` (R06,R11–R16), `test_vista.gd` (R09). Cuando un caso tenga condiciones diferentes, crear un test por condición para identificar el fallo.
 
 ## Criterios de UI y accesibilidad
 
-- [ ] Nombre de mesa, umbral 17, puntos actuales/meta 200 y campanadas se distinguen sin abrir ayuda.
-- [ ] Los botones anuncian su coste: Iniciar mano (1 campanada), Pedir (1 campanada), Plantarse (gratis), Devolver Llave (gratis, una vez por mano).
-- [ ] Los palos se reconocen por nombre y símbolo, además de color.
-- [ ] Una Máscara usa signo de interrogación e intervalo; ni tooltip ni etiqueta accesible contienen el valor oculto.
-- [ ] La resolución explica suma efectiva, patrones, multiplicador y puntos. Quiebra identifica su causa.
-- [ ] Tab/Shift+Tab recorre acciones en orden; Enter/Espacio activa; el foco es visible y se recupera al cerrar la ayuda. No usar acciones `ui_*` para reglas de juego.
-- [ ] Textos, cartas y acciones no se cortan en 1280×720 y 1920×1080; revisar también una ventana redimensionada.
-- [ ] Se adopta como criterio del proyecto contraste mínimo 4.5:1 para texto informativo sobre su fondo. Es una referencia de diseño tomada de WCAG, no una certificación del juego.
-- [ ] La primera versión comunica toda la información necesaria sin depender de audio o animaciones. Si se incorporan animaciones, deben respetar la opción de reducción prevista por el GDD.
+- [x] Nombre de mesa, umbral 17, puntos actuales/meta 200 y campanadas se distinguen sin abrir ayuda.
+- [x] Los botones anuncian su coste: Iniciar mano (1 campanada), Pedir (1 campanada), Plantarse (gratis), Devolver Llave (gratis, una vez por mano).
+- [x] Los palos se reconocen por nombre y símbolo, además de color.
+- [x] Una Máscara usa signo de interrogación e intervalo; ni tooltip ni etiqueta accesible contienen el valor oculto.
+- [x] La resolución explica suma efectiva, patrones, multiplicador y puntos. Quiebra identifica su causa.
+- [x] Tab/Shift+Tab recorre acciones en orden; Enter/Espacio activa; el foco es visible y se recupera al cerrar la ayuda. No usar acciones `ui_*` para reglas de juego.
+- [x] Textos, cartas y acciones no se cortan en 1280×720 y 1920×1080; revisar también una ventana redimensionada.
+- [x] Se adopta como criterio del proyecto contraste mínimo 4.5:1 para texto informativo sobre su fondo. Es una referencia de diseño tomada de WCAG, no una certificación del juego.
+- [x] La primera versión comunica toda la información necesaria sin depender de audio o animaciones. Si se incorporan animaciones, deben respetar la opción de reducción prevista por el GDD.
 
 ## Piloto de usabilidad
 
@@ -188,11 +193,12 @@ Si una persona queda bloqueada para iniciar, resolver o reiniciar, corregir y re
 
 ## Definición de terminado
 
-- [ ] R01–R20 cubiertos por pruebas y verificaciones registradas; sin fallos que invaliden la mesa.
-- [ ] Recorrido completo con victoria, derrota y reinicio.
-- [ ] State, Observer y Command identificados en clases, conexiones y pruebas; creación de cartas centralizada.
+- [x] R01–R20 cubiertos por pruebas y verificaciones registradas; sin fallos que invaliden la mesa.
+- [x] Recorrido completo con victoria, derrota y reinicio.
+- [x] State, Observer y Command identificados en clases, conexiones y pruebas; creación de cartas centralizada.
 - [ ] Revisión cruzada completada, sin acciones que dependan de desactivar validaciones para funcionar.
-- [ ] Criterios de UI revisados y bloqueos del piloto corregidos y comprobados de nuevo.
+- [x] Criterios técnicos de UI revisados; evidencia en REVISION_I1.md.
+- [ ] Bloqueos del piloto corregidos y comprobados de nuevo, después de las sesiones de Julio.
 - [ ] Ejecutable abierto y jugado en un segundo equipo, con versión exacta anotada.
 - [ ] Registro de cierre con commit, versión, resultados, problemas y objetivo siguiente.
 
@@ -208,4 +214,4 @@ Formato breve para el cierre: **Objetivo / Terminado / Pendiente / Pruebas / Hal
 - [W3C, contraste mínimo](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html).
 - [GOV.UK, pruebas moderadas de usabilidad](https://www.gov.uk/service-manual/user-research/using-moderated-usability-testing).
 
-El alcance, reparto, orden de tareas y tamaño del piloto son propuestas del proyecto. Las fuentes respaldan los mecanismos y métodos utilizados; las pruebas del juego aún no se han realizado.
+El alcance, reparto y orden de tareas pertenecen al proyecto. Las fuentes respaldan mecanismos y métodos; las pruebas técnicas de reglas, estados y UI ya se ejecutaron y constan en REVISION_I1.md. El piloto de usabilidad y la validación en otro equipo siguen pendientes.

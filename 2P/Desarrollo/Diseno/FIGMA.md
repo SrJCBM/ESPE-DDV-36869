@@ -1,6 +1,6 @@
 # La Última Mesa · diseño de la primera iteración
 
-**Estado:** prototipo de interacción completado para esta revisión, con comprobación técnica y visual. La aceptación del equipo, la implementación en Godot y las pruebas con usuarios siguen pendientes.
+**Estado:** prototipo de interacción completado y utilizado como referencia de la implementación Godot 0.1.0. La mesa, cartas, ayuda y controles ya están implementados; la aceptación del equipo y las pruebas con usuarios siguen pendientes. [Revisión del juego](../REVISION_I1.md).
 
 **Figma, cuenta Julio ESPE, equipo Education Videojuegos:** [Mesa del Custodio](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=13-103). [Baraja revisada](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=20-482).
 
@@ -16,7 +16,7 @@ La interfaz es editable por capas: textos, cartas, controles, vectores, estilos 
 - Tipografía de lectura y acciones: DM Sans Regular/Bold.
 - Fondo: `#0B2119`; panel: `#16362A`; marfil: `#EBDDBF`.
 - Texto claro: `#F1E4C9`; latón: `#D5B578`; aviso: `#F2B1A3`.
-- Marcos: 1440 × 810, relación 16:9. Su adaptación a otras resoluciones sigue pendiente.
+- Marcos de referencia: 1440 × 810, relación 16:9. Godot adapta el lienzo y se revisó en 1024×576, 1280×720 y 1920×1080. El archivo Figma conserva su tamaño de referencia.
 
 ## Recorridos preparados
 
@@ -66,13 +66,13 @@ Dirección utilizada para la generación: retrato vertical de un crupier sobrena
 
 `recursos/carta-velas-grabado.png`, `carta-llaves-grabado.png`, `carta-relojes-grabado.png` y `carta-mascaras-grabado.png`: cuatro ilustraciones generadas con la herramienta integrada `image_gen`, PNG RGBA de 1024 × 1536, incorporadas a las cartas de Figma. Los prompts exactos se conservan en [cartas-prompts.json](recursos/cartas-prompts.json). Valores, nombres, efectos y geometría de las cartas permanecen editables.
 
-## Revisión antes de implementar
+## Revisión de diseño y aceptación
 
 - Verificar con Ariel la correspondencia entre reglas, costes, valores efectivos y puntuación.
 - Comprobar que ninguna etiqueta o interacción revela el valor de una Máscara oculta.
 - Probar con tres personas si identifican meta, umbral, coste de pedir y consecuencia de plantarse.
 - Revisar contraste, tamaño de lectura, foco de teclado y estados deshabilitados; la revisión visual no sustituye estas pruebas.
-- Validar los atajos configurados y completar navegación por foco/Tab en la implementación. La confirmación de devolución de Llave ya está diseñada y enlazada.
+- Los atajos y el foco/Tab están implementados y comprobados técnicamente en Godot, incluida la confirmación de Llave; falta la revisión humana del equipo.
 - En Godot, conservar textos, controles y contenedores nativos. Usar la ilustración como recurso independiente y no exportar la mesa completa como una sola imagen.
 
-La tarea I1-01 queda pendiente de aceptación; I1-05 requiere todavía implementar e integrar la interfaz.
+I1-01 e I1-05 quedan Por revisar: la interfaz está implementada y conectada al dominio. La aceptación humana y el piloto I1-07 siguen pendientes.

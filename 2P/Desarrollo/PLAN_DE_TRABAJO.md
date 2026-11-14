@@ -1,8 +1,8 @@
 # Plan de desarrollo de La Última Mesa
 
-Base de trabajo: documento de diseño v2.4, actualizado el 9 de noviembre de 2026. Las tareas siguientes están pendientes; describen el desarrollo previsto.
+Base de trabajo: diseño v2.4. Estado actualizado el **13 de noviembre de 2026**: mesa local I1 implementada y revisada técnicamente, versión 0.1.0. I1-02 e I1-04 de Ariel Completado; las demás entregas implementadas Por revisar. I1-07 lo realizará Julio y la prueba en otro equipo sigue pendiente.
 
-El prototipo de Figma ya tiene material preparado para revisión. El [README de coordinación](README.md) registra el reparto de la primera iteración, sus estados actuales y la primera demostración en Godot. El proyecto ejecutable todavía no se ha creado.
+Figma permanece como referencia de diseño; la implementación activa está en `2P/Desarrollo/juego/`. La base de Kenned (`5d73d50`) forma parte del historial y el incremento se integra en `main` local. [Tablero actualizado](README.md) y [revisión técnica](REVISION_I1.md).
 
 ## Guía para comenzar
 
@@ -43,13 +43,15 @@ En LAN se utilizará ENet con un anfitrión que valide turno, recursos, remitent
 
 #### Distribución inicial propuesta
 
-| Integrante | Responsabilidad principal | Revisión cruzada |
-| --- | --- | --- |
-| Ariel Llumiquinga | Núcleo de cartas, patrones y pruebas de puntuación. | Revisar reglas de campaña y resultados de integración. |
-| Julio Blacio | Interfaz de cartas, exploración e interacción. | Revisar claridad de reglas, controles y recorrido. |
-| Kenned Sigcha | Base común, comandos, costes, estados e integración del primer incremento; posteriormente progresión, objetos y coordinación LAN. | Revisar estados, reinicios y conexión entre sistemas. |
+| Integrante | Responsabilidad en la iteración | Primera entrega | Revisor |
+| --- | --- | --- | --- |
+| **Kenned Sigcha** | Base del proyecto, acciones, costes, estados e integración | **I1-00:** proyecto común, escena mínima, pruebas y exportación; comprobarlo en los tres equipos. Después, **I1-03:** iniciar, pedir, devolver Llave y plantarse | Ariel revisa reglas; Julio revisa el recorrido y los mensajes |
+| **Ariel Llumiquinga** | Baraja, datos del intento, efectos, patrones y puntuación | **I1-02 e I1-04:** catálogo exacto de 24 cartas, identidades, fábrica, conservación de cartas y evaluación de una mano, con pruebas | Kenned; Julio comprueba que el desglose sea comprensible |
+| **Julio Blacio** | Interfaz, cartas, controles, ayuda y experiencia de uso | **I1-01:** revisión del diseño; **I1-05:** mesa en Godot basada en Figma, primero con vistas simuladas y después con la vista real del controlador | Kenned revisa integración; Ariel revisa fidelidad al GDD |
 
-Este reparto es una propuesta para acordar al comenzar. Cada tarea tendrá un responsable y otro integrante que revise el resultado. La integración LAN y las pruebas entre equipos requerirán colaboración; la asignación principal no limita la participación de los demás.
+La responsabilidad cubre toda la iteración. Base, datos, comandos, estados, evaluación e interfaz ya tienen implementación. La devolución de Llave pertenece a Kenned y Ariel revisa sus casos; el tablero distingue quién entrega y quién revisa. Progresión, objetos, exploración y LAN se mantienen en incrementos posteriores.
+
+Cada tarea conserva un responsable y otro integrante que revise el resultado. La asignación principal no limita la colaboración. Los estados actuales se mantienen en el [tablero de coordinación](README.md#tablero-de-trabajo).
 
 El desarrollo se realizará en la carpeta 2P del repositorio de GitHub [SrJCBM/ESPE-DDV-36869](https://github.com/SrJCBM/ESPE-DDV-36869). Allí se mantendrán el proyecto de Godot, el plan de trabajo y las evidencias de cada iteración. Las entregas calificadas se conservarán como antecedentes y el documento de diseño como especificación vigente.
 
@@ -79,13 +81,13 @@ Cada fila requiere una versión demostrable; la preparación es un paso previo y
 
 ### Inicio del desarrollo y validación
 
-La preparación comenzará por revisar las diferencias entre la conceptualización inicial y el diseño vigente. Se registrará que las reglas actuales utilizan umbrales y palos propios, con campaña y duelo LAN. Después se acordarán responsables, horas disponibles, versión de Godot y una prueba de ejecución y exportación mínima para Windows.
+La mesa local ya dispone de base, núcleo, UI y comprobaciones técnicas. Falta registrar la comprobación de Ariel, la aceptación del equipo, el piloto I1-07 y la prueba de la exportación actual en otro equipo. Julio realizará el piloto; no se consideran realizadas sesiones por disponer de capturas o pruebas automáticas.
 
 #### Primer incremento
 
 El primer objetivo será jugar una mesa local del Custodio con recursos provisionales. Se implementarán la baraja de veinticuatro cartas, su descarte, los cuatro palos, los cinco patrones, el umbral 17, la meta 200 y las diez campanadas. La mesa deberá terminar en victoria o derrota y permitir un reinicio consistente. La exploración y la tienda se incorporarán en incrementos posteriores.
 
-| Tarea pendiente | Responsable propuesto | Resultado verificable |
+| Tarea del incremento jugable (implementado; aceptación pendiente) | Responsable | Resultado verificable |
 | --- | --- | --- |
 | Definir datos y estado de la mano | Ariel | Catálogo y datos por intento; mano, mazo y descarte conservan las 24 cartas sin duplicados. |
 | Implementar acciones, costes y fases | Kenned; Ariel revisa | Iniciar y pedir cuestan una campanada; plantarse y devolver una Llave no consumen otra; las acciones inválidas no cambian el estado. |
