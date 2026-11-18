@@ -18,6 +18,11 @@ var _arte: TextureRect
 var _visual: Control
 var _animacion: Tween
 var _movimiento_reducido := false
+var _devolucion_disponible := false
+var _seleccionada := false
+var _patron_resaltado := false
+var _marco: Panel
+var _fondo: StyleBoxFlat
 
 func _ready() -> void:
 	clip_contents = false
@@ -31,6 +36,8 @@ func _ready() -> void:
 	fondo.border_color = Color("d5b578")
 	fondo.set_corner_radius_all(3)
 	var marco := Panel.new()
+	_marco = marco
+	_fondo = fondo
 	marco.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	marco.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	marco.add_theme_stylebox_override("panel", fondo)
@@ -118,13 +125,40 @@ func _actualizar() -> void:
 		_efecto.text = "OCULTA · 1–10"
 	else:
 		var efectivo: Variant = _vista.get("valor_efectivo")
-		_efecto.text = "EFECTIVO %s" % str(efectivo) if efectivo != null else "REVELADA"
+		_efecto.text = "Cuenta como %s" % str(efectivo) if efectivo != null and efectivo != _vista.get("valor") else ""
+	if _devolucion_disponible:
+		_efecto.text = "LLAVE ELEGIDA" if _seleccionada else "Cambiar · L"
 	tooltip_text = "%s. %s. %s. Activar para ampliar." % [NOMBRES.get(palo, palo), "Valor oculto" if oculta else "Valor %s" % _valor.text, _efecto.text]
 	if oculta:
 		tooltip_text = "%s. Valor oculto entre 1 y 10; se revela al plantarse. Activar para ampliar." % NOMBRES.get(palo, palo)
+	elif _devolucion_disponible:
+		tooltip_text = "Llave %s elegible. Activar para elegir; confirmar o cancelar en la mesa. No se devuelve hasta confirmar." % _valor.text
 	for propiedad in get_property_list():
 		if propiedad.name == "accessibility_name":
 			set("accessibility_name", tooltip_text)
+
+func establecer_devolucion_disponible(disponible: bool) -> void:
+	_devolucion_disponible = disponible
+	if is_node_ready(): _actualizar()
+
+func establecer_seleccionada(seleccionada: bool) -> void:
+	_seleccionada = seleccionada
+	_actualizar_borde()
+	_actualizar()
+	_actualizar_enfasis()
+
+func resaltar_patron(resaltar: bool, atenuar: bool = false) -> void:
+	_patron_resaltado = resaltar
+	set_meta("patron_resaltado", resaltar)
+	# Solo baja el arte de las otras cartas: los valores siguen legibles.
+	_arte.modulate.a = 0.45 if atenuar and not _seleccionada else 1.0
+	_actualizar_borde()
+
+func _actualizar_borde() -> void:
+	var borde := _fondo.duplicate() as StyleBoxFlat
+	borde.border_color = Color("f1e4c9") if _seleccionada else Color("d5b578")
+	borde.set_border_width_all(3 if _seleccionada else (2 if _patron_resaltado else 1))
+	_marco.add_theme_stylebox_override("panel", borde)
 
 func establecer_movimiento_reducido(reducido: bool) -> void:
 	_movimiento_reducido = reducido
@@ -150,7 +184,7 @@ func animar_entrada(retraso: float = 0.0) -> void:
 
 func _actualizar_enfasis() -> void:
 	_cancelar_animacion()
-	var activo := has_focus() or is_hovered()
+	var activo := has_focus() or is_hovered() or _seleccionada
 	z_index = 1 if activo else 0
 	if _movimiento_reducido or not activo:
 		return

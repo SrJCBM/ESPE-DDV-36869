@@ -74,12 +74,12 @@ func test_R02_iniciar_reparte_dos_y_cobra_una() -> void:
 	assert_eq(c.estado_activo.nombre, "decision")
 	assert_eq(c.partida.mazo.size(), 22)
 
-func test_R03_pedir_cobra_una_incluido_reloj() -> void:
+func test_R03_pedir_es_gratis_incluido_reloj() -> void:
 	var c := _crear()
 	_ordenar(c, ["llaves_01", "velas_02", "relojes_06"])
 	if not _iniciar(c): return
 	assert_true(c.procesar_comando(PedirCarta.new()).aceptado)
-	assert_eq(c.partida.campanadas, 8)
+	assert_eq(c.partida.campanadas, 9)
 	assert_eq(c.partida.mano.size(), 3)
 	assert_eq(c.partida.mano[-1].valor_efectivo(), 5)
 
@@ -89,18 +89,18 @@ func test_R04_R05_plantarse_gratis_y_no_puede_resolver_dos_veces() -> void:
 	if not _iniciar(c): return
 	c.procesar_comando(PedirCarta.new())
 	assert_true(c.procesar_comando(Plantarse.new()).aceptado)
-	assert_eq(c.partida.campanadas, 8)
+	assert_eq(c.partida.campanadas, 9)
 	assert_eq(c.partida.puntos, 102)
 	assert_eq(c.partida.mano.size(), 0)
 	assert_eq(c.partida.descarte.size(), 3)
 	_rechazo_sin_cambio(c, Plantarse.new())
 
-func test_R04_sin_campanadas_rechaza_pedir_pero_permite_plantarse() -> void:
+func test_R04_ultima_mano_permite_pedir_y_plantarse_con_cero() -> void:
 	var c := _crear()
 	c.cargar_demostracion()
 	if not _iniciar(c): return
 	c.partida.campanadas = 0
-	_rechazo_sin_cambio(c, PedirCarta.new())
+	assert_true(c.procesar_comando(PedirCarta.new()).aceptado)
 	assert_true(c.procesar_comando(Plantarse.new()).aceptado)
 	assert_eq(c.estado_activo.nombre, "finalizada")
 
@@ -136,7 +136,7 @@ func test_R07_solo_llave_recien_pedida_tras_otra_accion() -> void:
 	_rechazo_sin_cambio(c, DevolverLlave.new(inicial))
 	assert_true(c.procesar_comando(DevolverLlave.new(c.partida.mano[-1].id_instancia)).aceptado)
 	assert_eq(c.partida.mano[-1].definicion.id, "relojes_01")
-	assert_eq(c.partida.campanadas, 8)
+	assert_eq(c.partida.campanadas, 9)
 
 func test_R07_se_puede_conservar_uso_para_una_llave_posterior() -> void:
 	var c := _crear()
@@ -147,7 +147,7 @@ func test_R07_se_puede_conservar_uso_para_una_llave_posterior() -> void:
 	assert_true(c.obtener_vista().get("llaves_disponibles", []).is_empty())
 	c.procesar_comando(PedirCarta.new())
 	assert_true(c.procesar_comando(DevolverLlave.new(c.partida.mano[-1].id_instancia)).aceptado)
-	assert_eq(c.partida.campanadas, 7)
+	assert_eq(c.partida.campanadas, 9)
 
 func test_R08_no_puede_reemplazarse_por_si_misma() -> void:
 	var c := _crear()
@@ -168,20 +168,23 @@ func test_R10_ofrece_devolucion_antes_de_confirmar_quiebra() -> void:
 	_rechazo_sin_cambio(c, PedirCarta.new())
 	assert_true(c.procesar_comando(DevolverLlave.new(c.partida.mano[-1].id_instancia)).aceptado)
 	assert_eq(c.estado_activo.nombre, "decision")
-	assert_eq(c.partida.campanadas, 8)
+	assert_eq(c.partida.campanadas, 9)
 	assert_true(c.procesar_comando(Plantarse.new()).aceptado)
 	assert_false(c.obtener_vista().get("ultima_mano", {}).get("quiebra", true))
 
-func test_R10_quiebra_demostrable_sin_llave_resuelve_sola() -> void:
+func test_R10_quiebra_demostrable_sin_llave_espera_plantarse() -> void:
 	var c := _crear()
 	_ordenar(c, ["velas_10", "relojes_09"])
 	if not _iniciar(c): return
-	assert_eq(c.estado_activo.nombre, "preparado")
+	assert_eq(c.estado_activo.nombre, "decision")
 	assert_eq(c.partida.puntos, 0)
+	assert_true(c.obtener_vista().ultima_mano.is_empty())
+	_rechazo_sin_cambio(c, PedirCarta.new())
+	assert_true(c.procesar_comando(Plantarse.new()).aceptado)
 	assert_true(c.obtener_vista().get("ultima_mano", {}).get("quiebra", false))
 	_rechazo_sin_cambio(c, Plantarse.new())
 
-func test_R15_ejemplo_completo_221_puntos_y_tres_campanadas() -> void:
+func test_R15_ejemplo_completo_221_puntos_y_siete_campanadas() -> void:
 	var c := _crear()
 	c.cargar_demostracion()
 	if not _iniciar(c): return
@@ -198,7 +201,7 @@ func test_R15_ejemplo_completo_221_puntos_y_tres_campanadas() -> void:
 	c.procesar_comando(PedirCarta.new())
 	c.procesar_comando(Plantarse.new())
 	assert_eq(c.partida.puntos, 221)
-	assert_eq(c.partida.campanadas, 3)
+	assert_eq(c.partida.campanadas, 7)
 	assert_true(c.obtener_vista().get("victoria", false))
 	assert_eq(c.estado_activo.nombre, "finalizada")
 	assert_eq(c.partida.descarte.size() + c.partida.mazo.size(), 24)

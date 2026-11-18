@@ -1,0 +1,50 @@
+# Iteración 02 · La casa de los tres sellos
+
+**Versión 0.2.0 · 18 de noviembre de 2026.** Campaña jugable. Quedan pendientes la ayuda por mesa, el indicador de objetivo y la revisión con jugadores.
+
+El visitante recorre el casino aprobado en clase, prepara su baraja entre encuentros y sale al amanecer si supera las cuatro mesas. La campaña dura un intento y el progreso se conserva durante la sesión. La prioridad siguiente es revisar orientación y balance con el equipo. La red queda para un incremento posterior.
+
+## Recorrido de prueba
+
+1. Abrir el proyecto con Godot 4.7.2 y pulsar **F5**. Caminar con **WASD o flechas** hasta el mostrador iluminado del vestíbulo. **E** abre el diálogo y otra pulsación entrega la invitación. El inventario (**I**) debe mostrar 24 cartas y diez fichas. Hablar otra vez permite pedir indicaciones.
+2. Salir por el sur. En la galería, examinar la puerta del Recaudador antes de ganar el primer sello. Debe indicar el requisito. Entrar al gabinete, seleccionar la Lente y confirmar. El saldo baja a cuatro. Volver al mostrador y cancelar una compra conserva el saldo.
+3. Sentarse ante el Custodio. Al recibir una Máscara, usar la Lente para conocer su valor antes de decidir. Se gasta una unidad. La mesa entrega diez fichas más cinco por cada Punto exacto al ganar. Levantarse permite volver a la tienda o a la galería.
+4. El Recaudador adelanta quince fichas una sola vez y cobra una por petición adicional. La Coleccionista retiene la carta más alta, con desempate por la última robada. El Dueño reduce el umbral de la mano siguiente hasta 17. Se puede consultar la bolsa en cada mesa con **I**.
+5. Tras la cuarta victoria, rodear la mesa del Dueño y abrir el portón del norte con **E**. Una derrota termina el intento. El siguiente comienza de nuevo en recepción.
+
+## Entregas
+
+| Entrega | Estado técnico | Evidencia |
+| --- | --- | --- |
+| Salas y personajes | Implementada | Siete fondos originales de 1672 × 941, seis figuras de exploración, cuatro retratos nuevos y el Custodio original. [Atlas editable en Figma](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=57-4115) |
+| Exploración | Implementada | Movimiento con colisiones, diálogo por proximidad, indicación de puertas y retorno a la galería. |
+| Objetos y economía | Implementada | La Lente revela solo las Máscaras presentes. Corona, Sello del prudente y Moneda mellada aplican sus efectos. La tienda confirma el precio y admite ajustes o eliminación de cartas. [Gabinete y figuras](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=60-4103) |
+| Encuentros | Implementada | La misma mesa de cartas recibe las reglas del anfitrión y el inventario del intento. Las tres primeras victorias abren puertas y la cuarta habilita el portón. |
+| Revisión con usuarios | Pendiente | Comprobar si encuentran la salida sur, distinguen fichas de campanadas y entienden cuándo usar o guardar la Lente. Recoger los comentarios de I1 por separado. |
+
+## Entrega de Kenned
+
+Kenned se encarga de la integración y las pruebas en su equipo. Julio revisa la presentación y Ariel contrasta los costes con las reglas. Las tres actividades siguen pendientes.
+
+| Actividad | Criterio de aceptación |
+| --- | --- |
+| I2-K1 · Ayuda de la mesa activa | Al pulsar **H**, el libro toma meta, umbral, presupuesto y coste de la mesa actual. El Recaudador distingue el reparto inicial gratuito de la petición adicional de una ficha. Con el Dueño, el libro refleja el umbral vigente. El acceso independiente de I1 conserva la ayuda del Custodio. |
+| I2-K2 · Objetivo discreto a la izquierda | Durante la exploración se ve un objetivo breve en la esquina superior izquierda del área de juego. Un pequeño rombo de latón y texto marfil lo distinguen del aviso de interacción con **E**. Usar sombra o una franja translúcida ajustada al texto. Reservar un margen bajo el encabezado y dejar libres puertas, cartas y controles. |
+| I2-K3 · Prueba en otro equipo | Importar con Godot 4.7.2, ejecutar GUT y probar el exportado de Windows. Registrar resolución, resultado y pasos de cualquier fallo. Añadir pruebas para el coste que muestra la ayuda y los cambios de objetivo. |
+
+### Comportamiento del objetivo
+
+- Al llegar se lee «Habla con la anfitriona». Al recibir la baraja cambia a «Encuentra la mesa del Custodio». Los tres sellos llevan sucesivamente al Recaudador, a la Coleccionista y al Dueño. La cuarta victoria muestra «Abre el portón del amanecer».
+- Derivar el texto del progreso de la campaña. Visitar la tienda, cancelar una compra o volver al vestíbulo conserva el objetivo. Un intento nuevo comienza con la invitación.
+- Mostrar un único objetivo, de hasta dos líneas. Ocultarlo mientras están abiertos los diálogos, el inventario, la tienda o una mesa de cartas. Al volver a caminar reaparece el objetivo vigente.
+- Probar a **1024 × 576** y **1280 × 720**. Acercarse a una puerta, abrir un diálogo y ganar un sello. Comprobar que **E** sigue disponible, que el indicador deja pasar los clics y que el objetivo cambia una sola vez.
+
+Para entregar, compartir la rama, el commit, el resultado de GUT y una captura del indicador en el juego a la resolución menor.
+
+## Comprobaciones
+
+Godot 4.7.2 y GUT ejecutaron 120 pruebas con 1051 aserciones. La regresión de campaña usa barajas normales con semillas fijas y las acciones de la interfaz. Completa las cuatro mesas, abre el portón y empieza otro intento. También se probaron compras rechazadas, límites de amuletos, revelación parcial, cobro de recompensas, retenciones y la convivencia con el acceso directo a I1.
+
+En una simulación de 180 campañas, una estrategia fija compró una Lente al inicio, adquirió Corona y Sello cuando pudo y pidió si el punto medio del intervalo visible quedaba seis o más por debajo del umbral. Superó el Custodio 159 veces, el Recaudador 141, la Coleccionista 141 y el Dueño 107. Son resultados acumulados de esa estrategia. Antes de ajustar los precios o la dificultad, el equipo observará qué hacen personas que juegan por primera vez.
+
+El ejecutable de esta versión se llama `LaUltimaMesa-I2.exe`. Para el piloto de I1 se conserva el ejecutable que compartió Ariel y la escena `principal/principal.tscn`. [Ejecución, pruebas y exportación](juego/README.md).

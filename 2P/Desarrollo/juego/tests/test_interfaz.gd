@@ -31,7 +31,7 @@ func test_presenta_intervalo_y_habilita_solo_acciones_de_la_vista() -> void:
 	assert_eq(mesa._lectura.text, "5–14")
 	assert_false(mesa.boton_iniciar_pedir.disabled)
 	assert_false(mesa.boton_plantarse.disabled)
-	assert_true(mesa.boton_llave.disabled)
+	assert_false(mesa.vista.acciones.devolver)
 	assert_eq(mesa._contador.text, "8")
 
 func test_mascara_elimina_datos_ocultos_de_ampliacion_y_tooltip() -> void:
@@ -58,14 +58,15 @@ func test_cancelar_llave_no_modifica_vista_ni_cartas() -> void:
 	datos.acciones.devolver = true
 	datos.llaves_disponibles = ["opaco-1"]
 	mesa.presentar_vista(datos)
-	mesa.boton_llave.grab_focus()
+	var carta: Control = mesa.fila_cartas.get_child(0)
+	carta.grab_focus()
 	mesa.mostrar_devolucion()
-	assert_true(mesa._modal.visible)
-	assert_eq(mesa._contenido_modal.get_node("LlavesDisponibles").item_count, 1)
-	mesa.cerrar_modal()
+	assert_false(mesa._modal.visible)
+	assert_true(mesa._acciones_llave.visible)
+	mesa._cancelar_seleccion_llave()
 	assert_eq(mesa.vista, datos)
 	assert_eq(mesa.fila_cartas.get_child_count(), 2)
-	assert_eq(mesa.get_viewport().gui_get_focus_owner(), mesa.boton_llave)
+	assert_eq(mesa.get_viewport().gui_get_focus_owner(), carta)
 
 func test_ayuda_suspende_foco_de_mesa_y_lo_devuelve() -> void:
 	var mesa = _mesa()
@@ -190,7 +191,8 @@ func test_r11_muestra_conocido_nueve_mas_oculta_e_intervalo_y_no_desglose() -> v
 	mesa.presentar_vista(controlador.obtener_vista())
 	assert_eq(mesa._lectura.text, "10–19")
 	assert_string_contains(mesa._explicacion.text, "9 + ?")
-	assert_string_contains(mesa._explicacion.text, "UMBRAL 17 · 1 oculta")
+	assert_string_contains(mesa._explicacion.text, "1 oculta")
+	assert_eq(mesa._umbral.text, "17", "El umbral sigue visible, sin repetirlo junto al intervalo")
 	assert_false(mesa.boton_desglose.visible)
 	mesa.mostrar_desglose()
 	assert_false(mesa._modal.visible, "Un resultado no puede adelantarse mientras hay una Máscara oculta")
@@ -218,6 +220,7 @@ func test_desglose_quiebra_muestra_solo_resultado_revelado_y_cero_puntos() -> vo
 	controlador.procesar_comando(IniciarMano.new())
 	controlador.procesar_comando(PedirCarta.new())
 	var mesa = _mesa()
+	mesa.establecer_movimiento_reducido(true)
 	mesa.presentar_vista(controlador.obtener_vista())
 	assert_false(mesa.boton_desglose.visible)
 	controlador.procesar_comando(Plantarse.new())
@@ -255,13 +258,14 @@ func test_mensajes_y_devolucion_conservan_anchos_del_diseno() -> void:
 	mesa.presentar_vista(datos)
 	mesa.mostrar_devolucion()
 	await get_tree().process_frame
-	var descripcion: Label = mesa._contenido_modal.get_child(1)
-	assert_lte(descripcion.size.x, 696.0)
-	assert_lte(descripcion.position.x + descripcion.size.x, mesa._panel_modal.size.x - 32.0)
-	assert_gt(descripcion.get_line_count(), 1)
+	assert_false(mesa._modal.visible)
+	assert_true(mesa._acciones_llave.visible)
+	assert_lte(mesa._acciones_llave.position.x + mesa._acciones_llave.size.x, 1123.0)
 	assert_lte(mesa._mensaje.size.x, 684.0)
-	assert_gt(mesa._mensaje.get_line_count(), 1)
-	mesa.cerrar_modal()
+	assert_lte(mesa._mensaje.get_line_count(), 2)
+	assert_eq(mesa._mensaje.get_visible_line_count(), mesa._mensaje.get_line_count())
+	assert_lte(mesa._mensaje.get_global_rect().end.y, mesa.boton_iniciar_pedir.get_global_rect().position.y)
+	mesa._cancelar_seleccion_llave()
 
 func test_resumen_de_varios_patrones_no_desborda_su_rectangulo() -> void:
 	var controlador = _controlador_r11()
@@ -269,13 +273,14 @@ func test_resumen_de_varios_patrones_no_desborda_su_rectangulo() -> void:
 	var datos: Dictionary = controlador.obtener_vista()
 	# Prueba de longitud: el resumen debe aguantar un catálogo futuro más extenso.
 	datos.ultima_mano.patrones = ["Punto exacto", "Al filo", "Ascenso", "Mano larga", "Racha"]
+	datos.ultima_mano.bonos = {"Punto exacto": 3, "Al filo": 2, "Ascenso": 2, "Mano larga": 2, "Racha": 2}
 	var mesa = _mesa()
 	mesa.presentar_vista(datos)
 	await get_tree().process_frame
-	assert_lte(mesa._explicacion.size.x, 284.0)
-	assert_lte(mesa._explicacion.position.x + mesa._explicacion.size.x, 1111.0)
-	assert_lte(mesa._explicacion.get_line_count(), 2)
-	assert_string_contains(mesa._explicacion.text, "5 patrones")
+	assert_lte(mesa._explicacion.size.x, 680.0)
+	assert_lte(mesa._explicacion.position.x + mesa._explicacion.size.x, 1123.0)
+	assert_eq(mesa._explicacion.get_visible_line_count(), mesa._explicacion.get_line_count())
+	assert_string_contains(mesa._explicacion.text, "Exacto +3")
 
 func _vista_con_cartas(cantidad: int) -> Dictionary:
 	var datos := _decision()

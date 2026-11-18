@@ -19,8 +19,8 @@ func test_la_escena_principal_carga() -> void:
 	assert_is(escena, PackedScene)
 
 
-func test_la_escena_principal_abre_la_mesa_jugable() -> void:
-	var escena: PackedScene = load(_escena_principal())
+func test_el_acceso_directo_i1_abre_la_mesa_jugable() -> void:
+	var escena: PackedScene = load("res://principal/principal.tscn")
 	var instancia: Control = escena.instantiate()
 	add_child_autofree(instancia)
 	assert_not_null(instancia)

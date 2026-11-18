@@ -13,6 +13,11 @@ var navegacion: Array[Button] = []
 var movimiento: CheckButton
 var _pagina: Control
 var _folio: Label
+var _patron_ejemplo := "Punto exacto"
+
+func mostrar_patron(nombre: String) -> void:
+	_patron_ejemplo = nombre
+	ir_a_pagina(2)
 
 func _ready() -> void:
 	size = Vector2(1056, 520)
@@ -118,11 +123,11 @@ func _linea(y: float) -> void:
 
 func _apuesta() -> void:
 	_texto(_pagina, "Cada decisión tiene un coste.", Rect2(0, 0, 758, 85), 39, TINTA, true)
-	_texto(_pagina, "Acumula 200 puntos. Si una mano supera 17, quiebra y aporta cero.\nEmpiezas con 10 campanadas; pensar y consultar este libro es gratis.", Rect2(0, 108, 758, 68), 20)
+	_texto(_pagina, "Acumula 200 puntos. Si una mano supera 17, quiebra y aporta cero.\nTienes 10 manos: cada inicio consume una campanada. Pedir es gratis.", Rect2(0, 108, 758, 68), 20)
 	_linea(190)
 	var filas := [
 		["INICIAR MANO", "Recibes dos cartas.", "−1 campanada"],
-		["PEDIR OTRA", "Añades una carta al final.", "−1 campanada"],
+		["PEDIR OTRA", "Arriesgas la mano actual.", "Gratis"],
 		["PLANTARSE", "Revelas y puntúas tu mano.", "Gratis"],
 	]
 	for indice in range(filas.size()):
@@ -131,14 +136,14 @@ func _apuesta() -> void:
 		_texto(_pagina, filas[indice][1], Rect2(205, y, 345, 30), 18)
 		var coste := _texto(_pagina, filas[indice][2], Rect2(558, y, 200, 30), 18)
 		coste.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_texto(_pagina, "Puedes plantarte con cero campanadas. Al cerrar, llegar a 200 gana incluso con cero; si no llegas y no quedan oportunidades, pierdes.", Rect2(0, 399, 758, 76), 18, SECUNDARIO)
+	_texto(_pagina, "Con cero campanadas puedes seguir pidiendo en la última mano. Solo plantarte revela y resuelve: primero se comprueba si llegaste a 200, después si quedan manos.", Rect2(0, 399, 758, 76), 18, SECUNDARIO)
 
 func _palos() -> void:
 	_texto(_pagina, "Cuatro palos. Cuatro ventajas.", Rect2(0, 0, 758, 48), 34, TINTA, true)
 	var filas := [
 		["velas", "Velas", "+1 al multiplicador por cada Vela conservada en una mano válida."],
 		["llaves", "Llaves", "Devuelve una inicial antes de actuar, o la recién pedida. Un reemplazo gratis por mano; llega al final y no se puede volver a devolver."],
-		["relojes", "Relojes", "Valen uno menos que lo impreso, con mínimo 1. Un 6 vale 5; pedirlo cuesta una campanada, sin recuperarla."],
+		["relojes", "Relojes", "Valen uno menos que lo impreso, con mínimo 1. Un 6 vale 5. Pedirlos es gratis y no recuperan campanadas."],
 		["mascaras", "Máscaras", "Ocultas hasta plantarte. Si conoces 9 y tienes una Máscara, puedes sumar entre 10 y 19. Todavía puedes quebrar."],
 	]
 	for indice in range(filas.size()):
@@ -172,30 +177,39 @@ func _puntos() -> void:
 		_texto(_pagina, patrones[indice][2], Rect2(712, y, 46, 29), 20)
 	_linea(265)
 	_texto(_pagina, "Cada patrón cuenta una vez. Exacto y Al filo se excluyen.\nAscenso sigue el orden de robo; no requiere números consecutivos.", Rect2(0, 274, 758, 54), 17, SECUNDARIO)
-	var palos := ["llaves", "relojes", "mascaras"]
-	var valores := [4, 6, 8]
-	for indice in range(3):
+	var ejemplos := {
+		"Punto exacto": {"palos": ["llaves", "relojes", "mascaras"], "valores": [4,6,8], "efectivos": [4,5,8], "suma": "4 + 5 + 8 = 17", "cuenta": "Exacto +3 · Ascenso +2\n17 × (1 + 3 + 2) = 102 puntos"},
+		"Al filo": {"palos": ["llaves", "relojes", "mascaras"], "valores": [4,6,7], "efectivos": [4,5,7], "suma": "4 + 5 + 7 = 16", "cuenta": "Al filo +2 · Ascenso +2\n16 × (1 + 2 + 2) = 80 puntos"},
+		"Ascenso": {"palos": ["llaves", "relojes", "mascaras"], "valores": [2,6,8], "efectivos": [2,5,8], "suma": "2 < 5 < 8", "cuenta": "Ascenso +2 · Total 15\n15 × (1 + 2) = 45 puntos"},
+		"Mano larga": {"palos": ["velas", "llaves", "relojes", "mascaras", "velas"], "valores": [1,1,1,1,2], "efectivos": [1,1,1,1,2], "suma": "1 + 1 + 1 + 1 + 2 = 6", "cuenta": "Mano larga +2 · 2 Velas\n6 × (1 + 2 + 2) = 30 puntos"},
+		"Racha": {"palos": ["velas", "velas", "velas"], "valores": [2,4,1], "efectivos": [2,4,1], "suma": "2 + 4 + 1 = 7", "cuenta": "Racha +2 · 3 Velas\n7 × (1 + 3 + 2) = 42 puntos"},
+	}
+	var ejemplo: Dictionary = ejemplos.get(_patron_ejemplo, ejemplos["Punto exacto"])
+	var cantidad: int = ejemplo.palos.size()
+	var paso := 54 if cantidad > 3 else 91
+	for indice in range(cantidad):
 		var carta = Carta.instantiate()
-		carta.custom_minimum_size = Vector2(80, 130)
-		carta.position = Vector2(indice * 91, 332)
-		carta.size = Vector2(80, 130)
+		carta.custom_minimum_size = Vector2(paso - 11, 130)
+		carta.position = Vector2(indice * paso, 332)
+		carta.size = carta.custom_minimum_size
 		carta.focus_mode = Control.FOCUS_NONE
 		carta.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_pagina.add_child(carta)
 		carta.establecer_movimiento_reducido(true)
-		carta.presentar({"palo": palos[indice], "valor": valores[indice], "valor_efectivo": [4, 5, 8][indice], "oculta": false})
-	_texto(_pagina, "EJEMPLO AL REVELAR", Rect2(294, 330, 460, 25), 14, SECUNDARIO)
-	_texto(_pagina, "4 + 5 + 8 = 17", Rect2(294, 356, 460, 39), 31, TINTA, true)
-	_texto(_pagina, "Exacto +3 · Ascenso +2\n17 × (1 + 3 + 2) = 102 puntos", Rect2(294, 401, 460, 63), 19)
+		carta.presentar({"palo": ejemplo.palos[indice], "valor": ejemplo.valores[indice], "valor_efectivo": ejemplo.efectivos[indice], "oculta": false})
+	_texto(_pagina, "EJEMPLO · " + _patron_ejemplo.to_upper(), Rect2(294, 330, 460, 25), 14, SECUNDARIO)
+	_texto(_pagina, ejemplo.suma, Rect2(294, 356, 460, 39), 31, TINTA, true)
+	var cuenta := _texto(_pagina, ejemplo.cuenta, Rect2(294, 401, 460, 63), 19)
+	cuenta.name = "EjemploPuntos"
 
 func _controles() -> void:
 	_texto(_pagina, "Decide a tu ritmo", Rect2(0, 0, 758, 51), 36, TINTA, true)
-	_texto(_pagina, "Activa una carta para verla de cerca. Consultar ayuda o ampliar una carta no consume campanadas.", Rect2(0, 56, 758, 58), 20)
-	var teclas := [["P", "Iniciar / pedir"], ["S", "Plantarse"], ["L", "Devolver Llave"], ["H", "Abrir este libro"], ["R", "Reiniciar con confirmación"]]
+	_texto(_pagina, "Elige una Llave en la mano y confirma junto a la carta. Las demás cartas se amplían. Consultar este libro es gratis.", Rect2(0, 56, 758, 58), 20)
+	var teclas := [["P", "Iniciar / pedir"], ["S", "Plantarse"], ["L", "Elegir / cambiar Llave; confirmar en mesa"], ["H", "Abrir este libro"], ["R", "Reiniciar con confirmación"]]
 	for indice in range(teclas.size()):
 		var y: int = 128 + indice * 35
 		_texto(_pagina, teclas[indice][0], Rect2(0, y, 52, 30), 21)
 		_texto(_pagina, teclas[indice][1], Rect2(62, y, 670, 30), 19)
 	_linea(311)
-	_texto(_pagina, "Tab / Mayús+Tab: recorrer · Enter / Espacio: activar · Esc: volver.\nEl foco claro indica qué control estás usando.", Rect2(0, 320, 758, 55), 17)
+	_texto(_pagina, "Tab / Mayús+Tab: recorrer · Enter / Espacio: activar · Esc: cancelar / volver.\nEl foco claro indica qué control estás usando.", Rect2(0, 320, 758, 55), 17)
 	_texto(_pagina, "24 cartas: al agotarse el mazo se mezcla el descarte, sin incluir la mano actual. Si no puedes robar, puedes plantarte.", Rect2(0, 380, 758, 54), 17, SECUNDARIO)

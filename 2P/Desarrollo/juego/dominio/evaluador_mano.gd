@@ -2,6 +2,8 @@ class_name EvaluadorMano
 extends RefCounted
 ## Evaluación interna: la vista pública debe ocultar este resultado hasta revelar.
 
+const BONOS := {"Punto exacto": 3, "Al filo": 2, "Ascenso": 2, "Mano larga": 2, "Racha": 2}
+
 static func evaluar(mano: Array, umbral: int = 17) -> Dictionary:
 	var valores: Array[int] = []
 	var patrones: Array[String] = []
@@ -19,21 +21,21 @@ static func evaluar(mano: Array, umbral: int = 17) -> Dictionary:
 		return resultado
 	var bonos: Dictionary = resultado.bonos
 	if not mano.is_empty() and total == umbral:
-		bonos["Punto exacto"] = 3
+		bonos["Punto exacto"] = BONOS["Punto exacto"]
 	elif not mano.is_empty() and total == umbral - 1:
-		bonos["Al filo"] = 2
+		bonos["Al filo"] = BONOS["Al filo"]
 	var ascenso := mano.size() >= 3
 	for i in range(1, valores.size()):
 		if valores[i] <= valores[i - 1]:
 			ascenso = false
 	if ascenso:
-		bonos["Ascenso"] = 2
+		bonos["Ascenso"] = BONOS["Ascenso"]
 	if mano.size() >= 5:
-		bonos["Mano larga"] = 2
+		bonos["Mano larga"] = BONOS["Mano larga"]
 	if mano.size() >= 3:
 		var ultimo_palo: String = mano[-1].definicion.palo
 		if mano[-2].definicion.palo == ultimo_palo and mano[-3].definicion.palo == ultimo_palo:
-			bonos["Racha"] = 2
+			bonos["Racha"] = BONOS["Racha"]
 	var multiplicador: int = 1
 	for nombre: String in bonos:
 		patrones.append(nombre)
@@ -47,11 +49,11 @@ static func evaluar(mano: Array, umbral: int = 17) -> Dictionary:
 	return resultado
 
 
-static func intervalo(mano: Array, reveladas: bool = false) -> Dictionary:
+static func intervalo(mano: Array, reveladas: bool = false, vistas: Dictionary = {}) -> Dictionary:
 	var conocido: int = 0
 	var ocultas: int = 0
 	for carta: CartaEnPartida in mano:
-		if carta.definicion.palo == "mascaras" and not reveladas:
+		if carta.definicion.palo == "mascaras" and not reveladas and not vistas.has(carta.id_instancia):
 			# No se consulta su valor: estas cotas no dependen del valor oculto real.
 			ocultas += 1
 		else:
