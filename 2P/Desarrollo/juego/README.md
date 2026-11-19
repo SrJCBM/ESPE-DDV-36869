@@ -65,6 +65,15 @@ if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas' }
 
 El runner devuelve 0 si todas pasan y distinto de 0 si alguna falla. [Resultados registrados](../REVISION_I1.md).
 
+Capturas del objetivo de exploración (I2-K2). `progreso` va de -1 (sin invitación) a 4; las imágenes quedan en `exportaciones/qa/`:
+
+```powershell
+foreach ($t in '1024x576','1280x720') {
+  & $GodotExe --path '2P/Desarrollo/juego' --script res://tests/qa_objetivo.gd -- --sala=vestibulo --progreso=-1 --tamano=$t
+  & $GodotExe --path '2P/Desarrollo/juego' --script res://tests/qa_objetivo.gd -- --sala=corredor --progreso=2 --tamano=$t
+}
+```
+
 ## Exportar para Windows
 
 En el editor: **Editor → Administrar plantillas de exportación** y comprobar las plantillas **4.7.2**. Después **Proyecto → Exportar → Windows Desktop → Exportar proyecto**, desmarcar exportación de depuración y guardar en `exportaciones/LaUltimaMesa-I2.exe`. El preset ya existe.

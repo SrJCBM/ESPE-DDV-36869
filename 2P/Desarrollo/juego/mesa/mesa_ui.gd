@@ -662,6 +662,7 @@ func mostrar_ayuda() -> void:
 	_contenido_modal.size = _panel_modal.size
 	var guia := Guia.new()
 	guia.name = "Reglamento"
+	if controlador != null and controlador.has_method("reglas_ayuda"): guia.reglas = controlador.reglas_ayuda()
 	guia.position = Vector2(32, 100)
 	_contenido_modal.add_child(guia)
 	guia.movimiento.set_pressed_no_signal(movimiento_reducido)

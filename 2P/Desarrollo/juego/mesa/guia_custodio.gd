@@ -1,5 +1,5 @@
 extends Control
-## Libro de consulta: ejemplos fijos, sin acceso a la partida ni a valores ocultos.
+## Libro de consulta: ejemplos fijos y reglas públicas de la mesa activa, sin valores ocultos.
 
 signal movimiento_cambiado(reducido: bool)
 
@@ -14,6 +14,31 @@ var movimiento: CheckButton
 var _pagina: Control
 var _folio: Label
 var _patron_ejemplo := "Punto exacto"
+## Reglas de la mesa que se consulta. Sin datos, el libro describe al Custodio de I1.
+var reglas: Dictionary = {}
+const CUSTODIO := {"mesa": "custodio", "nombre": "El Custodio", "umbral": 17, "meta": 200, "presupuesto": 10, "ficha_por_pedir": 0, "umbral_minimo": 17}
+
+func regla(clave: String) -> Variant:
+	return reglas.get(clave, CUSTODIO[clave])
+
+func coste_pedir() -> String:
+	var fichas := int(regla("ficha_por_pedir"))
+	if fichas <= 0: return "Gratis"
+	return "−%s ficha" % fichas if fichas == 1 else "−%s fichas" % fichas
+
+func resumen_mesa() -> String:
+	return "%s · UMBRAL %s · META %s · %s CAMPANADAS" % [str(regla("nombre")).to_upper(), regla("umbral"), regla("meta"), regla("presupuesto")]
+
+func nota_mesa() -> String:
+	var meta := int(regla("meta"))
+	match str(regla("mesa")):
+		"recaudador":
+			return "Comisión del Recaudador: el reparto inicial es cortesía; cada carta que pidas después cuesta una ficha. Sin fichas no puedes pedir, pero sí plantarte."
+		"coleccionista":
+			return "La Coleccionista retiene la carta más alta de cada mano, incluso en Quiebra. Plantarte resuelve: primero se comprueba la meta de %s, después si quedan manos." % meta
+		"dueno":
+			return "El Dueño empieza en 25 y, tras cada mano resuelta, baja el umbral un punto hasta %s. Cada mano puntúa con el umbral vigente al jugarla." % regla("umbral_minimo")
+	return "Con cero campanadas puedes seguir pidiendo en la última mano. Solo plantarte revela y resuelve: primero se comprueba si llegaste a %s, después si quedan manos." % meta
 
 func mostrar_patron(nombre: String) -> void:
 	_patron_ejemplo = nombre
@@ -123,11 +148,16 @@ func _linea(y: float) -> void:
 
 func _apuesta() -> void:
 	_texto(_pagina, "Cada decisión tiene un coste.", Rect2(0, 0, 758, 85), 39, TINTA, true)
-	_texto(_pagina, "Acumula 200 puntos. Si una mano supera 17, quiebra y aporta cero.\nTienes 10 manos: cada inicio consume una campanada. Pedir es gratis.", Rect2(0, 108, 758, 68), 20)
+	var resumen := _texto(_pagina, resumen_mesa(), Rect2(0, 78, 758, 24), 14, SECUNDARIO)
+	resumen.name = "ResumenMesa"
+	var umbral_texto := "el umbral vigente es %s" % regla("umbral") if str(regla("mesa")) == "dueno" else "si una mano supera %s, quiebra y aporta cero" % regla("umbral")
+	var pedir := "Pedir es gratis." if int(regla("ficha_por_pedir")) <= 0 else "Pedir: una ficha."
+	var intro := _texto(_pagina, "Acumula %s puntos; %s.\nTienes %s manos: cada inicio consume una campanada. %s" % [regla("meta"), umbral_texto, regla("presupuesto"), pedir], Rect2(0, 108, 758, 68), 20)
+	intro.name = "CondicionesMesa"
 	_linea(190)
 	var filas := [
 		["INICIAR MANO", "Recibes dos cartas.", "−1 campanada"],
-		["PEDIR OTRA", "Arriesgas la mano actual.", "Gratis"],
+		["PEDIR OTRA", "Arriesgas la mano actual.", coste_pedir()],
 		["PLANTARSE", "Revelas y puntúas tu mano.", "Gratis"],
 	]
 	for indice in range(filas.size()):
@@ -135,15 +165,17 @@ func _apuesta() -> void:
 		_texto(_pagina, filas[indice][0], Rect2(0, y, 205, 28), 17)
 		_texto(_pagina, filas[indice][1], Rect2(205, y, 345, 30), 18)
 		var coste := _texto(_pagina, filas[indice][2], Rect2(558, y, 200, 30), 18)
+		coste.name = "Coste%s" % indice
 		coste.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_texto(_pagina, "Con cero campanadas puedes seguir pidiendo en la última mano. Solo plantarte revela y resuelve: primero se comprueba si llegaste a 200, después si quedan manos.", Rect2(0, 399, 758, 76), 18, SECUNDARIO)
+	var nota := _texto(_pagina, nota_mesa(), Rect2(0, 399, 758, 76), 18, SECUNDARIO)
+	nota.name = "NotaMesa"
 
 func _palos() -> void:
 	_texto(_pagina, "Cuatro palos. Cuatro ventajas.", Rect2(0, 0, 758, 48), 34, TINTA, true)
 	var filas := [
 		["velas", "Velas", "+1 al multiplicador por cada Vela conservada en una mano válida."],
 		["llaves", "Llaves", "Devuelve una inicial antes de actuar, o la recién pedida. Un reemplazo gratis por mano; llega al final y no se puede volver a devolver."],
-		["relojes", "Relojes", "Valen uno menos que lo impreso, con mínimo 1. Un 6 vale 5. Pedirlos es gratis y no recuperan campanadas."],
+		["relojes", "Relojes", "Valen uno menos que lo impreso, con mínimo 1. Un 6 vale 5. " + ("Pedirlos es gratis y no recuperan campanadas." if int(regla("ficha_por_pedir")) <= 0 else "Pedirlos cuesta la misma ficha que otra carta; no recuperan campanadas.")],
 		["mascaras", "Máscaras", "Ocultas hasta plantarte. Si conoces 9 y tienes una Máscara, puedes sumar entre 10 y 19. Todavía puedes quebrar."],
 	]
 	for indice in range(filas.size()):
@@ -197,7 +229,8 @@ func _puntos() -> void:
 		_pagina.add_child(carta)
 		carta.establecer_movimiento_reducido(true)
 		carta.presentar({"palo": ejemplo.palos[indice], "valor": ejemplo.valores[indice], "valor_efectivo": ejemplo.efectivos[indice], "oculta": false})
-	_texto(_pagina, "EJEMPLO · " + _patron_ejemplo.to_upper(), Rect2(294, 330, 460, 25), 14, SECUNDARIO)
+	var etiqueta := "EJEMPLO · " if int(regla("umbral")) == 17 else "EJEMPLO CON UMBRAL 17 · "
+	_texto(_pagina, etiqueta + _patron_ejemplo.to_upper(), Rect2(294, 330, 460, 25), 14, SECUNDARIO)
 	_texto(_pagina, ejemplo.suma, Rect2(294, 356, 460, 39), 31, TINTA, true)
 	var cuenta := _texto(_pagina, ejemplo.cuenta, Rect2(294, 401, 460, 63), 19)
 	cuenta.name = "EjemploPuntos"

@@ -33,6 +33,10 @@ var cuenta: Label
 var pista: Label
 var puntos: Array[Dictionary] = []
 var mesa: Control
+var indicador_objetivo := PanelContainer.new()
+var texto_objetivo: Label
+var cambios_objetivo := 0
+var _tween_objetivo: Tween
 
 func _ready() -> void:
 	get_window().min_size = Vector2i(1024,576)
@@ -65,6 +69,7 @@ func _ready() -> void:
 	var controles := Libro.rotulo("WASD / flechas · caminar     E · interactuar     I · inventario",16,Libro.ORO)
 	controles.position = Vector2(918,779)
 	pagina.add_child(controles)
+	_crear_objetivo()
 	velo.size = BASE
 	velo.color = Color(0.015,0.035,0.026,0.66)
 	pagina.add_child(velo)
@@ -74,6 +79,51 @@ func _ready() -> void:
 	resized.connect(_adaptar)
 	_adaptar()
 	entrar("vestibulo")
+
+## Objetivo discreto bajo el encabezado: no recibe clics ni compite con el aviso de E.
+func _crear_objetivo() -> void:
+	var franja := StyleBoxFlat.new()
+	franja.bg_color = Color(0.02,0.055,0.043,0.62)
+	franja.set_corner_radius_all(3)
+	franja.content_margin_left = 10
+	franja.content_margin_right = 14
+	franja.content_margin_top = 5
+	franja.content_margin_bottom = 6
+	indicador_objetivo.name = "IndicadorObjetivo"
+	indicador_objetivo.add_theme_stylebox_override("panel",franja)
+	indicador_objetivo.position = Vector2(96,64)
+	indicador_objetivo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var fila := HBoxContainer.new()
+	fila.add_theme_constant_override("separation",9)
+	fila.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	indicador_objetivo.add_child(fila)
+	var rombo := Libro.rotulo("◆",12,Libro.ORO)
+	rombo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	fila.add_child(rombo)
+	texto_objetivo = Libro.rotulo("",18,Libro.PAPEL)
+	texto_objetivo.name = "TextoObjetivo"
+	texto_objetivo.add_theme_constant_override("shadow_offset_x",1)
+	texto_objetivo.add_theme_constant_override("shadow_offset_y",1)
+	texto_objetivo.add_theme_color_override("font_shadow_color",Color(0,0,0,0.75))
+	fila.add_child(texto_objetivo)
+	pagina.add_child(indicador_objetivo)
+
+func objetivo_visible() -> bool:
+	return not libro.visible and not velo.visible and not is_instance_valid(mesa)
+
+func _actualizar_objetivo() -> void:
+	var texto := campana.objetivo()
+	if texto != texto_objetivo.text:
+		var habia_texto := not texto_objetivo.text.is_empty()
+		texto_objetivo.text = texto
+		indicador_objetivo.reset_size()
+		if habia_texto:
+			cambios_objetivo += 1
+			if _tween_objetivo != null: _tween_objetivo.kill()
+			indicador_objetivo.modulate.a = 0.0
+			_tween_objetivo = indicador_objetivo.create_tween()
+			_tween_objetivo.tween_property(indicador_objetivo,"modulate:a",1.0,0.4)
+	indicador_objetivo.visible = objetivo_visible()
 
 func _adaptar() -> void:
 	var escala := minf(size.x/BASE.x, size.y/BASE.y)
@@ -186,6 +236,7 @@ func cercano() -> Dictionary:
 	return elegido
 
 func _process(_delta: float) -> void:
+	_actualizar_objetivo()
 	if libro.visible or is_instance_valid(mesa): return
 	var elegido := cercano()
 	for punto in puntos:
@@ -287,6 +338,7 @@ func _abrir(t: String, mensaje: String, foto: String, volver: Callable) -> void:
 	visitante.bloqueado = true
 	velo.show()
 	libro.presentar(t,mensaje,foto,volver)
+	_actualizar_objetivo()
 
 func _aviso(t: String, mensaje: String, foto := "") -> void:
 	_abrir(t,mensaje,foto,_cerrar)
@@ -301,6 +353,7 @@ func _cerrar() -> void:
 func _refrescar() -> void:
 	titulo.text = CampanaCasino.NOMBRES.get(sala,"")
 	cuenta.text = "%s fichas     ·     %s / 3 sellos" % [campana.saldo,mini(3,campana.superadas)] if campana.recibida else "La invitación"
+	_actualizar_objetivo()
 
 func inventario() -> void:
 	var objetos := PackedStringArray()

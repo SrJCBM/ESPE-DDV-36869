@@ -53,6 +53,20 @@ func usar_lente() -> bool:
 func _intervalo() -> Dictionary:
 	return EvaluadorMano.intervalo(partida.mano, false, _vistas_con_lente)
 
+## Reglas públicas de la mesa activa para el libro de ayuda; no expone cartas ni el mazo.
+func reglas_ayuda() -> Dictionary:
+	var mesa := campana.activa if campana != null and not campana.activa.is_empty() else "custodio"
+	var umbral := partida.umbral
+	# Con el Dueño, entre manos se muestra el umbral que tendrá la siguiente mano.
+	if mesa == "dueno" and estado_activo.nombre != "decision":
+		umbral = maxi(17, 25 - _manos_resueltas)
+	return {
+		"mesa": mesa, "nombre": CampanaCasino.NOMBRES.get(mesa, "El Custodio"),
+		"umbral": umbral, "meta": partida.meta, "presupuesto": presupuesto,
+		"campanadas": partida.campanadas, "ficha_por_pedir": 1 if _cobra_comision() else 0,
+		"saldo": campana.saldo if campana != null else 0, "umbral_minimo": 17,
+	}
+
 func _cobra_comision() -> bool:
 	return campana != null and campana.activa == "recaudador"
 

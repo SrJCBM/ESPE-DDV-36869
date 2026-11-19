@@ -30,6 +30,16 @@ func recibir_invitacion() -> void:
 	saldo = 10
 	baraja = FabricaCartas.crear_baraja()
 
+## Objetivo de exploración derivado solo del progreso; tienda y paseos no lo cambian.
+func objetivo() -> String:
+	if not recibida: return "Habla con la anfitriona"
+	match superadas:
+		0: return "Encuentra la mesa del Custodio"
+		1: return "Encuentra la mesa del Recaudador"
+		2: return "Encuentra la mesa de la Coleccionista"
+		3: return "Encuentra la mesa del Dueño de la Casa"
+	return "Abre el portón del amanecer"
+
 func puerta_abierta(sala: String) -> bool:
 	var nivel := MESAS.find(sala)
 	return nivel < 0 or (recibida and nivel <= superadas)
