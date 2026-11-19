@@ -1,6 +1,6 @@
 # Iteración 02 · La casa de los tres sellos
 
-**Versión 0.2.0 · 18 de noviembre de 2026.** Campaña jugable. Quedan pendientes la ayuda por mesa, el indicador de objetivo y la revisión con jugadores.
+**Versión 0.2.0 · 18 de noviembre de 2026.** Campaña jugable con ayuda por mesa, objetivo de exploración y personajes ampliados. Queda pendiente la revisión con jugadores.
 
 El visitante recorre el casino aprobado en clase, prepara su baraja entre encuentros y sale al amanecer si supera las cuatro mesas. La campaña dura un intento y el progreso se conserva durante la sesión. La prioridad siguiente es revisar orientación y balance con el equipo. La red queda para un incremento posterior.
 
@@ -24,7 +24,7 @@ El visitante recorre el casino aprobado en clase, prepara su baraja entre encuen
 
 ## Entrega de Kenned
 
-Kenned se encarga de la integración y las pruebas en su equipo. Julio revisa la presentación y Ariel contrasta los costes con las reglas. Las tres actividades siguen pendientes.
+I2-K1, I2-K2 e I2-K3 están aceptadas. Kenned entregó la ayuda y el objetivo en `1ba87b6` y documentó su prueba de Windows a 1024 × 576 y 1280 × 720 en la [tarea #1](https://github.com/SrJCBM/ESPE-DDV-36869/issues/1). En `235a92f` amplió las figuras de exploración y ajustó el orden de dibujo para mantener visibles las placas y los indicadores.
 
 | Actividad | Criterio de aceptación |
 | --- | --- |
@@ -39,9 +39,9 @@ Kenned se encarga de la integración y las pruebas en su equipo. Julio revisa la
 - Mostrar un único objetivo, de hasta dos líneas. Ocultarlo mientras están abiertos los diálogos, el inventario, la tienda o una mesa de cartas. Al volver a caminar reaparece el objetivo vigente.
 - Probar a **1024 × 576** y **1280 × 720**. Acercarse a una puerta, abrir un diálogo y ganar un sello. Comprobar que **E** sigue disponible, que el indicador deja pasar los clics y que el objetivo cambia una sola vez.
 
-Para entregar, compartir la rama, el commit, el resultado de GUT y una captura del indicador en el juego a la resolución menor.
-
 ## Comprobaciones
+
+La versión integrada pasó **134 pruebas y 1182 aserciones** con Godot 4.7.2 desde una copia limpia. Se comprobó el indicador en el vestíbulo a 1024 × 576 y se exportó y ejecutó la compilación de Windows.
 
 Godot 4.7.2 y GUT ejecutaron 120 pruebas con 1051 aserciones. La regresión de campaña usa barajas normales con semillas fijas y las acciones de la interfaz. Completa las cuatro mesas, abre el portón y empieza otro intento. También se probaron compras rechazadas, límites de amuletos, revelación parcial, cobro de recompensas, retenciones y la convivencia con el acceso directo a I1.
 
