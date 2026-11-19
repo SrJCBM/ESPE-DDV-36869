@@ -6,10 +6,19 @@ extends RefCounted
 const SEMILLAS := 200
 ## Saldo al salir del Custodio: diez iniciales + premio con dos Puntos exactos (10 + 5 × 2), como en el GDD.
 const SALDO_TRAS_CUSTODIO := 30
+## «llega»: saldo al salir de la tienda hacia el Recaudador, antes de comprar.
+## Los dos controles no son recorridos alcanzables con los precios actuales:
+## fijan el saldo para separar el efecto de las fichas del de los amuletos.
 const RECORRIDOS := [
-	{"nombre": "Ahorra", "compras": []},
-	{"nombre": "Compra", "compras": ["corona", "prudente"]},
+	{"nombre": "Ahorra", "llega": SALDO_TRAS_CUSTODIO, "compras": []},
+	{"nombre": "Compra", "llega": SALDO_TRAS_CUSTODIO, "compras": ["corona", "prudente"]},
+	{"nombre": "Control: 18 sin amuletos", "llega": 3, "compras": []},
+	{"nombre": "Control: 45 con Corona y Sello", "llega": SALDO_TRAS_CUSTODIO + 27, "compras": ["corona", "prudente"]},
 ]
+const AHORRA := 0
+const COMPRA := 1
+const CONTROL_18 := 2
+const CONTROL_45 := 3
 const ESTILOS := [
 	{"nombre": "Se planta pronto", "extra": false},
 	{"nombre": "Pide una carta más", "extra": true},
@@ -21,7 +30,7 @@ const MARGEN := 6
 static func jugar(semilla: int, recorrido: Dictionary, estilo: Dictionary, registrar := false) -> Dictionary:
 	var c := CampanaCasino.new()
 	c.recibir_invitacion()
-	c.saldo = SALDO_TRAS_CUSTODIO
+	c.saldo = int(recorrido.llega)
 	for id: String in recorrido.compras:
 		var comprado := c.comprar(id)
 		assert(comprado, "Compra rechazada: %s" % id)
@@ -106,6 +115,7 @@ static func ejecutar() -> Dictionary:
 	for recorrido: Dictionary in RECORRIDOS:
 		for estilo: Dictionary in ESTILOS:
 			var fila := {"recorrido": recorrido.nombre, "estilo": estilo.nombre, "intentos": SEMILLAS,
+				"amuletos": recorrido.compras.size() > 0,
 				"saldo_al_sentarse": 0, "comisiones": 0, "manos_sin_saldo": 0, "victorias": 0,
 				"intentos_con_falta": 0, "manos": 0}
 			for semilla in range(SEMILLAS):
@@ -117,15 +127,20 @@ static func ejecutar() -> Dictionary:
 				if r.manos_sin_saldo > 0: fila.intentos_con_falta += 1
 				if r.victoria: fila.victorias += 1
 			filas.append(fila)
-	return {"filas": filas, "ejemplo": ejemplo()}
+	return {"filas": filas,
+		# Caso típico: sin amuletos y plantándose pronto, la regla base pide carta y no hay fichas.
+		"ejemplo_sin_saldo": ejemplo(CONTROL_18, AHORRA, 0),
+		# Caso menos frecuente: la falta de saldo evita la carta extra que habría causado Quiebra.
+		"ejemplo_carta_extra": ejemplo(CONTROL_18, AHORRA, 1)}
 
-## Primera semilla en la que quien compra quiere pedir la carta extra y no puede.
+## Primera semilla en la que el recorrido con poco saldo quiere pedir la carta extra y no puede.
 ## Hasta esa mano ambos recorridos jugaron exactamente igual (mismo reparto y decisiones).
-static func ejemplo() -> Dictionary:
+## Por defecto compara Compra con Ahorra; con CONTROL_18 frente a AHORRA no intervienen amuletos.
+static func ejemplo(pobre := COMPRA, rico := AHORRA, estilo := 1) -> Dictionary:
 	for semilla in range(SEMILLAS):
-		var compra := jugar(semilla, RECORRIDOS[1], ESTILOS[1], true)
+		var compra := jugar(semilla, RECORRIDOS[pobre], ESTILOS[estilo], true)
 		if compra.manos_sin_saldo == 0: continue
-		var ahorra := jugar(semilla, RECORRIDOS[0], ESTILOS[1], true)
+		var ahorra := jugar(semilla, RECORRIDOS[rico], ESTILOS[estilo], true)
 		for i in range(mini(compra.registro.size(), ahorra.registro.size())):
 			if compra.registro[i].le_falto_saldo:
 				return {"semilla": semilla, "mano": compra.registro[i].mano,
@@ -135,8 +150,9 @@ static func ejemplo() -> Dictionary:
 	return {}
 
 static func tabla(datos: Dictionary) -> String:
-	var lineas := PackedStringArray(["| Recorrido | Estilo | Saldo al sentarse | Fichas en comisiones (media) | Manos sin saldo para pedir (total) | Intentos ganados |", "|---|---|---:|---:|---:|---:|"])
+	var lineas := PackedStringArray(["| Recorrido | Estilo | Saldo al sentarse | Fichas en comisiones (media) | Manos sin saldo: total · media por intento · intentos afectados | Manos jugadas (media) | Intentos ganados |", "|---|---|---:|---:|---:|---:|---:|"])
 	for f: Dictionary in datos.filas:
-		lineas.append("| %s | %s | %s | %.1f | %s en %s intentos | %s / %s |" % [f.recorrido, f.estilo, f.saldo_al_sentarse,
-			float(f.comisiones) / f.intentos, f.manos_sin_saldo, f.intentos_con_falta, f.victorias, f.intentos])
+		lineas.append("| %s | %s | %s | %.1f | %s · %.2f · %s | %.1f | %s / %s |" % [f.recorrido, f.estilo, f.saldo_al_sentarse,
+			float(f.comisiones) / f.intentos, f.manos_sin_saldo, float(f.manos_sin_saldo) / f.intentos, f.intentos_con_falta,
+			float(f.manos) / f.intentos, f.victorias, f.intentos])
 	return "\n".join(lineas)
