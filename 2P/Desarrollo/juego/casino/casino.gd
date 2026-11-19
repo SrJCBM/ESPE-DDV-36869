@@ -25,6 +25,8 @@ var sala := ""
 var pagina := Control.new()
 var mundo := Node2D.new()
 var decorado := Node2D.new()
+## Rombos y placas: sobre el mundo y el visitante, pero debajo de diálogos y velo.
+var capa_superior := Node2D.new()
 var visitante := Visitante.new()
 var libro := Libro.new()
 var velo := ColorRect.new()
@@ -48,8 +50,13 @@ func _ready() -> void:
 	pagina.size = BASE
 	pagina.add_child(mundo)
 	mundo.position = Vector2(80,52)
+	# Orden por la altura de los pies: el visitante queda detrás de quien está más abajo.
+	mundo.y_sort_enabled = true
+	decorado.y_sort_enabled = true
 	mundo.add_child(decorado)
 	mundo.add_child(visitante)
+	pagina.add_child(capa_superior)
+	capa_superior.position = mundo.position
 	var marca := Libro.rotulo("LA ÚLTIMA MESA",24,Libro.ORO,true)
 	marca.position = Vector2(80,6)
 	pagina.add_child(marca)
@@ -133,13 +140,15 @@ func _adaptar() -> void:
 func entrar(destino: String, origen := "") -> void:
 	if not CampanaCasino.NOMBRES.has(destino) or not campana.puerta_abierta(destino): return
 	sala = destino
-	for hijo in decorado.get_children():
-		decorado.remove_child(hijo)
-		hijo.queue_free()
+	for capa in [decorado, capa_superior]:
+		for hijo in capa.get_children():
+			capa.remove_child(hijo)
+			hijo.queue_free()
 	puntos.clear()
 	if sala == "corredor":
 		var galeria := Galeria.new()
 		galeria.campana = campana
+		galeria.capa_placas = capa_superior
 		decorado.add_child(galeria)
 		for i in range(Galeria.DESTINOS.size()):
 			var puerta: String = Galeria.DESTINOS[i]
@@ -161,14 +170,14 @@ func _agregar_sala() -> void:
 	_punto("puerta",Vector2(640,651),"Volver a la galería","corredor")
 	match sala:
 		"vestibulo":
-			_figura("anfitriona",Vector2(990,231),63)
+			_figura("anfitriona",Vector2(990,231),84)
 			_obstaculo(Rect2(846,165,265,102))
 			_obstaculo(Rect2(80,463,50,154))
 			_obstaculo(Rect2(1152,463,55,154))
 			_punto("anfitriona",Vector2(985,279),"Hablar con la anfitriona")
 			_punto("nota",Vector2(640,190),"Examinar el reloj")
 		"tienda":
-			_figura("anfitriona",Vector2(650,174),64)
+			_figura("anfitriona",Vector2(650,174),84)
 			_obstaculo(Rect2(287,165,695,114))
 			_obstaculo(Rect2(82,237,77,265))
 			_obstaculo(Rect2(1120,237,78,265))
@@ -177,8 +186,10 @@ func _agregar_sala() -> void:
 			_punto("tienda",Vector2(645,290),"Abrir el mostrador")
 			_punto("nota",Vector2(168,385),"Examinar la vitrina")
 		_:
-			_figura(sala,Vector2(640,310),73)
+			_figura(sala,Vector2(640,310),95)
 			_obstaculo(Rect2(456,305,369,146))
+			# Solo la silla del jefe: no se puede pasar entre él y su silla, pero sí rodearlo por detrás.
+			_obstaculo(Rect2(600,240,84,70))
 			if sala == "coleccionista":
 				_obstaculo(Rect2(196,187,93,306))
 				_obstaculo(Rect2(994,187,93,306))
@@ -196,7 +207,8 @@ func _figura(id: String, pies: Vector2, alto: float) -> void:
 	var npc := Sprite2D.new()
 	npc.texture = load("res://casino/arte/figura_%s.webp" % id)
 	npc.scale = Vector2.ONE * alto / npc.texture.get_height()
-	npc.position = pies - Vector2(0,alto*0.5)
+	npc.offset = Vector2(0,-npc.texture.get_height()*0.5)
+	npc.position = pies
 	decorado.add_child(npc)
 
 func _limites(area: Rect2) -> void:
@@ -222,7 +234,7 @@ func _punto(tipo: String, pos: Vector2, accion: String, destino := "") -> void:
 	marca.add_theme_constant_override("outline_size",5)
 	marca.add_theme_color_override("font_outline_color",Color("15231e"))
 	marca.position = pos-Vector2(10,25)
-	decorado.add_child(marca)
+	capa_superior.add_child(marca)
 	puntos.append({"tipo":tipo,"pos":pos,"accion":accion,"destino":destino,"marca":marca})
 
 func cercano() -> Dictionary:

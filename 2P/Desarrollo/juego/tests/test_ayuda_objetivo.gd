@@ -77,6 +77,8 @@ func test_libro_del_recaudador_cobra_una_ficha_por_pedir() -> void:
 	var palos: String = ""
 	for etiqueta in guia.find_children("*", "Label", true, false): palos += etiqueta.text
 	assert_false(palos.contains("Pedirlos es gratis"))
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 func test_libro_de_las_demas_mesas_y_de_i1_no_cobra_fichas() -> void:
 	for nivel in [0, 2, 3]:
@@ -173,3 +175,5 @@ func test_indicador_deja_pasar_clics_y_no_tapa_el_juego() -> void:
 		juego.entrar(sala)
 		for punto in juego.puntos:
 			assert_false(caja.has_point(juego.mundo.position + punto.pos), "%s · %s" % [sala, punto.accion])
+	await get_tree().process_frame
+	await get_tree().process_frame

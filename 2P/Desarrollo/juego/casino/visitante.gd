@@ -1,6 +1,8 @@
 extends CharacterBody2D
 ## El origen del visitante está a la altura de sus pies.
 const FIGURA := preload("res://casino/arte/figura_visitante.webp")
+## Altura en píxeles del mundo (1280 × 720). La sombra crece en proporción.
+const ALTO := 104.0
 var bloqueado := false
 var rumbo := Vector2.DOWN
 var paso := 0.0
@@ -25,8 +27,7 @@ func _physics_process(delta: float) -> void:
 
 func _draw() -> void:
 	draw_set_transform(Vector2(1,-2),0,Vector2(1,0.28))
-	draw_circle(Vector2.ZERO,19,Color(0.02,0.04,0.03,0.63))
+	draw_circle(Vector2.ZERO,19.0*ALTO/66.0,Color(0.02,0.04,0.03,0.63))
 	draw_set_transform(Vector2(0,-absf(sin(paso))*1.8),sin(paso)*0.019,Vector2(-1 if rumbo.x < -0.1 else 1,1))
-	var alto := 66.0
-	var ancho := alto * FIGURA.get_width() / FIGURA.get_height()
-	draw_texture_rect(FIGURA,Rect2(-ancho/2,-alto,ancho,alto),false)
+	var ancho := ALTO * FIGURA.get_width() / FIGURA.get_height()
+	draw_texture_rect(FIGURA,Rect2(-ancho/2,-ALTO,ancho,ALTO),false)
