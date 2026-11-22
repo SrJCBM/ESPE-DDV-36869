@@ -662,7 +662,7 @@ func _ver_objetos() -> void:
 	match campana.activa:
 		"recaudador": datos.append("Comisión de la casa: una ficha al pedir.")
 		"coleccionista": datos.append("Cartas retenidas hasta superar esta mesa: %s." % controlador.retenidas.size())
-		"dueno": datos.append("Cada nueva mano reduce el umbral un punto, hasta 17.")
+		"dueno": datos.append("Cada mano cerrada sin Quiebra reduce el umbral un punto, hasta 17.")
 	var ficha := _etiqueta(_contenido_modal,"",Rect2(38,100,716,340),20,MARFIL)
 	ficha.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	ficha.text = "\n\n".join(datos)
