@@ -311,8 +311,8 @@ func _presentar_jefe() -> void:
 	if nivel < campana.superadas:
 		_aviso(CampanaCasino.NOMBRES[sala],"La mesa se ha cerrado. La casa recuerda tu victoria.",foto)
 		return
-	var regla: Array = CampanaCasino.REGLAS[nivel]
-	_abrir(CampanaCasino.NOMBRES[sala],"«%s»\nUmbral %s   ·   Meta %s   ·   %s campanadas" % [DIALOGOS[sala],regla[0],regla[1],regla[2]],foto,_cerrar)
+	var regla := CampanaCasino.MESAS_CAMPANA.de(sala)
+	_abrir(CampanaCasino.NOMBRES[sala],"«%s»\nUmbral %s   ·   Meta %s   ·   %s campanadas" % [DIALOGOS[sala],regla.umbral,regla.meta,regla.campanadas],foto,_cerrar)
 	libro.opcion("Tomar asiento",_jugar)
 	libro.opcion("Volver a la sala",_cerrar)
 
@@ -369,7 +369,7 @@ func _refrescar() -> void:
 
 func inventario() -> void:
 	var objetos := PackedStringArray()
-	for id in campana.amuletos: objetos.append(CampanaCasino.CATALOGO[id][0])
+	for id in campana.amuletos: objetos.append(CampanaCasino.TIENDA.buscar(id).nombre)
 	var mensaje := "%s cartas   ·   %s fichas   ·   %s / 3 sellos\n%s / 2 lentes de humo. Amuletos: %s." % [campana.baraja.size(),campana.saldo,mini(3,campana.superadas),campana.lentes,", ".join(objetos) if objetos.size() else "ninguno"]
 	_aviso("Tus pertenencias",mensaje if campana.recibida else "Una invitación lacrada y una ficha antigua. Enséñale la invitación a la anfitriona.")
 
@@ -378,17 +378,16 @@ func tienda() -> void:
 		_aviso("Mostrador cerrado","Presenta primero tu invitación en el vestíbulo.")
 		return
 	_abrir("Gabinete de la anfitriona","«Mira bien antes de gastar. Algunas piezas te acompañan toda la noche.»\nSaldo disponible: %s fichas." % campana.saldo,"",_cerrar)
-	for id: String in CampanaCasino.CATALOGO:
-		var item: Array = CampanaCasino.CATALOGO[id]
-		libro.opcion("%s    ·    %s fichas" % [item[0],item[1]],_elegir_producto.bind(id))
+	for item: ObjetoTienda in CampanaCasino.TIENDA.objetos:
+		libro.opcion("%s    ·    %s fichas" % [item.nombre,item.precio],_elegir_producto.bind(item.id))
 	libro.opcion("Salir del gabinete",_cerrar)
 
 func _elegir_producto(id: String) -> void:
 	if id not in ["eliminar","subir","bajar"]:
 		_confirmar_compra(id)
 		return
-	var item: Array = CampanaCasino.CATALOGO[id]
-	_abrir(item[0],"%s   ·   %s fichas. Saldo: %s." % [item[2],item[1],campana.saldo],"",tienda)
+	var item := CampanaCasino.TIENDA.buscar(id)
+	_abrir(item.nombre,"%s   ·   %s fichas. Saldo: %s." % [item.descripcion,item.precio,campana.saldo],"",tienda)
 	libro.opcion("Volver al catálogo",tienda)
 	for carta in campana.baraja:
 		var razon := campana.impedimento(id,carta)
@@ -396,19 +395,19 @@ func _elegir_producto(id: String) -> void:
 		libro.opcion(nombre if razon.is_empty() else nombre+"   /   "+razon,_confirmar_compra.bind(id,carta),razon.is_empty())
 
 func _confirmar_compra(id: String, carta: CartaEnPartida = null) -> void:
-	var item: Array = CampanaCasino.CATALOGO[id]
+	var item := CampanaCasino.TIENDA.buscar(id)
 	var razon := campana.impedimento(id,carta)
-	var detalle := str(item[2]) + "\nPrecio: %s fichas. Saldo actual: %s." % [item[1],campana.saldo]
+	var detalle := item.descripcion + "\nPrecio: %s fichas. Saldo actual: %s." % [item.precio,campana.saldo]
 	if carta != null: detalle += " Carta: %s de %s." % [carta.definicion.valor_impreso,carta.definicion.palo]
 	if not razon.is_empty(): detalle += "\n" + razon
 	var ilustracion := "res://casino/arte/objeto_%s.webp" % id if carta == null else ""
-	_abrir(item[0],detalle,ilustracion,tienda)
+	_abrir(item.nombre,detalle,ilustracion,tienda)
 	if razon.is_empty(): libro.opcion("Confirmar compra",_comprar.bind(id,carta))
 	libro.opcion("Volver al catálogo",tienda)
 
 func _comprar(id: String, carta: CartaEnPartida) -> void:
 	if not campana.comprar(id,carta): return
 	_refrescar()
-	_abrir("Trato cerrado","%s. Saldo tras la compra: %s fichas." % [CampanaCasino.CATALOGO[id][0],campana.saldo],"",tienda)
+	_abrir("Trato cerrado","%s. Saldo tras la compra: %s fichas." % [CampanaCasino.TIENDA.buscar(id).nombre,campana.saldo],"",tienda)
 	libro.opcion("Ver el catálogo",tienda)
 	libro.opcion("Dejar el mostrador",_cerrar)

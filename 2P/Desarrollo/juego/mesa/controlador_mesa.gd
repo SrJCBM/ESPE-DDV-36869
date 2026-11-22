@@ -36,10 +36,10 @@ func _init() -> void:
 func configurar_campana(sesion: CampanaCasino) -> void:
 	campana = sesion
 	regla = FabricaCrupieres.para(campana.activa)
-	var reglas: Array = CampanaCasino.REGLAS[CampanaCasino.MESAS.find(campana.activa)]
-	partida.umbral = reglas[0]
-	partida.meta = reglas[1]
-	presupuesto = reglas[2]
+	var reglas := CampanaCasino.MESAS_CAMPANA.de(campana.activa)
+	partida.umbral = reglas.umbral
+	partida.meta = reglas.meta
+	presupuesto = reglas.campanadas
 	partida.campanadas = presupuesto
 	partida.mazo.assign(campana.baraja)
 	partida._barajar()

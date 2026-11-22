@@ -9,7 +9,7 @@ const ESTRATEGIAS := [
 	{"nombre": "Lente, Corona y Sello", "lente": true, "amuletos": ["corona", "prudente"]},
 ]
 const MARGENES := [4, 6, 8]
-## Variantes con --variantes: {índice de mesa: [meta, campanadas]}. La primera usa CampanaCasino.REGLAS sin cambios.
+## Variantes con --variantes: {índice de mesa: [meta, campanadas]}. La primera usa las mesas de datos/mesas/mesas_campana.tres sin cambios.
 const VARIANTES := [
 	{"nombre": "Vigentes", "reglas": {}},
 	{"nombre": "Dueño 750/18", "reglas": {3: [750, 18]}},

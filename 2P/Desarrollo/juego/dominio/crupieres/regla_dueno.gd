@@ -6,7 +6,7 @@ const MINIMO := 17
 var _anterior := -1
 
 func umbral_para(manos_validas: int) -> int:
-	return maxi(MINIMO, int(CampanaCasino.REGLAS[3][0]) - manos_validas)
+	return maxi(MINIMO, CampanaCasino.MESAS_CAMPANA.de("dueno").umbral - manos_validas)
 
 func umbral_al_iniciar(mesa: ControladorMesa) -> int:
 	_anterior = mesa.partida.umbral if mesa.manos_resueltas() > 0 else -1

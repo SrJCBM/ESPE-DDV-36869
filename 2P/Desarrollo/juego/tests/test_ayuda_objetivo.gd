@@ -35,11 +35,11 @@ func test_reglas_de_cada_mesa_coinciden_con_la_campana() -> void:
 		autofree(m)
 		m.configurar_campana(_campana(nivel))
 		var reglas := m.reglas_ayuda()
-		var esperado: Array = CampanaCasino.REGLAS[nivel]
+		var esperado: ReglaMesa = CampanaCasino.MESAS_CAMPANA.de(CampanaCasino.MESAS[nivel])
 		assert_eq(reglas.mesa, CampanaCasino.MESAS[nivel])
-		assert_eq(reglas.umbral, esperado[0])
-		assert_eq(reglas.meta, esperado[1])
-		assert_eq(reglas.presupuesto, esperado[2])
+		assert_eq(reglas.umbral, esperado.umbral)
+		assert_eq(reglas.meta, esperado.meta)
+		assert_eq(reglas.presupuesto, esperado.campanadas)
 		assert_eq(reglas.ficha_por_pedir, 1 if nivel == 1 else 0)
 
 func test_acceso_i1_conserva_las_reglas_del_custodio() -> void:
@@ -84,10 +84,10 @@ func test_libro_de_las_demas_mesas_y_de_i1_no_cobra_fichas() -> void:
 	for nivel in [0, 2, 3]:
 		var mesa = _mesa_campana(nivel)
 		var guia = _libro(mesa)
-		var reglas: Array = CampanaCasino.REGLAS[nivel]
+		var reglas: ReglaMesa = CampanaCasino.MESAS_CAMPANA.de(CampanaCasino.MESAS[nivel])
 		assert_eq(guia.find_child("Coste1", true, false).text, "Gratis")
-		assert_string_contains(guia.find_child("CondicionesMesa", true, false).text, str(reglas[1]))
-		assert_string_contains(guia.find_child("ResumenMesa", true, false).text, "UMBRAL %s" % reglas[0])
+		assert_string_contains(guia.find_child("CondicionesMesa", true, false).text, str(reglas.meta))
+		assert_string_contains(guia.find_child("ResumenMesa", true, false).text, "UMBRAL %s" % reglas.umbral)
 		mesa.cerrar_modal()
 	var i1 = Mesa.instantiate()
 	i1.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)

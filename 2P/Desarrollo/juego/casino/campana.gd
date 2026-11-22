@@ -6,17 +6,9 @@ const MESAS := ["custodio", "recaudador", "coleccionista", "dueno"]
 const NOMBRES := {"vestibulo":"Vestíbulo", "corredor":"Galería de los sellos", "tienda":"Gabinete de la anfitriona", "custodio":"El Custodio", "recaudador":"El Recaudador", "coleccionista":"La Coleccionista", "dueno":"El Dueño de la Casa"}
 ## Usos por mesa del Sello del prudente (BALANCE_CAMPANA.md).
 const USOS_PRUDENTE := 1
-## [umbral, meta, campanadas] por mesa. Coleccionista y Dueño ajustados con tests/sim_campana.gd (BALANCE_CAMPANA.md).
-const REGLAS := [[17,200,10], [21,400,12], [25,700,12], [25,750,17]]
-const CATALOGO := {
-	"lente": ["Lente de humo", 6, "Revela todas las Máscaras ocultas de la mano. Se consume al usarla."],
-	"corona": ["Corona del riesgo", 15, "+2 al multiplicador al plantarte con una Máscara aún oculta en una mano válida."],
-	"prudente": ["Sello del prudente", 12, "Recupera una campanada al quedar tres o más por debajo. Una vez por mesa."],
-	"moneda": ["Moneda mellada", 10, "Gana dos fichas por un Punto exacto. Tres veces por mesa."],
-	"eliminar": ["Retirar una carta", 4, "Elige una carta. Deben quedar al menos doce."],
-	"subir": ["Ajustar valor +1", 5, "Elige una carta. Solo puedes ajustar su valor una vez por intento."],
-	"bajar": ["Ajustar valor −1", 5, "Elige una carta. Solo puedes ajustar su valor una vez por intento."],
-}
+## Catálogos de datos (Resources): condiciones de las mesas y productos de la tienda.
+const MESAS_CAMPANA: CatalogoMesas = preload("res://datos/mesas/mesas_campana.tres")
+const TIENDA: CatalogoTienda = preload("res://datos/tienda/catalogo_tienda.tres")
 var recibida := false
 var saldo := 0
 var superadas := 0
@@ -64,8 +56,9 @@ func cerrar(victoria: bool, exactos: int) -> int:
 	return premio
 
 func impedimento(id: String, carta: CartaEnPartida = null) -> String:
-	if not CATALOGO.has(id) or not recibida or derrota or not activa.is_empty(): return "Compra no disponible."
-	if saldo < int(CATALOGO[id][1]): return "Fichas insuficientes."
+	var producto := TIENDA.buscar(id)
+	if producto == null or not recibida or derrota or not activa.is_empty(): return "Compra no disponible."
+	if saldo < producto.precio: return "Fichas insuficientes."
 	if id == "lente" and lentes >= 2: return "Ya llevas dos consumibles."
 	if amuletos.has(id): return "Ya llevas este amuleto."
 	if id in ["eliminar", "subir", "bajar"]:
@@ -77,7 +70,7 @@ func impedimento(id: String, carta: CartaEnPartida = null) -> String:
 
 func comprar(id: String, carta: CartaEnPartida = null) -> bool:
 	if not impedimento(id, carta).is_empty(): return false
-	saldo -= int(CATALOGO[id][1])
+	saldo -= TIENDA.buscar(id).precio
 	match id:
 		"lente": lentes += 1
 		"eliminar": baraja.erase(carta)

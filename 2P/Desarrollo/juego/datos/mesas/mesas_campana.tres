@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CatalogoMesas" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://datos/mesas/catalogo_mesas.gd" id="1_catalogo"]
+[ext_resource type="Script" path="res://datos/mesas/regla_mesa.gd" id="2_mesa"]
+
+[sub_resource type="Resource" id="custodio"]
+script = ExtResource("2_mesa")
+id = "custodio"
+umbral = 17
+meta = 200
+campanadas = 10
+
+[sub_resource type="Resource" id="recaudador"]
+script = ExtResource("2_mesa")
+id = "recaudador"
+umbral = 21
+meta = 400
+campanadas = 12
+
+[sub_resource type="Resource" id="coleccionista"]
+script = ExtResource("2_mesa")
+id = "coleccionista"
+umbral = 25
+meta = 700
+campanadas = 12
+
+[sub_resource type="Resource" id="dueno"]
+script = ExtResource("2_mesa")
+id = "dueno"
+umbral = 25
+meta = 750
+campanadas = 17
+
+[resource]
+script = ExtResource("1_catalogo")
+mesas = Array[ExtResource("2_mesa")]([SubResource("custodio"), SubResource("recaudador"), SubResource("coleccionista"), SubResource("dueno")])

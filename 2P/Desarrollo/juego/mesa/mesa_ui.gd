@@ -657,8 +657,8 @@ func _ver_objetos() -> void:
 	datos.append("Fichas: %s     ·     Lentes de humo: %s / 2" % [campana.saldo,campana.lentes])
 	datos.append("La Lente revela las Máscaras actuales. Úsala desde la mesa antes de plantarte.")
 	for id in campana.amuletos:
-		var objeto: Array = CampanaCasino.CATALOGO[id]
-		datos.append("%s  ·  %s" % [objeto[0],objeto[2]])
+		var objeto := CampanaCasino.TIENDA.buscar(id)
+		datos.append("%s  ·  %s" % [objeto.nombre,objeto.descripcion])
 	match campana.activa:
 		"recaudador": datos.append("Comisión de la casa: una ficha al pedir.")
 		"coleccionista": datos.append("Cartas retenidas hasta superar esta mesa: %s." % controlador.retenidas.size())

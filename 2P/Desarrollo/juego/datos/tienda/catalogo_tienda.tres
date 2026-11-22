@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="CatalogoTienda" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://datos/tienda/catalogo_tienda.gd" id="1_catalogo"]
+[ext_resource type="Script" path="res://datos/tienda/objeto_tienda.gd" id="2_objeto"]
+
+[sub_resource type="Resource" id="lente"]
+script = ExtResource("2_objeto")
+id = "lente"
+nombre = "Lente de humo"
+precio = 6
+descripcion = "Revela todas las Máscaras ocultas de la mano. Se consume al usarla."
+
+[sub_resource type="Resource" id="corona"]
+script = ExtResource("2_objeto")
+id = "corona"
+nombre = "Corona del riesgo"
+precio = 15
+descripcion = "+2 al multiplicador al plantarte con una Máscara aún oculta en una mano válida."
+
+[sub_resource type="Resource" id="prudente"]
+script = ExtResource("2_objeto")
+id = "prudente"
+nombre = "Sello del prudente"
+precio = 12
+descripcion = "Recupera una campanada al quedar tres o más por debajo. Una vez por mesa."
+
+[sub_resource type="Resource" id="moneda"]
+script = ExtResource("2_objeto")
+id = "moneda"
+nombre = "Moneda mellada"
+precio = 10
+descripcion = "Gana dos fichas por un Punto exacto. Tres veces por mesa."
+
+[sub_resource type="Resource" id="eliminar"]
+script = ExtResource("2_objeto")
+id = "eliminar"
+nombre = "Retirar una carta"
+precio = 4
+descripcion = "Elige una carta. Deben quedar al menos doce."
+
+[sub_resource type="Resource" id="subir"]
+script = ExtResource("2_objeto")
+id = "subir"
+nombre = "Ajustar valor +1"
+precio = 5
+descripcion = "Elige una carta. Solo puedes ajustar su valor una vez por intento."
+
+[sub_resource type="Resource" id="bajar"]
+script = ExtResource("2_objeto")
+id = "bajar"
+nombre = "Ajustar valor −1"
+precio = 5
+descripcion = "Elige una carta. Solo puedes ajustar su valor una vez por intento."
+
+[resource]
+script = ExtResource("1_catalogo")
+objetos = Array[ExtResource("2_objeto")]([SubResource("lente"), SubResource("corona"), SubResource("prudente"), SubResource("moneda"), SubResource("eliminar"), SubResource("subir"), SubResource("bajar")])

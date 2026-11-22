@@ -279,3 +279,13 @@ func test_cada_mesa_usa_la_regla_de_su_crupier() -> void:
 	for nivel in range(4):
 		var m := control(nueva(), nivel)
 		assert_eq(m.regla.cobra_por_pedir(), nivel == 1)
+
+func test_catalogos_de_mesas_y_tienda_cargan_desde_resources() -> void:
+	var ids := []
+	for mesa: ReglaMesa in CampanaCasino.MESAS_CAMPANA.mesas: ids.append(mesa.id)
+	assert_eq(ids, CampanaCasino.MESAS, "Las mesas del recurso siguen el orden de la campaña")
+	var precios := {}
+	for objeto: ObjetoTienda in CampanaCasino.TIENDA.objetos: precios[objeto.id] = objeto.precio
+	assert_eq(precios, {"lente": 6, "corona": 15, "prudente": 12, "moneda": 10, "eliminar": 4, "subir": 5, "bajar": 5})
+	assert_null(CampanaCasino.TIENDA.buscar("inexistente"))
+	assert_null(CampanaCasino.MESAS_CAMPANA.de("inexistente"))
