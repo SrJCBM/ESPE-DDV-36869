@@ -6,7 +6,7 @@
 
 - Catálogo exacto de 24 cartas; identidades opacas e independencia entre catálogo e intentos.
 - Mano, mazo, descarte y reciclaje sin duplicados ni incorporación de la mano actual al descarte reciclado.
-- Iniciar y pedir cuestan una campanada; plantarse y devolver Llave son gratis. Las solicitudes rechazadas conservan el estado.
+- Iniciar cuesta una campanada; pedir, plantarse y devolver Llave son gratis. Las solicitudes rechazadas conservan el estado. *Esta revisión se hizo con el coste anterior, en el que pedir también gastaba una campanada; el coste por mano rige desde el 14 de noviembre ([ITERACION_01.md](ITERACION_01.md#ajuste-de-jugabilidad-del-14-de-noviembre)) y la suite vigente lo comprueba.*
 - Llave inicial o recién pedida, una devolución por mano, reemplazo diferente añadido al final y sin devolución encadenada.
 - Máscaras ocultas: la vista, la ampliación, el tooltip y la etiqueta accesible no revelan el valor. El intervalo usa cotas conservadoras.
 - Cuatro palos, cinco patrones y sus condiciones; Quiebra produce cero. El orden real de robo se conserva.
@@ -21,7 +21,7 @@
 | Revisión independiente de reglas y vista | 49/49 pruebas y 583 aserciones; sin defectos reproducibles encontrados en el alcance I1 |
 | Revisión independiente de interfaz | 23/23 pruebas y 116 aserciones; sin defectos críticos ni importantes encontrados |
 | R01–R20 | Cubiertos por baraja, acciones/estados, puntuación y vista; los ejemplos de aceptación coinciden con el GDD v2.4 |
-| Demostración del encuentro | 102 → Quiebra → 119 = **221 puntos**, victoria y **3 campanadas** |
+| Demostración del encuentro | 102 → Quiebra → 119 = **221 puntos** y victoria; quedaban 3 campanadas con el coste anterior y quedan **7** con el vigente |
 | Teclado | Enter/Espacio ejecutan botones nativos una vez; atajos bloqueados tras ayuda; foco conservado al actualizar cartas y recuperado al cerrar ventanas |
 | Movimiento reducido y cancelación | Estado final inmediato; reiniciar durante transiciones no restaura puntuaciones ni cartas antiguas |
 | Revisión visual mediante capturas | Inicio, Máscara, ayuda, cuatro páginas del libro, confirmación, Llave, desglose, Quiebra y victoria; tamaños 1024×576, 1280×720 y 1920×1080 según cada caso |

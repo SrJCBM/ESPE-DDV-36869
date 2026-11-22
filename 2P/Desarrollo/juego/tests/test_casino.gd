@@ -18,6 +18,14 @@ func reparto(m: ControladorMesa, palos: Array, valores: Array) -> void:
 	m.partida.mazo.clear()
 	for i in palos.size(): m.partida.mazo.append(FabricaCartas.crear_carta(palos[i],valores[i]))
 
+func test_reglas_de_coleccionista_y_dueno_siguen_el_balance_de_campana() -> void:
+	# BALANCE_CAMPANA.md: la Coleccionista deja de ser un pase libre y el Dueño
+	# se puede superar sin compras en torno a un tercio de las veces.
+	for nivel in [2, 3]:
+		var m := control(nueva(), nivel)
+		var esperado: Array = [[25, 700, 12, 12], [25, 750, 18, 18]][nivel - 2]
+		assert_eq([m.partida.umbral, m.partida.meta, m.presupuesto, m.partida.campanadas], esperado)
+
 func test_recepcion_unica_y_puertas() -> void:
 	var c := CampanaCasino.new()
 	assert_false(c.iniciar("custodio"))
@@ -85,7 +93,8 @@ func test_lente_sin_mascara_nueva_y_limites_de_amuletos() -> void:
 		if i == 0: assert_true(m.usar_lente())
 		m.procesar_comando(Plantarse.new())
 		assert_eq(m.obtener_vista().ultima_mano.get("corona",0),0 if i==0 else 2)
-	assert_eq(m.partida.campanadas,9)
+	# Tres manos cuestan tres campanadas; el Sello devuelve solo una por mesa.
+	assert_eq(m.partida.campanadas,8)
 	m.partida.meta = 1000
 	for i in range(4):
 		reparto(m,["llaves","llaves"],[8,9])

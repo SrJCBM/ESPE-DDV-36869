@@ -64,7 +64,7 @@ stateDiagram-v2
     [*] --> Preparado
     Preparado --> Decision: iniciar y pagar una campanada
     Decision --> Decision: pedir o devolver Llave legal
-    Decision --> Resolucion: plantarse o Quiebra confirmada
+    Decision --> Resolucion: plantarse, también tras avisar Quiebra segura
     Resolucion --> Finalizada: alcanza meta o agota oportunidades
     Resolucion --> Preparado: faltan puntos y quedan oportunidades
     Finalizada --> Preparado: reiniciar con estado nuevo

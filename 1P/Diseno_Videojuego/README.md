@@ -4,7 +4,7 @@
 
 - [Documento de diseño v2.4](Documento_Diseno_La_Ultima_Mesa_v2_4.docx).
 
-La versión v2.4 añade la sección Tecnología y plan de desarrollo: motor, herramientas, organización técnica, reparto propuesto e incrementos con criterios de aceptación. Los detalles de Godot se contrastaron con su documentación oficial mediante Context7. Las reglas de juego de v2.3 se conservan.
+La versión v2.4 añade la sección Tecnología y plan de desarrollo: motor, herramientas, organización técnica, reparto propuesto e incrementos con criterios de aceptación. Los detalles de Godot se contrastaron con su documentación oficial mediante Context7. El 22 de noviembre se actualizó en el mismo archivo con las reglas implementadas: campanadas por mano, Quiebra segura y revelación, nuevas metas de la Coleccionista y el Dueño y un solo uso del Sello del prudente ([balance de la campaña](../../2P/Desarrollo/BALANCE_CAMPANA.md)).
 
 - [Plan de trabajo y tareas para comenzar](../../2P/Desarrollo/PLAN_DE_TRABAJO.md).
 

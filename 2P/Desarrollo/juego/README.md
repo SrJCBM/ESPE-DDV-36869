@@ -21,7 +21,7 @@ Versión **0.2.0** para Godot 4.7.2 estándar. La campaña enlaza el vestíbulo,
 
 Activar una Llave elegible la selecciona en la mano: **Confirmar** la devuelve y recibe su reemplazo al final; **Cancelar / Esc** conserva cartas y recursos. No se abre una ventana de selección. Las demás cartas se amplían y explican su palo. P/S están dentro de sus botones y H/R junto a sus controles.
 
-Sin Máscaras, el botón Plantarse anticipa los puntos que ofrece la mano. Con valores ocultos conserva el intervalo y no anticipa la puntuación. El boleto mantiene acumulado y meta. [Coste por mano, patrones y revelación](../AJUSTE_JUGABILIDAD_I1.md).
+Sin Máscaras, el botón Plantarse anticipa los puntos que ofrece la mano. Con valores ocultos conserva el intervalo y no anticipa la puntuación. El boleto mantiene acumulado y meta. [Coste por mano, patrones y revelación](../ITERACION_01.md#ajuste-de-jugabilidad-del-14-de-noviembre).
 
 La ayuda no consume recursos. **Movimiento reducido**, en «A tu ritmo», desactiva las transiciones de cartas y progreso; se mantiene al reiniciar el intento durante esa sesión. Toda información necesaria se muestra sin depender de animaciones o sonido.
 

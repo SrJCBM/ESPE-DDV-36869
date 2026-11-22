@@ -90,7 +90,7 @@ El primer objetivo será jugar una mesa local del Custodio con recursos provisio
 | Tarea del incremento jugable (implementado; aceptación pendiente) | Responsable | Resultado verificable |
 | --- | --- | --- |
 | Definir datos y estado de la mano | Ariel | Catálogo y datos por intento; mano, mazo y descarte conservan las 24 cartas sin duplicados. |
-| Implementar acciones, costes y fases | Kenned; Ariel revisa | Iniciar y pedir cuestan una campanada; plantarse y devolver una Llave no consumen otra; las acciones inválidas no cambian el estado. |
+| Implementar acciones, costes y fases | Kenned; Ariel revisa | Iniciar cuesta una campanada; pedir, plantarse y devolver una Llave no consumen campanadas; las acciones inválidas no cambian el estado. |
 | Construir la mesa y sus controles | Julio | Orden de cartas, umbral, meta, puntos y campanadas visibles; acciones inválidas deshabilitadas. |
 | Verificar visibilidad y puntuación | Kenned y Julio; Ariel revisa cálculos | El controlador oculta las Máscaras, la UI representa la vista permitida y el evaluador produce un desglose correcto al resolver. |
 | Integrar el encuentro y reinicio | Kenned | Se comprueba meta antes de declarar derrota con cero campanadas; reiniciar restaura el estado. |

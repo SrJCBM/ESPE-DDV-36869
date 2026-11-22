@@ -28,7 +28,7 @@ Las responsabilidades se mantienen aunque haya colaboración. La UI solicita acc
 | I1-03 | Comandos y fases | Kenned | Por revisar | Iniciar, pedir, devolver y plantarse implementados; costes y rechazos probados |
 | I1-04 | Efectos y puntuación | Ariel | **Completado** | Cuatro palos, cinco patrones, Quiebra y ejemplos 102/119 comprobados |
 | I1-05 | Interfaz en Godot | Julio | Por revisar | Mesa conectada, cartas, libro de ayuda, desglose, confirmaciones, teclado y movimiento reducido |
-| I1-06 | Encuentro y reinicio | Kenned | Por revisar | Victoria, derrota, prioridad de meta y reinicio probados; recorrido 221 puntos / 3 campanadas |
+| I1-06 | Encuentro y reinicio | Kenned | Por revisar | Victoria, derrota, prioridad de meta y reinicio probados; recorrido 221 puntos / 7 campanadas |
 | I1-07 | Piloto y correcciones de usabilidad | Julio modera; otro integrante toma notas | **Pendiente** | Julio realizará las sesiones con tres participantes y registrará hallazgos |
 | I1-08 | Exportación y cierre | Kenned; Ariel prueba otro equipo y Julio UI | Por revisar | Exportación técnica local; faltan juego en otro equipo, hallazgos del piloto y cierre de aceptación |
 
@@ -41,7 +41,7 @@ Solo I1-02 e I1-04 pasan a Completado. Las demás entregas implementadas permane
 3. Usar **Cómo jugar** o **H** para consultar el libro. Tab / Mayús+Tab recorre los controles; Enter o Espacio activa y Esc vuelve a la mesa.
 4. Para revisar resultados repetibles, activar **Demostración guiada** y confirmar. Es una baraja preparada, distinta de la partida normal.
 
-La secuencia guiada es: iniciar, pedir, plantarse → 102; iniciar, pedir, plantarse → Quiebra; iniciar, pedir dos veces, plantarse → 119. Termina con **221 puntos, victoria y tres campanadas**. Reiniciar devuelve al juego normal.
+La secuencia guiada es: iniciar, pedir, plantarse → 102; iniciar, pedir, plantarse → Quiebra; iniciar, pedir dos veces, plantarse → 119. Termina con **221 puntos, victoria y siete campanadas**. Reiniciar devuelve al juego normal.
 
 Los comandos de pruebas y exportación están en [juego/README.md](juego/README.md). El protocolo de I1-07 y la tabla para anotar cada sesión están en [ITERACION_01.md](ITERACION_01.md#piloto-de-usabilidad). No anticipar la solución al participante antes de observar su intento.
 

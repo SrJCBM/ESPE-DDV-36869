@@ -26,7 +26,7 @@ Hay **37 estados de pantalla, 27 cuadros de reglas, puntuación y confirmación,
 | --- | --- |
 | 01 · Mesa del Custodio | Tres manos conectadas: 102 puntos, Quiebra y 119 puntos; victoria con 221 acumulados |
 | 02 · Decisiones y devolución de Llave | Plantarse antes, pedir, confirmar o cancelar devolución y revisar sus resultados |
-| 03 · Terminar sin campanadas | Último reparto; pedir deshabilitado, plantarse gratis y derrota al no alcanzar la meta |
+| 03 · Terminar sin campanadas | Último reparto; pedir deshabilitado, plantarse gratis y derrota al no alcanzar la meta. *Diseñado con el coste anterior: en el juego vigente la última mano permite seguir pidiendo gratis* |
 | 04 · Victoria con cero campanadas | Plantarse con 17; sumar 119 y comprobar victoria con 221 antes de declarar derrota |
 
 La devolución de la Llave en la tercera mano tiene dos victorias alternativas: conservar las Velas 2, 4 y 8 produce `14 × 8 = 112`, para 214 acumulados; pedir la Vela 1 produce `15 × 7 = 105`, para 207 acumulados.

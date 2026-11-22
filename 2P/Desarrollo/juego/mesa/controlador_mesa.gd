@@ -255,7 +255,7 @@ func _aplicar_objetos() -> void:
 		if campana.amuletos.has("moneda") and _usos_moneda < 3:
 			campana.saldo += 2
 			_usos_moneda += 1
-	if campana.amuletos.has("prudente") and _usos_prudente < 2 and _ultimo_resultado.total <= partida.umbral - 3:
+	if campana.amuletos.has("prudente") and _usos_prudente < CampanaCasino.USOS_PRUDENTE and _ultimo_resultado.total <= partida.umbral - 3:
 		partida.campanadas = mini(presupuesto, partida.campanadas + 1)
 		_usos_prudente += 1
 
