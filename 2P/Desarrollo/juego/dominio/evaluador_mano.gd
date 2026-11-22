@@ -41,7 +41,7 @@ static func evaluar(mano: Array, umbral: int = 17) -> Dictionary:
 		patrones.append(nombre)
 		multiplicador += int(bonos[nombre])
 	for carta: CartaEnPartida in mano:
-		if carta.definicion.palo == "velas":
+		if carta.definicion.palo == Palos.VELAS:
 			resultado.velas += 1
 	multiplicador += int(resultado.velas)
 	resultado.multiplicador = multiplicador
@@ -53,7 +53,7 @@ static func intervalo(mano: Array, reveladas: bool = false, vistas: Dictionary =
 	var conocido: int = 0
 	var ocultas: int = 0
 	for carta: CartaEnPartida in mano:
-		if carta.definicion.palo == "mascaras" and not reveladas and not vistas.has(carta.id_instancia):
+		if carta.definicion.palo == Palos.MASCARAS and not reveladas and not vistas.has(carta.id_instancia):
 			# No se consulta su valor: estas cotas no dependen del valor oculto real.
 			ocultas += 1
 		else:

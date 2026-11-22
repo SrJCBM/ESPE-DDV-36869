@@ -130,3 +130,10 @@ func test_reiniciar_restaura_todos_los_recursos_y_renueva_las_cartas() -> void:
 	assert_false(estado.llave_usada)
 	for carta in estado.mazo:
 		assert_false(ids_anteriores.has(carta.id_instancia))
+
+func test_todas_las_cartas_del_catalogo_usan_un_palo_conocido() -> void:
+	var catalogo: CatalogoCartas = load("res://datos/cartas/baraja_inicial.tres")
+	for definicion: CartaDef in catalogo.cartas:
+		assert_true(Palos.es_valido(definicion.palo), definicion.id)
+	assert_eq(Palos.TODOS.size(), 4)
+	assert_false(Palos.es_valido("vela"), "Una errata no es un palo")

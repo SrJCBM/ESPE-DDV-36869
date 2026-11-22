@@ -47,7 +47,7 @@ func configurar_campana(sesion: CampanaCasino) -> void:
 func usar_lente() -> bool:
 	if _procesando or campana == null or campana.lentes == 0 or estado_activo.nombre != "decision" or _intervalo().ocultas == 0: return false
 	for carta in partida.mano:
-		if carta.definicion.palo == "mascaras": _vistas_con_lente[carta.id_instancia] = true
+		if carta.definicion.palo == Palos.MASCARAS: _vistas_con_lente[carta.id_instancia] = true
 	campana.lentes -= 1
 	_llaves_habilitadas.clear()
 	vista_actualizada.emit(obtener_vista())
@@ -169,7 +169,7 @@ func _iniciar_mano() -> ResultadoAccion:
 	for i in range(2):
 		var carta := partida.robar()
 		partida.mano.append(carta)
-		if carta.definicion.palo == "llaves":
+		if carta.definicion.palo == Palos.LLAVES:
 			_llaves_habilitadas.append(carta.id_instancia)
 	estado_activo = EstadoDecision.new(self)
 	_mensaje = "Elige pedir o plantarte. Puedes devolver una Llave inicial antes de otra acción."
@@ -187,7 +187,7 @@ func _pedir_carta() -> ResultadoAccion:
 	_llaves_habilitadas.clear()
 	var carta := partida.robar()
 	partida.mano.append(carta)
-	if carta.definicion.palo == "llaves" and not partida.llave_usada:
+	if carta.definicion.palo == Palos.LLAVES and not partida.llave_usada:
 		_llaves_habilitadas.append(carta.id_instancia)
 	_mensaje = "Carta recibida. Decide con la información visible; plantarse no cuesta campanadas."
 	_comprobar_quiebra_demostrable()
@@ -201,7 +201,7 @@ func _devolver_llave(carta_id: String) -> ResultadoAccion:
 		return ResultadoAccion.rechazar("No existe otra carta disponible para reemplazar la Llave.")
 	var indice: int = -1
 	for i in range(partida.mano.size()):
-		if partida.mano[i].id_instancia == carta_id and partida.mano[i].definicion.palo == "llaves":
+		if partida.mano[i].id_instancia == carta_id and partida.mano[i].definicion.palo == Palos.LLAVES:
 			indice = i
 			break
 	if indice < 0:
@@ -227,7 +227,7 @@ func _llaves_disponibles() -> Array[String]:
 	if estado_activo.nombre != "decision" or partida.llave_usada or partida.disponibles() == 0:
 		return ids
 	for carta: CartaEnPartida in partida.mano:
-		if carta.definicion.palo == "llaves" and _llaves_habilitadas.has(carta.id_instancia):
+		if carta.definicion.palo == Palos.LLAVES and _llaves_habilitadas.has(carta.id_instancia):
 			ids.append(carta.id_instancia)
 	return ids
 
@@ -286,7 +286,7 @@ func _vista_cartas(cartas: Array, revelar: bool) -> Array[Dictionary]:
 	if not revelar:
 		elegibles = _llaves_disponibles()
 	for carta: CartaEnPartida in cartas:
-		var oculta := carta.definicion.palo == "mascaras" and not revelar and not _vistas_con_lente.has(carta.id_instancia)
+		var oculta := carta.definicion.palo == Palos.MASCARAS and not revelar and not _vistas_con_lente.has(carta.id_instancia)
 		var valor: Variant = null
 		var efectivo: Variant = null
 		if not oculta:

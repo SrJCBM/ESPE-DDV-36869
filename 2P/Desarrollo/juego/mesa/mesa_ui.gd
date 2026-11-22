@@ -818,14 +818,14 @@ func mostrar_carta(carta: Dictionary) -> void:
 	_contenido_modal.add_child(ampliada)
 	ampliada.establecer_movimiento_reducido(true)
 	ampliada.presentar(carta)
-	var palo := str(carta.get("palo", "mascaras"))
-	var nombres := {"velas": "Velas", "llaves": "Llaves", "relojes": "Relojes", "mascaras": "Máscaras"}
+	var palo := str(carta.get("palo", Palos.MASCARAS))
+	var nombres := Palos.NOMBRES
 	_etiqueta(_contenido_modal, nombres.get(palo, "Carta"), Rect2(350, 144, 370, 58), 40, ORO, true)
 	var efectos := {
-		"velas": "Cada Vela conservada suma +1 al multiplicador, siempre que la mano no quiebre.",
-		"llaves": "Puedes devolver una Llave elegible para recibir otra carta gratis. Solo una vez por mano; el reemplazo se añade al final.",
-		"relojes": "Su valor efectivo es el impreso menos uno, con mínimo uno. Pedirlo es gratis en campanadas, igual que las demás cartas.",
-		"mascaras": "Su valor permanece oculto hasta plantarte. El intervalo usa de 1 a 10 por Máscara y no predice el valor real.",
+		Palos.VELAS: "Cada Vela conservada suma +1 al multiplicador, siempre que la mano no quiebre.",
+		Palos.LLAVES: "Puedes devolver una Llave elegible para recibir otra carta gratis. Solo una vez por mano; el reemplazo se añade al final.",
+		Palos.RELOJES: "Su valor efectivo es el impreso menos uno, con mínimo uno. Pedirlo es gratis en campanadas, igual que las demás cartas.",
+		Palos.MASCARAS: "Su valor permanece oculto hasta plantarte. El intervalo usa de 1 a 10 por Máscara y no predice el valor real.",
 	}
 	var detalle := _etiqueta(_contenido_modal, efectos.get(palo, ""), Rect2(350, 230, 362, 220), 21, MARFIL)
 	detalle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

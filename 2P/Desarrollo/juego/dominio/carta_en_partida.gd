@@ -13,6 +13,6 @@ func _init(datos: CartaDef = null, identidad: String = "") -> void:
 
 
 func valor_efectivo() -> int:
-	if definicion.palo == "relojes":
+	if definicion.palo == Palos.RELOJES:
 		return maxi(1, definicion.valor_impreso - 1)
 	return definicion.valor_impreso

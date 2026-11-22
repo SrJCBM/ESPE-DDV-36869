@@ -173,10 +173,10 @@ func _apuesta() -> void:
 func _palos() -> void:
 	_texto(_pagina, "Cuatro palos. Cuatro ventajas.", Rect2(0, 0, 758, 48), 34, TINTA, true)
 	var filas := [
-		["velas", "Velas", "+1 al multiplicador por cada Vela conservada en una mano válida."],
-		["llaves", "Llaves", "Devuelve una inicial antes de actuar, o la recién pedida. Un reemplazo gratis por mano; llega al final y no se puede volver a devolver."],
-		["relojes", "Relojes", "Valen uno menos que lo impreso, con mínimo 1. Un 6 vale 5. " + ("Pedirlos es gratis y no recuperan campanadas." if int(regla("ficha_por_pedir")) <= 0 else "Pedirlos cuesta la misma ficha que otra carta; no recuperan campanadas.")],
-		["mascaras", "Máscaras", "Ocultas hasta plantarte. Si conoces 9 y tienes una Máscara, puedes sumar entre 10 y 19. Todavía puedes quebrar."],
+		[Palos.VELAS, "Velas", "+1 al multiplicador por cada Vela conservada en una mano válida."],
+		[Palos.LLAVES, "Llaves", "Devuelve una inicial antes de actuar, o la recién pedida. Un reemplazo gratis por mano; llega al final y no se puede volver a devolver."],
+		[Palos.RELOJES, "Relojes", "Valen uno menos que lo impreso, con mínimo 1. Un 6 vale 5. " + ("Pedirlos es gratis y no recuperan campanadas." if int(regla("ficha_por_pedir")) <= 0 else "Pedirlos cuesta la misma ficha que otra carta; no recuperan campanadas.")],
+		[Palos.MASCARAS, "Máscaras", "Ocultas hasta plantarte. Si conoces 9 y tienes una Máscara, puedes sumar entre 10 y 19. Todavía puedes quebrar."],
 	]
 	for indice in range(filas.size()):
 		var y: int = 61 + indice * 103
@@ -210,11 +210,11 @@ func _puntos() -> void:
 	_linea(265)
 	_texto(_pagina, "Cada patrón cuenta una vez. Exacto y Al filo se excluyen.\nAscenso sigue el orden de robo; no requiere números consecutivos.", Rect2(0, 274, 758, 54), 17, SECUNDARIO)
 	var ejemplos := {
-		"Punto exacto": {"palos": ["llaves", "relojes", "mascaras"], "valores": [4,6,8], "efectivos": [4,5,8], "suma": "4 + 5 + 8 = 17", "cuenta": "Exacto +3 · Ascenso +2\n17 × (1 + 3 + 2) = 102 puntos"},
-		"Al filo": {"palos": ["llaves", "relojes", "mascaras"], "valores": [4,6,7], "efectivos": [4,5,7], "suma": "4 + 5 + 7 = 16", "cuenta": "Al filo +2 · Ascenso +2\n16 × (1 + 2 + 2) = 80 puntos"},
-		"Ascenso": {"palos": ["llaves", "relojes", "mascaras"], "valores": [2,6,8], "efectivos": [2,5,8], "suma": "2 < 5 < 8", "cuenta": "Ascenso +2 · Total 15\n15 × (1 + 2) = 45 puntos"},
-		"Mano larga": {"palos": ["velas", "llaves", "relojes", "mascaras", "velas"], "valores": [1,1,1,1,2], "efectivos": [1,1,1,1,2], "suma": "1 + 1 + 1 + 1 + 2 = 6", "cuenta": "Mano larga +2 · 2 Velas\n6 × (1 + 2 + 2) = 30 puntos"},
-		"Racha": {"palos": ["velas", "velas", "velas"], "valores": [2,4,1], "efectivos": [2,4,1], "suma": "2 + 4 + 1 = 7", "cuenta": "Racha +2 · 3 Velas\n7 × (1 + 3 + 2) = 42 puntos"},
+		"Punto exacto": {"palos": [Palos.LLAVES, Palos.RELOJES, Palos.MASCARAS], "valores": [4,6,8], "efectivos": [4,5,8], "suma": "4 + 5 + 8 = 17", "cuenta": "Exacto +3 · Ascenso +2\n17 × (1 + 3 + 2) = 102 puntos"},
+		"Al filo": {"palos": [Palos.LLAVES, Palos.RELOJES, Palos.MASCARAS], "valores": [4,6,7], "efectivos": [4,5,7], "suma": "4 + 5 + 7 = 16", "cuenta": "Al filo +2 · Ascenso +2\n16 × (1 + 2 + 2) = 80 puntos"},
+		"Ascenso": {"palos": [Palos.LLAVES, Palos.RELOJES, Palos.MASCARAS], "valores": [2,6,8], "efectivos": [2,5,8], "suma": "2 < 5 < 8", "cuenta": "Ascenso +2 · Total 15\n15 × (1 + 2) = 45 puntos"},
+		"Mano larga": {"palos": [Palos.VELAS, Palos.LLAVES, Palos.RELOJES, Palos.MASCARAS, Palos.VELAS], "valores": [1,1,1,1,2], "efectivos": [1,1,1,1,2], "suma": "1 + 1 + 1 + 1 + 2 = 6", "cuenta": "Mano larga +2 · 2 Velas\n6 × (1 + 2 + 2) = 30 puntos"},
+		"Racha": {"palos": [Palos.VELAS, Palos.VELAS, Palos.VELAS], "valores": [2,4,1], "efectivos": [2,4,1], "suma": "2 + 4 + 1 = 7", "cuenta": "Racha +2 · 3 Velas\n7 × (1 + 3 + 2) = 42 puntos"},
 	}
 	var ejemplo: Dictionary = ejemplos.get(_patron_ejemplo, ejemplos["Punto exacto"])
 	var cantidad: int = ejemplo.palos.size()

@@ -4,13 +4,13 @@ extends Button
 signal ampliacion_solicitada(carta: Dictionary)
 
 const ARTE := {
-	"velas": preload("res://recursos/arte/carta-velas-grabado.png"),
-	"llaves": preload("res://recursos/arte/carta-llaves-grabado.png"),
-	"relojes": preload("res://recursos/arte/carta-relojes-grabado.png"),
-	"mascaras": preload("res://recursos/arte/carta-mascaras-grabado.png"),
+	Palos.VELAS: preload("res://recursos/arte/carta-velas-grabado.png"),
+	Palos.LLAVES: preload("res://recursos/arte/carta-llaves-grabado.png"),
+	Palos.RELOJES: preload("res://recursos/arte/carta-relojes-grabado.png"),
+	Palos.MASCARAS: preload("res://recursos/arte/carta-mascaras-grabado.png"),
 }
 const DURACION_SACUDIDA := 0.42
-const NOMBRES := {"velas": "VELAS", "llaves": "LLAVES", "relojes": "RELOJES", "mascaras": "MÁSCARAS"}
+const NOMBRES := {Palos.VELAS: "VELAS", Palos.LLAVES: "LLAVES", Palos.RELOJES: "RELOJES", Palos.MASCARAS: "MÁSCARAS"}
 var _vista: Dictionary = {}
 var _valor: Label
 var _palo: Label
@@ -67,7 +67,7 @@ func presentar(carta: Dictionary) -> void:
 	# Whitelist: los datos de una Máscara se eliminan antes de almacenarlos.
 	var oculta: bool = bool(carta.get("oculta", false))
 	var revelar: bool = bool(_vista.get("oculta", false)) and not oculta
-	_vista = {"palo": str(carta.get("palo", "mascaras")), "oculta": oculta,
+	_vista = {"palo": str(carta.get("palo", Palos.MASCARAS)), "oculta": oculta,
 		"valor": null if oculta else carta.get("valor"),
 		"valor_efectivo": null if oculta else carta.get("valor_efectivo")}
 	if is_node_ready():
@@ -118,9 +118,9 @@ func _colocar() -> void:
 	_efecto.size = Vector2(size.x - 16, 22)
 
 func _actualizar() -> void:
-	var palo: String = _vista.get("palo", "mascaras")
+	var palo: String = _vista.get("palo", Palos.MASCARAS)
 	var oculta: bool = _vista.get("oculta", false)
-	_arte.texture = ARTE.get(palo, ARTE["mascaras"])
+	_arte.texture = ARTE.get(palo, ARTE[Palos.MASCARAS])
 	_valor.text = "?" if oculta else str(_vista.get("valor", "—"))
 	_palo.text = NOMBRES.get(palo, palo.to_upper())
 	if oculta:
