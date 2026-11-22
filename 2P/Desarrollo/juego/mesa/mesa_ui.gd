@@ -786,12 +786,17 @@ func mostrar_ayuda() -> void:
 	guia.position = Vector2(32, 100)
 	_contenido_modal.add_child(guia)
 	guia.movimiento.set_pressed_no_signal(movimiento_reducido)
-	guia.movimiento_cambiado.connect(establecer_movimiento_reducido)
+	guia.movimiento_cambiado.connect(_cambiar_movimiento_reducido)
 	var cerrar := _cerrar_boton()
 	cerrar.position = Vector2(278, 649)
 	cerrar.size = Vector2(810, 42)
 	_etiqueta(_contenido_modal, "REGLAMENTO DE LA CASA", Rect2(32, 650, 220, 39), 12, MUTED)
 	guia.navegacion[0].grab_focus()
+
+## Elección de la persona en el libro: se aplica y se recuerda para la próxima sesión.
+func _cambiar_movimiento_reducido(reducido: bool) -> void:
+	establecer_movimiento_reducido(reducido)
+	AjustesJuego.guardar_movimiento_reducido(reducido)
 
 func establecer_movimiento_reducido(reducido: bool) -> void:
 	movimiento_reducido = reducido

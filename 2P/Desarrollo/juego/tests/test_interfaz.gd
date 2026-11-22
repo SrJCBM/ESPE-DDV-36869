@@ -101,6 +101,9 @@ func test_accion_que_se_deshabilita_transfiere_foco_a_siguiente_legal() -> void:
 	assert_eq(mesa.get_viewport().gui_get_focus_owner(), mesa.boton_plantarse)
 
 func test_reglamento_cambia_paginas_sin_tocar_partida_y_conserva_opcion_de_movimiento() -> void:
+	# La opción del libro se guarda: se redirige a un archivo de prueba.
+	var ruta_original := AjustesJuego.ruta
+	AjustesJuego.ruta = "user://ajustes_prueba_interfaz.cfg"
 	var mesa = _mesa()
 	mesa.presentar_vista(_decision())
 	var antes: Dictionary = mesa.vista.duplicate(true)
@@ -118,6 +121,9 @@ func test_reglamento_cambia_paginas_sin_tocar_partida_y_conserva_opcion_de_movim
 	assert_true(mesa._contenido_modal.get_node("Reglamento").movimiento.button_pressed)
 	mesa.cerrar_modal()
 	await get_tree().process_frame
+	assert_true(AjustesJuego.movimiento_reducido(), "La elección queda guardada")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.ruta = ruta_original
 
 func test_actualizar_misma_mano_conserva_cartas_y_foco() -> void:
 	var mesa = _mesa()

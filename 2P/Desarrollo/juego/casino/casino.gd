@@ -325,6 +325,7 @@ func _jugar() -> void:
 	mesa.set("campana",campana)
 	mesa.connect("salir_de_mesa",_levantarse,CONNECT_ONE_SHOT)
 	add_child(mesa)
+	mesa.establecer_movimiento_reducido(AjustesJuego.movimiento_reducido())
 
 func _levantarse(victoria: bool, exactos: int) -> void:
 	var premio := campana.cerrar(victoria,exactos)

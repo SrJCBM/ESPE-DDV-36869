@@ -3,3 +3,4 @@ extends Control
 
 func _ready() -> void:
 	get_window().min_size = Vector2i(1024, 576)
+	$Mesa.establecer_movimiento_reducido(AjustesJuego.movimiento_reducido())
