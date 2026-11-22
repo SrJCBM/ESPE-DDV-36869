@@ -268,3 +268,14 @@ func test_campana_completa_con_baraja_normal_y_recompensas_unicas() -> void:
 	assert_false(juego.campana.recibida)
 	await get_tree().process_frame
 	await get_tree().process_frame
+
+func test_cada_mesa_usa_la_regla_de_su_crupier() -> void:
+	assert_true(FabricaCrupieres.para("custodio") is ReglaCrupier)
+	assert_false(FabricaCrupieres.para("custodio").cobra_por_pedir())
+	assert_true(FabricaCrupieres.para("recaudador") is ReglaRecaudador)
+	assert_true(FabricaCrupieres.para("coleccionista") is ReglaColeccionista)
+	assert_true(FabricaCrupieres.para("dueno") is ReglaDueno)
+	assert_true(FabricaCrupieres.para("") is ReglaCrupier, "La mesa suelta de I1 no tiene regla especial")
+	for nivel in range(4):
+		var m := control(nueva(), nivel)
+		assert_eq(m.regla.cobra_por_pedir(), nivel == 1)

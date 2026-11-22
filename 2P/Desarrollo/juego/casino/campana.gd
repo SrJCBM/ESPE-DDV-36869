@@ -50,7 +50,7 @@ func puerta_abierta(sala: String) -> bool:
 func iniciar(sala: String) -> bool:
 	if derrota or not activa.is_empty() or MESAS.find(sala) != superadas or not MESAS.has(sala) or not puerta_abierta(sala): return false
 	activa = sala
-	if activa == "recaudador": saldo += 15
+	FabricaCrupieres.para(activa).al_sentarse(self)
 	return true
 
 func cerrar(victoria: bool, exactos: int) -> int:
