@@ -9,7 +9,7 @@
 | I3-01 | Respuesta visual al resolver la mano | 2 | **Completado** | `835ddff`. 141 pruebas, 6 nuevas en `test_feedback_resultado.gd` |
 | I3-02 | Balance de la Coleccionista, el Dueño y el Sello | 3 | **Completado** | `d477d3a`. [BALANCE_CAMPANA.md](BALANCE_CAMPANA.md); Word v2.4 y MD alineados |
 | I3-03 | Regla del crupier visible en la mesa | 5 | **Completado** | Placa de regla, aviso del umbral y Dueño sin bajar tras Quiebra. 149 pruebas, 7 nuevas en `test_regla_crupier.gd` |
-| I3-04 | Pruebas de invariantes de zonas y de barajado | 7 | Pendiente | Antes de I3-05, como red de seguridad |
+| I3-04 | Pruebas de invariantes de zonas y de barajado | 7 | **Completado** | 3 pruebas en `test_invariantes.gd`; comprobadas con dos errores introducidos a propósito |
 | I3-05 | Deuda técnica | 6 | Pendiente | Strategy por crupier, catálogo en Resources, palos como constantes, dividir `mesa_ui.gd`, ajustes persistentes |
 | I3-06 | Recompensa de cartas tras cada mesa | 4 | En pausa | Diseño acordado; se retoma cuando el equipo lo indique |
 | I3-07 | Sonido | 1 | Diferido | Se hará con la tarea del docente sobre sonido diegético y no diegético |
@@ -54,13 +54,17 @@ Antes la regla especial solo se leía en la ayuda (H) y el umbral del Dueño cam
 - Archivos: `mesa/controlador_mesa.gd`, `mesa/lectura_mesa.gd`, `mesa/mesa_ui.gd`, `tests/test_regla_crupier.gd` y `tests/qa_regla.gd`, que genera las capturas en `juego/exportaciones/qa/`. Revisado a 1024 × 576 y 1280 × 720: la placa no tapa umbral, cartas ni acciones.
 - **Regla nueva del Dueño (decisión de Julio):** como propuso Damián, el umbral solo baja tras una mano cerrada sin Quiebra. La ayuda, el diálogo del Dueño y el Word lo explican. La regla resultó facilitar la mesa (sin compras, del 35 % al 42 %), así que el Dueño pasa de 18 a 17 campanadas y vuelve al 34 % ([balance](BALANCE_CAMPANA.md#el-dueño-solo-baja-tras-una-mano-sin-quiebra)).
 
-## Por implementar
-
 ### I3-04 · Pruebas de invariantes y de barajado
 
-- Tras miles de acciones aleatorias legales en las cuatro mesas, cada carta está en una sola zona y el total `mazo + mano + descarte + retenidas` no cambia.
-- Barajar 4 cartas 24.000 veces: cada uno de los 24 órdenes cerca de 1.000; un chi-cuadrado mayor que 41 indica sesgo.
-- La misma semilla y las mismas acciones reproducen el mismo estado final.
+Red de seguridad para reorganizar el código en I3-05 sin romper reglas. `tests/test_invariantes.gd`:
+
+- **Zonas.** Un agente elige al azar entre las acciones legales de la vista pública (iniciar, pedir, plantarse, devolver Llave y usar la Lente) durante 10.000 acciones, 2.500 por mesa, con amuletos equipados y empezando otra mesa al terminar. Después de cada acción, cada carta de la baraja está en una sola zona (`mazo`, `mano`, `descarte` o `retenidas`) y el total no cambia.
+- **Barajado.** 24.000 barajados de 4 cartas reparten las 24 permutaciones con un chi-cuadrado de 21,5; con 23 grados de libertad, superar 41,64 indicaría sesgo (p < 0,01). La semilla es fija para que el resultado no varíe entre ejecuciones.
+- **Reproducibilidad.** En cada mesa, la misma semilla y las mismas acciones dan el mismo estado final (cartas por definición, puntos, campanadas, umbral, saldo y Lentes) y otra semilla da otro.
+- **Las pruebas detectan errores reales.** Se comprobaron introduciendo dos errores a propósito y restaurando el código después. Si `cerrar_mano` no pasa la mano al descarte, la prueba de zonas falla en el paso 9 del Custodio (17 cartas de 24). Si el barajado elige el intercambio entre todas las posiciones, el chi-cuadrado sube a 6.218.
+- No se encontró ningún defecto en el código actual.
+
+## Por implementar
 
 ### I3-05 · Deuda técnica
 
@@ -94,4 +98,4 @@ Comentario 3 de Damián: en algunas esquinas el visitante pasa por encima de mes
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/sim_campana.gd -- --semillas=1000
 ```
 
-Estado al cerrar I3-03: **149 pruebas, 1.298 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.
+Estado al cerrar I3-04: **152 pruebas, 1.554 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.
