@@ -7,7 +7,7 @@ const NOMBRES := {"vestibulo":"Vestíbulo", "corredor":"Galería de los sellos",
 ## Usos por mesa del Sello del prudente (BALANCE_CAMPANA.md).
 const USOS_PRUDENTE := 1
 ## [umbral, meta, campanadas] por mesa. Coleccionista y Dueño ajustados con tests/sim_campana.gd (BALANCE_CAMPANA.md).
-const REGLAS := [[17,200,10], [21,400,12], [25,700,12], [25,750,18]]
+const REGLAS := [[17,200,10], [21,400,12], [25,700,12], [25,750,17]]
 const CATALOGO := {
 	"lente": ["Lente de humo", 6, "Revela todas las Máscaras ocultas de la mano. Se consume al usarla."],
 	"corona": ["Corona del riesgo", 15, "+2 al multiplicador al plantarte con una Máscara aún oculta en una mano válida."],

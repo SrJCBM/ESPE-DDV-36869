@@ -37,7 +37,7 @@ func nota_mesa() -> String:
 		"coleccionista":
 			return "La Coleccionista retiene la carta más alta de cada mano, incluso en Quiebra. Plantarte resuelve: primero se comprueba la meta de %s, después si quedan manos." % meta
 		"dueno":
-			return "El Dueño empieza en 25 y, tras cada mano resuelta, baja el umbral un punto hasta %s. Cada mano puntúa con el umbral vigente al jugarla." % regla("umbral_minimo")
+			return "El Dueño empieza en 25 y, tras cada mano cerrada sin Quiebra, baja el umbral un punto hasta %s. Una Quiebra lo mantiene. Cada mano puntúa con el umbral vigente al jugarla." % regla("umbral_minimo")
 	return "Con cero campanadas puedes seguir pidiendo en la última mano. Solo plantarte revela y resuelve: primero se comprueba si llegaste a %s, después si quedan manos." % meta
 
 func mostrar_patron(nombre: String) -> void:

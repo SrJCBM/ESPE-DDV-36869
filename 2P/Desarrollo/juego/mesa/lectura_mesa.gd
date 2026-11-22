@@ -25,6 +25,42 @@ static func resultado(vista: Dictionary) -> Dictionary:
 	return {"formula": "%s × %s = %s" % [total, mano.get("multiplicador", 1), mano.get("puntos", 0)],
 		"detalle": detalle, "completo": completo}
 
+## Regla del crupier aplicada a la mano en curso, para leerla sin abrir la ayuda.
+## texto: placa bajo el retrato (vacía si la mesa no tiene regla especial). nota: línea junto al umbral.
+static func regla(vista: Dictionary) -> Dictionary:
+	var nota := "No lo excedas."
+	var umbral: int = int(vista.get("umbral", 17))
+	var siguiente: int = int(vista.get("umbral_siguiente", -1))
+	var anterior: int = int(vista.get("umbral_anterior", -1))
+	match str(vista.get("mesa", "")):
+		"recaudador":
+			return {"texto": "Cada carta que pides tras el reparto cuesta 1 ficha. Saldo: %s." % vista.get("saldo", 0), "nota": nota}
+		"coleccionista":
+			var retenidas: int = int(vista.get("retenidas", 0))
+			return {"texto": "Al cerrar cada mano se queda tu carta más alta hasta el final de la mesa. Retenidas: %s." % retenidas, "nota": nota}
+		"dueno":
+			if vista.get("terminado", false):
+				return {"texto": "El umbral bajó uno por cada mano cerrada sin Quiebra.", "nota": nota}
+			if vista.get("fase", "") == "decision":
+				var texto := ""
+				if anterior > umbral: texto = "El umbral bajó de %s a %s. " % [anterior, umbral]
+				elif anterior == umbral and siguiente < umbral: texto = "El umbral sigue en %s: tu última mano fue Quiebra. " % umbral
+				if siguiente < umbral:
+					texto += "Si cierras esta mano sin Quiebra, bajará a %s." % siguiente
+					nota = "Baja a %s sin Quiebra." % siguiente
+				else:
+					texto += "El umbral ya está en su mínimo: %s." % umbral
+					nota = "Mínimo alcanzado."
+				return {"texto": texto, "nota": nota}
+			if anterior < 0:
+				return {"texto": "Empieza en %s y baja uno por cada mano que cierres sin Quiebra, hasta 17." % siguiente, "nota": "Baja sin Quiebra."}
+			if siguiente < anterior:
+				return {"texto": "Tu próxima mano tendrá umbral %s: baja de %s." % [siguiente, anterior], "nota": "Próxima mano: %s." % siguiente}
+			if siguiente > 17:
+				return {"texto": "La Quiebra no baja el umbral: tu próxima mano sigue en %s." % siguiente, "nota": "Próxima mano: %s." % siguiente}
+			return {"texto": "El umbral se mantiene en su mínimo: %s." % siguiente, "nota": "Mínimo alcanzado."}
+	return {"texto": "", "nota": nota}
+
 static func pista(vista: Dictionary) -> String:
 	if vista.get("terminado", false):
 		var resumen: Dictionary = vista.get("resumen_intento", {})

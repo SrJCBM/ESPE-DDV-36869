@@ -12,9 +12,9 @@ const MARGENES := [4, 6, 8]
 ## Variantes con --variantes: {índice de mesa: [meta, campanadas]}. La primera usa CampanaCasino.REGLAS sin cambios.
 const VARIANTES := [
 	{"nombre": "Vigentes", "reglas": {}},
-	{"nombre": "Anteriores (600/14 y 800/16)", "reglas": {2: [600, 14], 3: [800, 16]}},
-	{"nombre": "Dueño 700/17", "reglas": {3: [700, 17]}},
-	{"nombre": "Dueño 700/16", "reglas": {3: [700, 16]}},
+	{"nombre": "Dueño 750/18", "reglas": {3: [750, 18]}},
+	{"nombre": "Dueño 800/18", "reglas": {3: [800, 18]}},
+	{"nombre": "Dueño 800/17", "reglas": {3: [800, 17]}},
 ]
 
 func _init() -> void:

@@ -3,6 +3,8 @@ extends Node
 ## Única entrada de acciones; publica solo datos permitidos para la presentación.
 
 const Indicadores = preload("res://dominio/indicadores_patrones.gd")
+## El Dueño empieza en el umbral de su mesa y baja uno por cada mano cerrada sin Quiebra, hasta este mínimo.
+const UMBRAL_MINIMO_DUENO := 17
 
 signal vista_actualizada(vista: Dictionary)
 signal encuentro_finalizado(victoria: bool)
@@ -21,6 +23,7 @@ var _cartas_resueltas: Array[Dictionary] = []
 var _ultimo_resultado: Dictionary = {}
 var _mensaje: String = "Inicia una mano: dos cartas, una campanada."
 var _numero_mano: int = 0
+var _umbral_mano_anterior: int = -1
 var _manos_resueltas: int = 0
 var _quiebras: int = 0
 var _terminado: bool = false
@@ -59,13 +62,29 @@ func reglas_ayuda() -> Dictionary:
 	var umbral := partida.umbral
 	# Con el Dueño, entre manos se muestra el umbral que tendrá la siguiente mano.
 	if mesa == "dueno" and estado_activo.nombre != "decision":
-		umbral = maxi(17, 25 - _manos_resueltas)
+		umbral = _umbral_dueno(_manos_validas())
 	return {
 		"mesa": mesa, "nombre": CampanaCasino.NOMBRES.get(mesa, "El Custodio"),
 		"umbral": umbral, "meta": partida.meta, "presupuesto": presupuesto,
 		"campanadas": partida.campanadas, "ficha_por_pedir": 1 if _cobra_comision() else 0,
-		"saldo": campana.saldo if campana != null else 0, "umbral_minimo": 17,
+		"saldo": campana.saldo if campana != null else 0, "umbral_minimo": UMBRAL_MINIMO_DUENO,
 	}
+
+func _umbral_dueno(manos_validas: int) -> int:
+	return maxi(UMBRAL_MINIMO_DUENO, int(CampanaCasino.REGLAS[3][0]) - manos_validas)
+
+## Manos cerradas sin Quiebra: son las que hacen bajar el umbral del Dueño.
+func _manos_validas() -> int:
+	return _manos_resueltas - _quiebras
+
+## Umbral de la mano anterior y de la siguiente, para anunciar los cambios del Dueño. −1 si no aplica.
+func _umbrales_vecinos() -> Dictionary:
+	if campana == null or campana.activa != "dueno":
+		return {"anterior": -1, "siguiente": -1}
+	if estado_activo.nombre == "decision":
+		# La siguiente supone que esta mano se cierra sin Quiebra.
+		return {"anterior": _umbral_mano_anterior, "siguiente": _umbral_dueno(_manos_validas() + 1)}
+	return {"anterior": partida.umbral if _manos_resueltas > 0 else -1, "siguiente": _umbral_dueno(_manos_validas())}
 
 func _cobra_comision() -> bool:
 	return campana != null and campana.activa == "recaudador"
@@ -99,6 +118,7 @@ func _preparar_intento(semilla: int) -> void:
 	_cartas_resueltas.clear()
 	_ultimo_resultado.clear()
 	_numero_mano = 0
+	_umbral_mano_anterior = -1
 	_manos_resueltas = 0
 	_quiebras = 0
 	_terminado = false
@@ -137,7 +157,8 @@ func _iniciar_mano() -> ResultadoAccion:
 	if partida.disponibles() < 2 or not partida.mano.is_empty():
 		return ResultadoAccion.rechazar("Se necesitan dos cartas disponibles y ninguna mano abierta.")
 	if campana != null and campana.activa == "dueno":
-		partida.umbral = maxi(17, 25 - _manos_resueltas)
+		_umbral_mano_anterior = partida.umbral if _manos_resueltas > 0 else -1
+		partida.umbral = _umbral_dueno(_manos_validas())
 	_vistas_con_lente.clear()
 	partida.campanadas -= 1
 	partida.llave_usada = false
@@ -290,7 +311,10 @@ func obtener_vista() -> Dictionary:
 	# Solo se anticipa una puntuación determinada por información ya pública.
 	if decision and int(intervalo.ocultas) == 0:
 		resultado_visible = EvaluadorMano.evaluar(partida.mano, partida.umbral).duplicate(true)
+	var vecinos := _umbrales_vecinos()
 	return {
+		"mesa": campana.activa if campana != null else "", "retenidas": retenidas.size(),
+		"umbral_anterior": vecinos.anterior, "umbral_siguiente": vecinos.siguiente,
 		"comision": _cobra_comision(), "saldo": campana.saldo if campana != null else 0,
 		"fase": estado_activo.nombre, "campanadas": partida.campanadas, "presupuesto": presupuesto,
 		"puntos": partida.puntos, "meta": partida.meta, "umbral": partida.umbral,

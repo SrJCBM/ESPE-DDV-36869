@@ -8,7 +8,7 @@
 | --- | --- | :---: | --- | --- |
 | I3-01 | Respuesta visual al resolver la mano | 2 | **Completado** | `835ddff`. 141 pruebas, 6 nuevas en `test_feedback_resultado.gd` |
 | I3-02 | Balance de la Coleccionista, el Dueño y el Sello | 3 | **Completado** | `d477d3a`. [BALANCE_CAMPANA.md](BALANCE_CAMPANA.md); Word v2.4 y MD alineados |
-| I3-03 | Regla del crupier visible en la mesa | 5 | Pendiente | Incluye el comentario de Damián sobre el umbral del Dueño |
+| I3-03 | Regla del crupier visible en la mesa | 5 | **Completado** | Placa de regla, aviso del umbral y Dueño sin bajar tras Quiebra. 149 pruebas, 7 nuevas en `test_regla_crupier.gd` |
 | I3-04 | Pruebas de invariantes de zonas y de barajado | 7 | Pendiente | Antes de I3-05, como red de seguridad |
 | I3-05 | Deuda técnica | 6 | Pendiente | Strategy por crupier, catálogo en Resources, palos como constantes, dividir `mesa_ui.gd`, ajustes persistentes |
 | I3-06 | Recompensa de cartas tras cada mesa | 4 | En pausa | Diseño acordado; se retoma cuando el equipo lo indique |
@@ -32,27 +32,29 @@ Al plantarse, cada Máscara se voltea con un leve rebote al revelarse. La fórmu
 | Regla | Antes | Ahora |
 | --- | --- | --- |
 | La Coleccionista (meta · campanadas) | 600 · 14 | **700 · 12** |
-| El Dueño de la Casa (meta · campanadas) | 800 · 16 | **750 · 18** |
+| El Dueño de la Casa (meta · campanadas) | 800 · 16 | **750 · 18**; con I3-03, **750 · 17** |
 | Sello del prudente | Dos usos por mesa | **Un uso por mesa** (propuesta de Julio) |
 
-En 1.000 campañas simuladas sin compras, la Coleccionista pasa de superarse el 100 % al 94 % de las veces y el Dueño del 13 % al 35 %, dentro del objetivo del 30–40 %. Precios y amuletos no cambian: las fichas siguen siendo escasas para que comprar sea una decisión. El mismo commit:
+En 1.000 campañas simuladas sin compras, la Coleccionista pasa de superarse el 100 % al 94 % de las veces y el Dueño del 13 % al 35 %, dentro del objetivo del 30–40 % (34 % tras la regla nueva del Dueño de I3-03). Precios y amuletos no cambian: las fichas siguen siendo escasas para que comprar sea una decisión. El mismo commit:
 
 - añade `tests/sim_campana.gd`, que simula campañas completas con los comandos reales;
 - edita el documento de diseño v2.4 en su mismo archivo con el coste por mano, la Quiebra segura y las reglas nuevas;
 - integra el ajuste del 14 de noviembre en [ITERACION_01.md](ITERACION_01.md#ajuste-de-jugabilidad-del-14-de-noviembre), borra `AJUSTE_JUGABILIDAD_I1.md` y corrige los MD que seguían con el coste por carta.
 
-Límite conocido: quien compra Corona y Sello supera la Coleccionista siempre y el Dueño el 94 % de las veces. La ventaja viene sobre todo de la Corona, que se mantiene hasta observar a más jugadores.
-
-## Por implementar
+Límite conocido: quien compra Corona y Sello supera la Coleccionista siempre y el Dueño el 96 % de las veces. La ventaja viene sobre todo de la Corona, que se mantiene hasta observar a más jugadores.
 
 ### I3-03 · Regla del crupier visible en la mesa
 
-Hoy la regla especial de cada crupier solo se lee en la ayuda (H) y el umbral del Dueño cambia sin aviso; Damián no notó que bajaba. Criterios:
+Antes la regla especial solo se leía en la ayuda (H) y el umbral del Dueño cambiaba sin aviso al iniciar la mano siguiente; Damián no notó que bajaba.
 
-- La mesa muestra siempre, sin abrir la ayuda, la regla del crupier aplicada a la mano en curso. Por ejemplo: «Esta mano: umbral 23 · baja a 22 al cerrarla» o «Retendrá tu carta más alta».
-- Cuando el umbral del Dueño cambia entre manos, el cambio se señala de forma visible (antes → después) y también con texto, sin depender de la animación.
-- No tapa cartas, patrones ni acciones a 1024 × 576 y 1280 × 720.
-- **Decisión pendiente de Julio:** la otra idea de Damián, que el umbral solo baje si la mano no terminó en Quiebra, cambia la regla. Si se adopta, actualizar controlador, pruebas, `BALANCE_CAMPANA.md` y Word, y volver a medir.
+- Una placa **«Regla de la mesa»** bajo el retrato del crupier explica su regla aplicada a la mano en curso: la comisión y el saldo en el Recaudador, la carta que retiene y cuántas lleva la Coleccionista, y el umbral del Dueño. El Custodio y la mesa suelta de I1 no tienen regla especial y no la muestran.
+- Con el Dueño, la línea junto al umbral cambia de «No lo excedas.» a «Baja a 23 sin Quiebra.» durante la mano y a «Próxima mano: 23.» entre manos. Al iniciar la mano siguiente, el número del umbral late en oro y la placa dice «El umbral bajó de 24 a 23». Tras una Quiebra explica que el umbral se mantiene; en el mínimo, que ya no baja.
+- Todo cambio se explica con texto; con movimiento reducido el número no se anima.
+- El controlador añade a la vista pública la mesa, las cartas retenidas y los umbrales anterior y siguiente del Dueño. El tope de 17 queda en una constante y el valor inicial sale de `CampanaCasino.REGLAS`.
+- Archivos: `mesa/controlador_mesa.gd`, `mesa/lectura_mesa.gd`, `mesa/mesa_ui.gd`, `tests/test_regla_crupier.gd` y `tests/qa_regla.gd`, que genera las capturas en `juego/exportaciones/qa/`. Revisado a 1024 × 576 y 1280 × 720: la placa no tapa umbral, cartas ni acciones.
+- **Regla nueva del Dueño (decisión de Julio):** como propuso Damián, el umbral solo baja tras una mano cerrada sin Quiebra. La ayuda, el diálogo del Dueño y el Word lo explican. La regla resultó facilitar la mesa (sin compras, del 35 % al 42 %), así que el Dueño pasa de 18 a 17 campanadas y vuelve al 34 % ([balance](BALANCE_CAMPANA.md#el-dueño-solo-baja-tras-una-mano-sin-quiebra)).
+
+## Por implementar
 
 ### I3-04 · Pruebas de invariantes y de barajado
 
@@ -92,4 +94,4 @@ Comentario 3 de Damián: en algunas esquinas el visitante pasa por encima de mes
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/sim_campana.gd -- --semillas=1000
 ```
 
-Estado al cerrar I3-02: **142 pruebas, 1.251 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.
+Estado al cerrar I3-03: **149 pruebas, 1.298 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.

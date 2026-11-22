@@ -9,7 +9,7 @@ El visitante recorre el casino aprobado en clase, prepara su baraja entre encuen
 1. Abrir el proyecto con Godot 4.7.2 y pulsar **F5**. Caminar con **WASD o flechas** hasta el mostrador iluminado del vestíbulo. **E** abre el diálogo y otra pulsación entrega la invitación. El inventario (**I**) debe mostrar 24 cartas y diez fichas. Hablar otra vez permite pedir indicaciones.
 2. Salir por el sur. En la galería, examinar la puerta del Recaudador antes de ganar el primer sello. Debe indicar el requisito. Entrar al gabinete, seleccionar la Lente y confirmar. El saldo baja a cuatro. Volver al mostrador y cancelar una compra conserva el saldo.
 3. Sentarse ante el Custodio. Al recibir una Máscara, usar la Lente para conocer su valor antes de decidir. Se gasta una unidad. La mesa entrega diez fichas más cinco por cada Punto exacto al ganar. Levantarse permite volver a la tienda o a la galería.
-4. El Recaudador adelanta quince fichas una sola vez y cobra una por petición adicional. La Coleccionista retiene la carta más alta, con desempate por la última robada. El Dueño reduce el umbral de la mano siguiente hasta 17. Se puede consultar la bolsa en cada mesa con **I**.
+4. El Recaudador adelanta quince fichas una sola vez y cobra una por petición adicional. La Coleccionista retiene la carta más alta, con desempate por la última robada. El Dueño reduce el umbral de la mano siguiente hasta 17, salvo tras una Quiebra. Se puede consultar la bolsa en cada mesa con **I**.
 5. Tras la cuarta victoria, rodear la mesa del Dueño y abrir el portón del norte con **E**. Una derrota termina el intento. El siguiente comienza de nuevo en recepción.
 
 ## Entregas
@@ -28,8 +28,8 @@ Damián jugó la versión 0.2.0 completa, antes del balance de la campaña y de 
 
 | # | Comentario | Lectura del equipo | Destino |
 | --- | --- | --- | --- |
-| 1 | «Sentí el juego muy fácil.» | Coincide con la simulación: la Coleccionista la superaba el 100 % de quienes llegaban y quien compra Corona y Sello superaba al Dueño el 84 % de las veces. | I3-02 endureció la Coleccionista y redujo el Sello a un uso. Quien compra sigue superando al Dueño el 94 % de las veces, así que conviene repetir la prueba con él. |
-| 2 | «No me di cuenta de que el jefe iba bajando su límite en cada ronda. Debería haber algo más llamativo visualmente, o que solo baje si no me excedí del límite.» | El cambio de umbral solo se veía en el número y en la ayuda (H). La segunda idea cambia la regla del Dueño. | I3-03 mostrará la regla del crupier y el cambio de umbral en la mesa. Bajar solo sin Quiebra queda como decisión de diseño para Julio. |
+| 1 | «Sentí el juego muy fácil.» | Coincide con la simulación: la Coleccionista la superaba el 100 % de quienes llegaban y quien compra Corona y Sello superaba al Dueño el 84 % de las veces. | I3-02 endureció la Coleccionista y redujo el Sello a un uso. Quien compra sigue superando al Dueño el 96 % de las veces, así que conviene repetir la prueba con él. |
+| 2 | «No me di cuenta de que el jefe iba bajando su límite en cada ronda. Debería haber algo más llamativo visualmente, o que solo baje si no me excedí del límite.» | El cambio de umbral solo se veía en el número y en la ayuda (H). La segunda idea cambia la regla del Dueño. | I3-03 muestra la regla del crupier y el cambio de umbral en la mesa. Por decisión de Julio, el umbral ya solo baja tras una mano sin Quiebra. |
 | 3 | «Debería haber más colisiones con el entorno. Al mover al personaje por las esquinas, en algunos sitios puedo pasar por encima de mesas u objetos cuando no debería.» | Los obstáculos de algunas salas no cubren todo el mobiliario dibujado. | I3-08: revisar y completar las colisiones de cada sala. |
 
 Sus comentarios no cubren si encontró la salida sur, si distinguió fichas de campanadas ni cuándo usar la Lente: esas preguntas quedan para el próximo piloto.

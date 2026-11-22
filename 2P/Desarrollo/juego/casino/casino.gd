@@ -9,7 +9,7 @@ const DIALOGOS := {
 	"custodio": "He guardado la primera silla para ti. Escucha lo que calla la Máscara antes de pedir otra carta.",
 	"recaudador": "Quince fichas de cortesía. Cada carta que pidas después del reparto cuesta una. Hasta el azar lleva cuentas.",
 	"coleccionista": "Quédate con los puntos. Yo conservaré la carta más alta de cada mano, incluso si te pasas.",
-	"dueno": "¿Ya distingues el alba tras la verja? Empiezas en veinticinco. Cada mano que cierres me devuelve un paso, hasta diecisiete."
+	"dueno": "¿Ya distingues el alba tras la verja? Empiezas en veinticinco. Cada mano que cierres sin pasarte me devuelve un paso, hasta diecisiete."
 }
 const NOTAS := {
 	"vestibulo": ["El reloj detenido", "Todas las agujas señalan la hora a la que llegaste. Bajo el cristal alguien grabó tres ranuras del tamaño de un sello."],

@@ -23,7 +23,7 @@ Activar una Llave elegible la selecciona en la mano: **Confirmar** la devuelve y
 
 Sin Máscaras, el botón Plantarse anticipa los puntos que ofrece la mano. Con valores ocultos conserva el intervalo y no anticipa la puntuación. El boleto mantiene acumulado y meta. [Coste por mano, patrones y revelación](../ITERACION_01.md#ajuste-de-jugabilidad-del-14-de-noviembre).
 
-La ayuda no consume recursos. **Movimiento reducido**, en «A tu ritmo», desactiva las transiciones de cartas y progreso; se mantiene al reiniciar el intento durante esa sesión. Toda información necesaria se muestra sin depender de animaciones o sonido.
+En la campaña, una placa bajo el retrato muestra la regla del crupier aplicada a la mano en curso; con el Dueño anuncia cuándo baja el umbral y el número late al cambiar. La ayuda no consume recursos. **Movimiento reducido**, en «A tu ritmo», desactiva las transiciones de cartas y progreso; se mantiene al reiniciar el intento durante esa sesión. Toda información necesaria se muestra sin depender de animaciones o sonido.
 
 Los cinco indicadores muestran progreso y bonos de patrones. Señalarlos con el ratón o enfocarlos con Tab resalta las cartas relacionadas y muestra una explicación breve; Racha señala las últimas tres. Pulsarlos abre ejemplos. Solo una indicación contextual acompaña la mano: las reglas completas siguen en el libro y el desglose.
 

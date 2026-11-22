@@ -23,7 +23,7 @@ func test_reglas_de_coleccionista_y_dueno_siguen_el_balance_de_campana() -> void
 	# se puede superar sin compras en torno a un tercio de las veces.
 	for nivel in [2, 3]:
 		var m := control(nueva(), nivel)
-		var esperado: Array = [[25, 700, 12, 12], [25, 750, 18, 18]][nivel - 2]
+		var esperado: Array = [[25, 700, 12, 12], [25, 750, 17, 17]][nivel - 2]
 		assert_eq([m.partida.umbral, m.partida.meta, m.presupuesto, m.partida.campanadas], esperado)
 
 func test_recepcion_unica_y_puertas() -> void:

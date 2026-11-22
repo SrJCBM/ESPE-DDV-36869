@@ -69,6 +69,11 @@ var _revision_revelacion := 0
 var _vista_por_revelar: Dictionary = {}
 ## Respuesta visual al resolver: cuenta de puntos y gesto de las cartas. Nunca altera la vista.
 var _feedback: Tween
+## Placa con la regla del crupier sobre el pie del retrato, y su aviso de cambio de umbral.
+var _regla: PanelContainer
+var _regla_texto: Label
+var _nota_umbral: Label
+var _aviso_umbral: Tween
 var _textos_finales: Dictionary = {}
 
 func _ready() -> void:
@@ -118,11 +123,12 @@ func _construir() -> void:
 		_boton_texto(lienzo,"bolsa_campana","OBJETOS · I",Rect2(1025,32,158,38),_ver_objetos,15)
 		boton_lente = _boton_texto(lienzo, "boton_lente", "LENTE", Rect2(510, 66, 340, 36), _usar_lente, 15)
 	_imagen(lienzo, retrato, Rect2(22, 124, 356, 534), true)
+	_construir_regla()
 	_etiqueta(lienzo, nombre, Rect2(429, 119, 610, 75), 46, MARFIL, true)
 	_titulo_estado = _etiqueta(lienzo, "", Rect2(431, 194, 680, 30), 16, ORO)
 	_umbral = _etiqueta(lienzo, "", Rect2(32, 660, 115, 112), 88, ORO, true)
 	_etiqueta(lienzo, "UMBRAL", Rect2(155, 671, 215, 28), 18, ORO)
-	_etiqueta(lienzo, "No lo excedas.", Rect2(155, 703, 215, 29), 20, MUTED)
+	_nota_umbral = _etiqueta(lienzo, "No lo excedas.", Rect2(155, 703, 215, 29), 20, MUTED)
 	_imagen(lienzo, "res://recursos/figma/dial.svg", Rect2(1210, 124, 180, 180))
 	_contador = _etiqueta(lienzo, "", Rect2(1234, 168, 130, 78), 62, ORO, true)
 	_contador.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -327,6 +333,8 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	_cancelar_seleccion_llave(false)
 	_limpiar_patron()
 	_detener_feedback()
+	var umbral_previo: int = int(vista.get("umbral", 0))
+	var mesa_previa: String = str(vista.get("mesa", ""))
 	var recien_resuelta: bool = vista.get("fase", "") == "decision" and nueva_vista.get("fase", "") != "decision" and not nueva_vista.get("ultima_mano", {}).is_empty()
 	var puntos_previos: int = int(vista.get("puntos", 0))
 	var anteriores: Array = vista.get("cartas", [])
@@ -350,6 +358,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	_meta.text = str(vista.get("meta", 200))
 	_puntos.text = "%s / %s" % [vista.get("puntos", 0), vista.get("meta", 200)]
 	_umbral.text = str(vista.get("umbral", 17))
+	_presentar_regla(umbral_previo, mesa_previa)
 	_mazo.text = "MAZO %s  ·  DESCARTE %s" % [vista.get("mazo", 0), vista.get("descarte", 0)]
 	_subtitulo.text = "MESA I  /  EL PRIMER SELLO" + ("  ·  DEMOSTRACIÓN" if vista.get("modo_demostracion", false) else "")
 	boton_iniciar_pedir.disabled = not bool(acciones.get("iniciar", false) or acciones.get("pedir", false))
@@ -442,6 +451,67 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 		_mostrar_ultima_carta(_revision_vista)
 	if recien_resuelta and not movimiento_reducido and not _modal.visible:
 		_celebrar_resultado(puntos_previos)
+
+func _construir_regla() -> void:
+	_regla = PanelContainer.new()
+	_regla.name = "ReglaCrupier"
+	var placa := StyleBoxFlat.new()
+	placa.bg_color = Color(0.02, 0.06, 0.045, 0.86)
+	placa.border_color = ORO
+	placa.border_width_top = 1
+	placa.content_margin_left = 14
+	placa.content_margin_right = 14
+	placa.content_margin_top = 8
+	placa.content_margin_bottom = 9
+	_regla.add_theme_stylebox_override("panel", placa)
+	_regla.position = Vector2(22, 580)
+	_regla.size = Vector2(356, 78)
+	_regla.custom_minimum_size = Vector2(356, 0)
+	_regla.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var columna := VBoxContainer.new()
+	columna.add_theme_constant_override("separation", 2)
+	columna.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_regla.add_child(columna)
+	var rotulo := Label.new()
+	rotulo.text = "REGLA DE LA MESA"
+	rotulo.add_theme_font_size_override("font_size", 11)
+	rotulo.add_theme_color_override("font_color", ORO)
+	columna.add_child(rotulo)
+	_regla_texto = Label.new()
+	_regla_texto.name = "TextoRegla"
+	_regla_texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_regla_texto.custom_minimum_size = Vector2(328, 0)
+	_regla_texto.add_theme_font_size_override("font_size", 15)
+	_regla_texto.add_theme_color_override("font_color", MARFIL)
+	columna.add_child(_regla_texto)
+	lienzo.add_child(_regla)
+	_regla.hide()
+
+## La placa crece hacia arriba desde el pie del retrato para no tapar el umbral.
+func _presentar_regla(umbral_previo: int, mesa_previa: String) -> void:
+	var regla: Dictionary = Lectura.regla(vista)
+	_regla_texto.text = regla.texto
+	_nota_umbral.text = regla.nota
+	_regla.visible = not str(regla.texto).is_empty()
+	if _regla.visible:
+		_regla.reset_size()
+		_regla.position.y = 658.0 - _regla.get_combined_minimum_size().y
+	var umbral := int(vista.get("umbral", 17))
+	if umbral_previo > 0 and umbral != umbral_previo and mesa_previa == str(vista.get("mesa", "")):
+		_avisar_cambio_umbral()
+
+## El número del umbral late en oro al cambiar; el texto de la placa explica el cambio.
+func _avisar_cambio_umbral() -> void:
+	if _aviso_umbral != null and _aviso_umbral.is_valid(): _aviso_umbral.kill()
+	_umbral.scale = Vector2.ONE
+	_umbral.modulate = Color.WHITE
+	if movimiento_reducido: return
+	_umbral.pivot_offset = _umbral.size * 0.5
+	_umbral.scale = Vector2.ONE * 1.3
+	_umbral.modulate = Color(1.25, 1.12, 0.8)
+	_aviso_umbral = create_tween().set_parallel(true)
+	_aviso_umbral.tween_property(_umbral, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_aviso_umbral.tween_property(_umbral, "modulate", Color.WHITE, 0.9)
 
 ## Los textos ya contienen el resultado final; la animación solo los recorre y vuelve a ellos.
 func _celebrar_resultado(puntos_previos: int) -> void:
@@ -728,6 +798,9 @@ func establecer_movimiento_reducido(reducido: bool) -> void:
 	if reducido:
 		_terminar_revelacion()
 		_detener_feedback()
+		if _aviso_umbral != null and _aviso_umbral.is_valid(): _aviso_umbral.kill()
+		_umbral.scale = Vector2.ONE
+		_umbral.modulate = Color.WHITE
 	for carta in fila_cartas.get_children():
 		carta.establecer_movimiento_reducido(reducido)
 	if reducido:
