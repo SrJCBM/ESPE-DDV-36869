@@ -1,6 +1,6 @@
 # Iteración 02 · La casa de los tres sellos
 
-**Versión 0.2.0 · 18 de noviembre de 2026.** Campaña jugable con ayuda por mesa, objetivo de exploración y personajes ampliados. Queda pendiente la revisión con jugadores.
+**Versión 0.2.0 · 18 de noviembre de 2026.** Campaña jugable con ayuda por mesa, objetivo de exploración y personajes ampliados. La revisión con un jugador se completó y sus hallazgos pasan a la [iteración 3](ITERACION_03.md).
 
 El visitante recorre el casino aprobado en clase, prepara su baraja entre encuentros y sale al amanecer si supera las cuatro mesas. La campaña dura un intento y el progreso se conserva durante la sesión. La prioridad siguiente es revisar orientación y balance con el equipo. La red queda para un incremento posterior.
 
@@ -20,7 +20,19 @@ El visitante recorre el casino aprobado en clase, prepara su baraja entre encuen
 | Exploración | Implementada | Movimiento con colisiones, diálogo por proximidad, indicación de puertas y retorno a la galería. |
 | Objetos y economía | Implementada | La Lente revela solo las Máscaras presentes. Corona, Sello del prudente y Moneda mellada aplican sus efectos. La tienda confirma el precio y admite ajustes o eliminación de cartas. [Gabinete y figuras](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=60-4103) |
 | Encuentros | Implementada | La misma mesa de cartas recibe las reglas del anfitrión y el inventario del intento. Las tres primeras victorias abren puertas y la cuarta habilita el portón. |
-| Revisión con usuarios | Pendiente | Comprobar si encuentran la salida sur, distinguen fichas de campanadas y entienden cuándo usar o guardar la Lente. Recoger los comentarios de I1 por separado. |
+| Revisión con usuarios | Completada | Damián jugó la campaña antes del balance del 22 de noviembre. Tres observaciones: dificultad, umbral del Dueño y colisiones. [Detalle](#revisión-con-damián) |
+
+## Revisión con Damián
+
+Damián jugó la versión 0.2.0 completa, antes del balance de la campaña y de las mejoras de la iteración 3. Sus comentarios se registran tal como los expresó y cada uno tiene destino en la [iteración 3](ITERACION_03.md).
+
+| # | Comentario | Lectura del equipo | Destino |
+| --- | --- | --- | --- |
+| 1 | «Sentí el juego muy fácil.» | Coincide con la simulación: la Coleccionista la superaba el 100 % de quienes llegaban y quien compra Corona y Sello superaba al Dueño el 84 % de las veces. | I3-02 endureció la Coleccionista y redujo el Sello a un uso. Quien compra sigue superando al Dueño el 94 % de las veces, así que conviene repetir la prueba con él. |
+| 2 | «No me di cuenta de que el jefe iba bajando su límite en cada ronda. Debería haber algo más llamativo visualmente, o que solo baje si no me excedí del límite.» | El cambio de umbral solo se veía en el número y en la ayuda (H). La segunda idea cambia la regla del Dueño. | I3-03 mostrará la regla del crupier y el cambio de umbral en la mesa. Bajar solo sin Quiebra queda como decisión de diseño para Julio. |
+| 3 | «Debería haber más colisiones con el entorno. Al mover al personaje por las esquinas, en algunos sitios puedo pasar por encima de mesas u objetos cuando no debería.» | Los obstáculos de algunas salas no cubren todo el mobiliario dibujado. | I3-08: revisar y completar las colisiones de cada sala. |
+
+Sus comentarios no cubren si encontró la salida sur, si distinguió fichas de campanadas ni cuándo usar la Lente: esas preguntas quedan para el próximo piloto.
 
 ## Entrega de Kenned
 

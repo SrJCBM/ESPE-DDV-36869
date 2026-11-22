@@ -48,6 +48,8 @@ Los comandos de pruebas y exportación están en [juego/README.md](juego/README.
 ## Documentos y materiales
 
 - [Iteración 01 y criterios R01–R20](ITERACION_01.md).
+- [Iteración 02: campaña y revisión con Damián](ITERACION_02.md).
+- [Iteración 03: pulido, balance y deuda técnica](ITERACION_03.md), con el estado de cada mejora.
 - [Revisión técnica y pendientes de cierre](REVISION_I1.md).
 - [Plan general](PLAN_DE_TRABAJO.md), [arquitectura](ARQUITECTURA_Y_PATRONES.md) y [entorno](ENTORNO_Y_HERRAMIENTAS.md).
 - [Figma y alcance del prototipo](Diseno/FIGMA.md): referencia de diseño; sus repartos preparados no sustituyen pruebas del juego.
