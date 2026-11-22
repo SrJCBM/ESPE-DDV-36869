@@ -10,11 +10,14 @@ const Carta = preload("res://cartas/carta.tscn")
 const Guia = preload("res://mesa/guia_custodio.gd")
 const Marco = preload("res://mesa/marco_casa.gd")
 const Lectura = preload("res://mesa/lectura_mesa.gd")
-const DURACION_CUENTA := 0.45
-const ORO := Color("d5b578")
-const MARFIL := Color("f1e4c9")
-const MUTED := Color("b9c4a8")
-const TINTA := Color("263a2b")
+const Piezas = preload("res://mesa/piezas_mesa.gd")
+const Desglose = preload("res://mesa/desglose_mano.gd")
+const PlacaRegla = preload("res://mesa/placa_regla.gd")
+const Respuesta = preload("res://mesa/respuesta_resultado.gd")
+const ORO := Piezas.ORO
+const MARFIL := Piezas.MARFIL
+const MUTED := Piezas.MUTED
+const TINTA := Piezas.TINTA
 const BASE := Vector2(1440, 810)
 
 signal salir_de_mesa(victoria: bool, exactos: int)
@@ -67,14 +70,15 @@ var _patron_foco := -1
 var _revelando := false
 var _revision_revelacion := 0
 var _vista_por_revelar: Dictionary = {}
-## Respuesta visual al resolver: cuenta de puntos y gesto de las cartas. Nunca altera la vista.
-var _feedback: Tween
-## Placa con la regla del crupier sobre el pie del retrato, y su aviso de cambio de umbral.
-var _regla: PanelContainer
+## Respuesta visual al resolver y aviso del cambio de umbral (respuesta_resultado.gd).
+var _respuesta: Respuesta
+## La cuenta de puntos en curso, o null si no hay ninguna.
+var _feedback: Tween:
+	get: return _respuesta.tween if _respuesta != null else null
+## Placa con la regla del crupier sobre el pie del retrato (placa_regla.gd).
+var _regla: PlacaRegla
 var _regla_texto: Label
 var _nota_umbral: Label
-var _aviso_umbral: Tween
-var _textos_finales: Dictionary = {}
 
 func _ready() -> void:
 	_construir()
@@ -106,12 +110,12 @@ func _construir() -> void:
 	lienzo.name = "LienzoMesa"
 	lienzo.size = BASE
 	add_child(lienzo)
-	_imagen(lienzo, "res://recursos/figma/marco-casino.svg", Rect2(24, 24, 1391, 761))
-	_etiqueta(lienzo, "LA ÚLTIMA MESA", Rect2(40, 29, 490, 44), 29, ORO, true)
-	_subtitulo = _etiqueta(lienzo, "MESA I  /  EL PRIMER SELLO", Rect2(530, 39, 430, 22), 13, MUTED)
-	boton_reiniciar = _boton_texto(lienzo, "boton_reiniciar", "REINICIAR · R", Rect2(1025, 32, 158, 38), _solicitar_reinicio, 13)
-	boton_ayuda = _boton_texto(lienzo, "boton_ayuda", "CÓMO JUGAR · H", Rect2(1210, 32, 185, 38), mostrar_ayuda, 14)
-	boton_demostracion = _boton_texto(lienzo, "boton_demostracion", "DEMOSTRACIÓN GUIADA", Rect2(531, 68, 245, 25), _solicitar_demostracion, 11)
+	Piezas.imagen(lienzo, "res://recursos/figma/marco-casino.svg", Rect2(24, 24, 1391, 761))
+	Piezas.etiqueta(lienzo, "LA ÚLTIMA MESA", Rect2(40, 29, 490, 44), 29, ORO, true)
+	_subtitulo = Piezas.etiqueta(lienzo, "MESA I  /  EL PRIMER SELLO", Rect2(530, 39, 430, 22), 13, MUTED)
+	boton_reiniciar = Piezas.boton_texto(lienzo, "boton_reiniciar", "REINICIAR · R", Rect2(1025, 32, 158, 38), _solicitar_reinicio, 13)
+	boton_ayuda = Piezas.boton_texto(lienzo, "boton_ayuda", "CÓMO JUGAR · H", Rect2(1210, 32, 185, 38), mostrar_ayuda, 14)
+	boton_demostracion = Piezas.boton_texto(lienzo, "boton_demostracion", "DEMOSTRACIÓN GUIADA", Rect2(531, 68, 245, 25), _solicitar_demostracion, 11)
 	boton_demostracion.tooltip_text = "Cargar una secuencia preparada para aprender las reglas. Reinicia el intento."
 	var retrato := "res://recursos/arte/custodio-grabado.png"
 	var nombre := "El Custodio"
@@ -120,27 +124,27 @@ func _construir() -> void:
 		if campana.activa != "custodio": retrato = "res://casino/arte/personaje_%s.webp" % campana.activa
 		boton_demostracion.hide()
 		boton_reiniciar.hide()
-		_boton_texto(lienzo,"bolsa_campana","OBJETOS · I",Rect2(1025,32,158,38),_ver_objetos,15)
-		boton_lente = _boton_texto(lienzo, "boton_lente", "LENTE", Rect2(510, 66, 340, 36), _usar_lente, 15)
-	_imagen(lienzo, retrato, Rect2(22, 124, 356, 534), true)
+		Piezas.boton_texto(lienzo,"bolsa_campana","OBJETOS · I",Rect2(1025,32,158,38),_ver_objetos,15)
+		boton_lente = Piezas.boton_texto(lienzo, "boton_lente", "LENTE", Rect2(510, 66, 340, 36), _usar_lente, 15)
+	Piezas.imagen(lienzo, retrato, Rect2(22, 124, 356, 534), true)
 	_construir_regla()
-	_etiqueta(lienzo, nombre, Rect2(429, 119, 610, 75), 46, MARFIL, true)
-	_titulo_estado = _etiqueta(lienzo, "", Rect2(431, 194, 680, 30), 16, ORO)
-	_umbral = _etiqueta(lienzo, "", Rect2(32, 660, 115, 112), 88, ORO, true)
-	_etiqueta(lienzo, "UMBRAL", Rect2(155, 671, 215, 28), 18, ORO)
-	_nota_umbral = _etiqueta(lienzo, "No lo excedas.", Rect2(155, 703, 215, 29), 20, MUTED)
-	_imagen(lienzo, "res://recursos/figma/dial.svg", Rect2(1210, 124, 180, 180))
-	_contador = _etiqueta(lienzo, "", Rect2(1234, 168, 130, 78), 62, ORO, true)
+	Piezas.etiqueta(lienzo, nombre, Rect2(429, 119, 610, 75), 46, MARFIL, true)
+	_titulo_estado = Piezas.etiqueta(lienzo, "", Rect2(431, 194, 680, 30), 16, ORO)
+	_umbral = Piezas.etiqueta(lienzo, "", Rect2(32, 660, 115, 112), 88, ORO, true)
+	Piezas.etiqueta(lienzo, "UMBRAL", Rect2(155, 671, 215, 28), 18, ORO)
+	_nota_umbral = Piezas.etiqueta(lienzo, "No lo excedas.", Rect2(155, 703, 215, 29), 20, MUTED)
+	Piezas.imagen(lienzo, "res://recursos/figma/dial.svg", Rect2(1210, 124, 180, 180))
+	_contador = Piezas.etiqueta(lienzo, "", Rect2(1234, 168, 130, 78), 62, ORO, true)
 	_contador.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_presupuesto = _etiqueta(lienzo, "", Rect2(1234, 250, 130, 23), 13, MUTED)
+	_presupuesto = Piezas.etiqueta(lienzo, "", Rect2(1234, 250, 130, 23), 13, MUTED)
 	_presupuesto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_etiqueta(lienzo, "CAMPANADAS", Rect2(1190, 306, 240, 32), 17, ORO)
-	_imagen(lienzo, "res://recursos/figma/boleto.svg", Rect2(1157, 393, 238, 237))
-	_etiqueta(lienzo, "META DE LA MESA", Rect2(1180, 416, 195, 24), 14, TINTA)
-	_meta = _etiqueta(lienzo, "", Rect2(1182, 441, 190, 85), 68, TINTA, true)
-	_etiqueta(lienzo, "PUNTOS", Rect2(1294, 485, 82, 22), 12, TINTA)
-	_etiqueta(lienzo, "ACUMULADOS", Rect2(1181, 542, 195, 24), 12, TINTA)
-	_puntos = _etiqueta(lienzo, "", Rect2(1181, 562, 196, 48), 35, TINTA, true)
+	Piezas.etiqueta(lienzo, "CAMPANADAS", Rect2(1190, 306, 240, 32), 17, ORO)
+	Piezas.imagen(lienzo, "res://recursos/figma/boleto.svg", Rect2(1157, 393, 238, 237))
+	Piezas.etiqueta(lienzo, "META DE LA MESA", Rect2(1180, 416, 195, 24), 14, TINTA)
+	_meta = Piezas.etiqueta(lienzo, "", Rect2(1182, 441, 190, 85), 68, TINTA, true)
+	Piezas.etiqueta(lienzo, "PUNTOS", Rect2(1294, 485, 82, 22), 12, TINTA)
+	Piezas.etiqueta(lienzo, "ACUMULADOS", Rect2(1181, 542, 195, 24), 12, TINTA)
+	_puntos = Piezas.etiqueta(lienzo, "", Rect2(1181, 562, 196, 48), 35, TINTA, true)
 	_progreso = ProgressBar.new()
 	_progreso.position = Vector2(1182, 615)
 	_progreso.show_percentage = false
@@ -153,7 +157,7 @@ func _construir() -> void:
 	_progreso.add_theme_stylebox_override("fill", avance)
 	lienzo.add_child(_progreso)
 	_progreso.size = Vector2(192, 5)
-	boton_desglose = _boton_texto(lienzo, "boton_desglose", "VER DESGLOSE", Rect2(1157, 646, 238, 36), mostrar_desglose, 14)
+	boton_desglose = Piezas.boton_texto(lienzo, "boton_desglose", "VER DESGLOSE", Rect2(1157, 646, 238, 36), mostrar_desglose, 14)
 	boton_desglose.hide()
 	_construir_mano()
 	_patrones_ui = HBoxContainer.new()
@@ -162,17 +166,18 @@ func _construir() -> void:
 	_patrones_ui.add_theme_constant_override("separation", 6)
 	lienzo.add_child(_patrones_ui)
 	_patrones_ui.hide()
-	_imagen(lienzo, "res://recursos/figma/filete.svg", Rect2(432, 599, 671, 1))
-	_lectura_titulo = _etiqueta(lienzo, "SIGUIENTE PASO", Rect2(431, 607, 175, 23), 12, MUTED)
-	_lectura = _etiqueta(lienzo, "—", Rect2(588, 606, 235, 50), 40, MARFIL, true)
-	_explicacion = _etiqueta(lienzo, "", Rect2(827, 606, 284, 47), 16, MUTED)
+	Piezas.imagen(lienzo, "res://recursos/figma/filete.svg", Rect2(432, 599, 671, 1))
+	_lectura_titulo = Piezas.etiqueta(lienzo, "SIGUIENTE PASO", Rect2(431, 607, 175, 23), 12, MUTED)
+	_lectura = Piezas.etiqueta(lienzo, "—", Rect2(588, 606, 235, 50), 40, MARFIL, true)
+	_explicacion = Piezas.etiqueta(lienzo, "", Rect2(827, 606, 284, 47), 16, MUTED)
 	_explicacion.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_mensaje = _etiqueta(lienzo, "", Rect2(432, 660, 684, 40), 16, MUTED)
+	_mensaje = Piezas.etiqueta(lienzo, "", Rect2(432, 660, 684, 40), 16, MUTED)
 	_mensaje.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	boton_iniciar_pedir = _boton_accion("boton_iniciar_pedir", Rect2(417, 706, 278, 80), true, _iniciar_o_pedir, "P")
-	boton_plantarse = _boton_accion("boton_plantarse", Rect2(713, 706, 278, 80), false, _plantarse, "S")
-	_texto_accion(boton_plantarse, "PLANTARSE", "Gratis · revelar y puntuar")
-	_mazo = _etiqueta(lienzo, "", Rect2(40, 780, 350, 24), 12, MUTED)
+	boton_iniciar_pedir = Piezas.boton_accion(lienzo, "boton_iniciar_pedir", Rect2(417, 706, 278, 80), true, _iniciar_o_pedir, "P")
+	boton_plantarse = Piezas.boton_accion(lienzo, "boton_plantarse", Rect2(713, 706, 278, 80), false, _plantarse, "S")
+	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "Gratis · revelar y puntuar")
+	_mazo = Piezas.etiqueta(lienzo, "", Rect2(40, 780, 350, 24), 12, MUTED)
+	_respuesta = Respuesta.new(self, _lectura, _puntos, _umbral)
 	_construir_eleccion_llave()
 	_construir_modal()
 
@@ -196,82 +201,8 @@ func _construir_mano() -> void:
 	_vacio.position = Vector2(432, 310)
 	_vacio.size = Vector2(665, 150)
 	lienzo.add_child(_vacio)
-	var titulo := _etiqueta(_vacio, "La mesa te espera", Rect2(0, 40, 665, 50), 34, ORO, true)
+	var titulo := Piezas.etiqueta(_vacio, "La mesa te espera", Rect2(0, 40, 665, 50), 34, ORO, true)
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-
-func _etiqueta(padre: Node, texto: String, rect: Rect2, tamano: int, color: Color, display := false) -> Label:
-	var etiqueta := Label.new()
-	# El texto no debe imponer su ancho mínimo antes de habilitar el ajuste.
-	etiqueta.clip_text = true
-	etiqueta.text = texto
-	etiqueta.position = rect.position
-	etiqueta.size = rect.size
-	etiqueta.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	etiqueta.add_theme_font_size_override("font_size", tamano)
-	etiqueta.add_theme_color_override("font_color", color)
-	if display:
-		etiqueta.theme_type_variation = &"DisplayLabel"
-	padre.add_child(etiqueta)
-	return etiqueta
-
-func _imagen(padre: Node, ruta: String, rect: Rect2, conservar := false) -> TextureRect:
-	var imagen := TextureRect.new()
-	imagen.texture = load(ruta)
-	imagen.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	imagen.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED if conservar else TextureRect.STRETCH_SCALE
-	imagen.position = rect.position
-	imagen.size = rect.size
-	imagen.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	padre.add_child(imagen)
-	return imagen
-
-func _boton_texto(padre: Node, nombre: String, texto: String, rect: Rect2, accion: Callable, tamano := 16) -> Button:
-	var boton := Button.new()
-	boton.name = nombre
-	boton.text = texto
-	boton.position = rect.position
-	boton.size = rect.size
-	boton.add_theme_font_size_override("font_size", tamano)
-	boton.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	boton.pressed.connect(accion)
-	padre.add_child(boton)
-	return boton
-
-func _boton_accion(nombre: String, rect: Rect2, primario: bool, accion: Callable, tecla: String) -> Button:
-	var boton := _boton_texto(lienzo, nombre, "", rect, accion)
-	var ruta := "res://recursos/figma/accion-primaria.svg" if primario else "res://recursos/figma/accion-secundaria.svg"
-	var imagen := _imagen(boton, ruta, Rect2(Vector2.ZERO, rect.size))
-	imagen.name = "Fondo"
-	var atajo := Panel.new()
-	atajo.name = "Atajo"
-	atajo.position = Vector2(12, 26)
-	atajo.size = Vector2(28, 28)
-	atajo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var borde := StyleBoxFlat.new()
-	borde.bg_color = Color.TRANSPARENT
-	borde.border_color = TINTA if primario else ORO
-	borde.set_border_width_all(2)
-	atajo.add_theme_stylebox_override("panel", borde)
-	boton.add_child(atajo)
-	var letra := _etiqueta(atajo, tecla, Rect2(0, 0, 28, 28), 16, TINTA if primario else MARFIL)
-	letra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	letra.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var titulo := _etiqueta(boton, "", Rect2(47, 14, rect.size.x - 59, 30), 17, TINTA if primario else MARFIL)
-	titulo.name = "Etiqueta"
-	titulo.theme_type_variation = &"BoldLabel"
-	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var detalle := _etiqueta(boton, "", Rect2(47, 44, rect.size.x - 59, 24), 13, TINTA if primario else MUTED)
-	detalle.name = "Coste"
-	detalle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	return boton
-
-func _texto_accion(boton: Button, titulo: String, detalle: String) -> void:
-	boton.get_node("Etiqueta").text = titulo
-	boton.get_node("Coste").text = detalle
-	boton.tooltip_text = "%s. %s" % [titulo, detalle]
-	for propiedad in boton.get_property_list():
-		if propiedad.name == "accessibility_name":
-			boton.set("accessibility_name", boton.tooltip_text)
 
 func presentar_vista(nueva_vista: Dictionary) -> void:
 	var tiene_ocultas := false
@@ -307,7 +238,7 @@ func _revelar_mano(final: Dictionary) -> void:
 	boton_iniciar_pedir.disabled = true
 	boton_iniciar_pedir.get_node("Fondo").modulate.a = 0.55
 	boton_plantarse.disabled = false
-	_texto_accion(boton_plantarse, "MOSTRAR RESULTADO", "Saltar revelación")
+	Piezas.texto_accion(boton_plantarse, "MOSTRAR RESULTADO", "Saltar revelación")
 	var indices: Array[int] = []
 	for i in range(vista.get("cartas", []).size()):
 		if vista.cartas[i].get("oculta", false): indices.append(i)
@@ -332,7 +263,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 		return
 	_cancelar_seleccion_llave(false)
 	_limpiar_patron()
-	_detener_feedback()
+	_respuesta.detener()
 	var umbral_previo: int = int(vista.get("umbral", 0))
 	var mesa_previa: String = str(vista.get("mesa", ""))
 	var recien_resuelta: bool = vista.get("fase", "") == "decision" and nueva_vista.get("fase", "") != "decision" and not nueva_vista.get("ultima_mano", {}).is_empty()
@@ -369,7 +300,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 		boton_lente.visible = campana.lentes > 0
 		boton_lente.disabled = fase != "decision" or int(vista.intervalo.ocultas) == 0
 	boton_reiniciar.disabled = not bool(acciones.get("reiniciar", true))
-	_texto_accion(boton_iniciar_pedir, "PEDIR" if fase == "decision" else "INICIAR MANO", ("−1 ficha" if vista.get("comision", false) else "Gratis") if fase == "decision" else "−1 campanada")
+	Piezas.texto_accion(boton_iniciar_pedir, "PEDIR" if fase == "decision" else "INICIAR MANO", ("−1 ficha" if vista.get("comision", false) else "Gratis") if fase == "decision" else "−1 campanada")
 	boton_plantarse.visible = fase == "decision"
 	for boton in [boton_iniciar_pedir, boton_plantarse]:
 		boton.get_node("Fondo").modulate.a = 0.55 if boton.disabled else 1.0
@@ -450,108 +381,20 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	if cartas.size() >= 6 and str(cartas.back().get("id", "")) != ultimo_anterior and not _modal.visible:
 		_mostrar_ultima_carta(_revision_vista)
 	if recien_resuelta and not movimiento_reducido and not _modal.visible:
-		_celebrar_resultado(puntos_previos)
+		_respuesta.celebrar(vista, fila_cartas.get_children(), puntos_previos)
 
 func _construir_regla() -> void:
-	_regla = PanelContainer.new()
-	_regla.name = "ReglaCrupier"
-	var placa := StyleBoxFlat.new()
-	placa.bg_color = Color(0.02, 0.06, 0.045, 0.86)
-	placa.border_color = ORO
-	placa.border_width_top = 1
-	placa.content_margin_left = 14
-	placa.content_margin_right = 14
-	placa.content_margin_top = 8
-	placa.content_margin_bottom = 9
-	_regla.add_theme_stylebox_override("panel", placa)
-	_regla.position = Vector2(22, 580)
-	_regla.size = Vector2(356, 78)
-	_regla.custom_minimum_size = Vector2(356, 0)
-	_regla.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var columna := VBoxContainer.new()
-	columna.add_theme_constant_override("separation", 2)
-	columna.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_regla.add_child(columna)
-	var rotulo := Label.new()
-	rotulo.text = "REGLA DE LA MESA"
-	rotulo.add_theme_font_size_override("font_size", 11)
-	rotulo.add_theme_color_override("font_color", ORO)
-	columna.add_child(rotulo)
-	_regla_texto = Label.new()
-	_regla_texto.name = "TextoRegla"
-	_regla_texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_regla_texto.custom_minimum_size = Vector2(328, 0)
-	_regla_texto.add_theme_font_size_override("font_size", 15)
-	_regla_texto.add_theme_color_override("font_color", MARFIL)
-	columna.add_child(_regla_texto)
+	_regla = PlacaRegla.new()
 	lienzo.add_child(_regla)
-	_regla.hide()
+	_regla_texto = _regla.texto
 
-## La placa crece hacia arriba desde el pie del retrato para no tapar el umbral.
 func _presentar_regla(umbral_previo: int, mesa_previa: String) -> void:
 	var regla: Dictionary = Lectura.regla(vista)
-	_regla_texto.text = regla.texto
+	_regla.mostrar(str(regla.texto))
 	_nota_umbral.text = regla.nota
-	_regla.visible = not str(regla.texto).is_empty()
-	if _regla.visible:
-		_regla.reset_size()
-		_regla.position.y = 658.0 - _regla.get_combined_minimum_size().y
 	var umbral := int(vista.get("umbral", 17))
 	if umbral_previo > 0 and umbral != umbral_previo and mesa_previa == str(vista.get("mesa", "")):
-		_avisar_cambio_umbral()
-
-## El número del umbral late en oro al cambiar; el texto de la placa explica el cambio.
-func _avisar_cambio_umbral() -> void:
-	if _aviso_umbral != null and _aviso_umbral.is_valid(): _aviso_umbral.kill()
-	_umbral.scale = Vector2.ONE
-	_umbral.modulate = Color.WHITE
-	if movimiento_reducido: return
-	_umbral.pivot_offset = _umbral.size * 0.5
-	_umbral.scale = Vector2.ONE * 1.3
-	_umbral.modulate = Color(1.25, 1.12, 0.8)
-	_aviso_umbral = create_tween().set_parallel(true)
-	_aviso_umbral.tween_property(_umbral, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_aviso_umbral.tween_property(_umbral, "modulate", Color.WHITE, 0.9)
-
-## Los textos ya contienen el resultado final; la animación solo los recorre y vuelve a ellos.
-func _celebrar_resultado(puntos_previos: int) -> void:
-	var mano: Dictionary = vista.get("ultima_mano", {})
-	var cartas := fila_cartas.get_children()
-	_textos_finales = {_lectura: _lectura.text, _puntos: _puntos.text}
-	_lectura.pivot_offset = _lectura.size * 0.5
-	_feedback = create_tween()
-	if mano.get("quiebra", false):
-		for carta in cartas:
-			carta.sacudir(0.8)
-		_feedback.tween_property(_lectura, "modulate", Color(1.0, 0.62, 0.55), 0.08)
-		_feedback.tween_property(_lectura, "modulate", Color.WHITE, 0.4)
-		_feedback.tween_callback(_detener_feedback)
-		return
-	var total: int = int(mano.get("total", 0))
-	var multiplicador: int = int(mano.get("multiplicador", 1))
-	var aporte: int = int(mano.get("puntos", 0))
-	var meta: int = int(vista.get("meta", 200))
-	var cuenta := func(valor: float) -> void:
-		_lectura.text = "%s × %s = %s" % [total, multiplicador, roundi(valor)]
-		_puntos.text = "%s / %s" % [puntos_previos + roundi(valor), meta]
-	cuenta.call(0.0)
-	_feedback.tween_method(cuenta, 0.0, float(aporte), DURACION_CUENTA).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_feedback.tween_property(_lectura, "scale", Vector2.ONE * 1.12, 0.07)
-	_feedback.tween_property(_lectura, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_feedback.tween_callback(_detener_feedback)
-	if mano.get("patrones", []).has("Punto exacto"):
-		for i in range(cartas.size()):
-			cartas[i].celebrar(DURACION_CUENTA * 0.6 + i * 0.05)
-
-func _detener_feedback() -> void:
-	if _feedback != null and _feedback.is_valid():
-		_feedback.kill()
-	_feedback = null
-	for etiqueta in _textos_finales:
-		etiqueta.text = _textos_finales[etiqueta]
-	_textos_finales.clear()
-	_lectura.scale = Vector2.ONE
-	_lectura.modulate = Color.WHITE
+		_respuesta.avisar_cambio_umbral(movimiento_reducido)
 
 func _mostrar_ultima_carta(revision: int) -> void:
 	# Los Containers necesitan ordenar sus hijos antes de conocer el rango final.
@@ -577,47 +420,7 @@ func mostrar_desglose() -> void:
 	_panel_modal.position = Vector2(250, 62)
 	_panel_modal.size = Vector2(940, 686)
 	_contenido_modal.size = _panel_modal.size
-	var resultado: Dictionary = vista.get("ultima_mano", {})
-	var valores: Array = resultado.get("valores", [])
-	var partes := PackedStringArray()
-	for valor in valores:
-		partes.append(str(valor))
-	var texto := RichTextLabel.new()
-	texto.name = "DesgloseResultado"
-	texto.position = Vector2(32, 95)
-	texto.size = Vector2(536, 498)
-	texto.bbcode_enabled = true
-	texto.focus_mode = Control.FOCUS_ALL
-	texto.add_theme_font_size_override("normal_font_size", 19)
-	texto.add_theme_color_override("default_color", MARFIL)
-	texto.text = "[b]VALORES EFECTIVOS · ORDEN DE ROBO[/b]\n%s = %s\nUmbral: %s\n\n" % [" + ".join(partes), resultado.get("total", 0), vista.get("umbral", 17)]
-	if resultado.get("quiebra", false):
-		texto.text += "[b]QUIEBRA[/b]\nEl total %s supera el umbral %s.\n\nBase del multiplicador: 1, sin aplicar.\nLas Velas y los patrones no producen bonificaciones en Quiebra.\nMultiplicador final: %s.\n\n[b]RESULTADO: 0 PUNTOS[/b]" % [resultado.get("total", 0), vista.get("umbral", 17), resultado.get("multiplicador", 0)]
-	else:
-		texto.text += "[b]MULTIPLICADOR[/b]\nBase: 1\nVelas conservadas: %s × +1\n" % resultado.get("velas", 0)
-		var bonos: Dictionary = resultado.get("bonos", {})
-		var patrones: Array = resultado.get("patrones", [])
-		var formula := "1 + %s" % resultado.get("velas", 0)
-		if patrones.is_empty():
-			texto.text += "Sin patrones activados.\n"
-		for patron in patrones:
-			var bono: String = str(bonos.get(patron, "—"))
-			texto.text += "%s: +%s\n" % [patron, bono]
-			formula += " + " + bono
-		if resultado.get("corona", 0) > 0:
-			texto.text += "Corona del riesgo: +2\n"
-			formula += " + 2"
-		texto.text += "\nMultiplicador final: %s = %s\n\n[b]%s × %s = %s PUNTOS[/b]" % [formula, resultado.get("multiplicador", 1), resultado.get("total", 0), resultado.get("multiplicador", 1), resultado.get("puntos", 0)]
-	_contenido_modal.add_child(texto)
-	_imagen(_contenido_modal, "res://recursos/figma/boleto.svg", Rect2(595, 108, 310, 460))
-	_etiqueta(_contenido_modal, "APORTE DE ESTA MANO", Rect2(617, 135, 266, 26), 13, TINTA)
-	var aporte := _etiqueta(_contenido_modal, str(resultado.get("puntos", 0)), Rect2(615, 175, 270, 120), 80, TINTA, true)
-	aporte.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var concepto := _etiqueta(_contenido_modal, "QUIEBRA" if resultado.get("quiebra", false) else "PUNTOS", Rect2(615, 306, 270, 30), 18, TINTA)
-	concepto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_etiqueta(_contenido_modal, "ACUMULADO / META", Rect2(617, 387, 266, 28), 13, TINTA)
-	_etiqueta(_contenido_modal, "%s / %s" % [vista.get("puntos", 0), vista.get("meta", 200)], Rect2(617, 421, 266, 62), 36, TINTA, true)
-	_etiqueta(_contenido_modal, "SELLO CONSEGUIDO" if vista.get("victoria", false) else "LA CUENTA CONTINÚA", Rect2(617, 511, 266, 30), 12, TINTA)
+	Desglose.construir(_contenido_modal, vista)
 	var cerrar := _cerrar_boton()
 	cerrar.size.x = 876
 
@@ -663,7 +466,7 @@ func _ver_objetos() -> void:
 		"recaudador": datos.append("Comisión de la casa: una ficha al pedir.")
 		"coleccionista": datos.append("Cartas retenidas hasta superar esta mesa: %s." % controlador.retenidas.size())
 		"dueno": datos.append("Cada mano cerrada sin Quiebra reduce el umbral un punto, hasta 17.")
-	var ficha := _etiqueta(_contenido_modal,"",Rect2(38,100,716,340),20,MARFIL)
+	var ficha := Piezas.etiqueta(_contenido_modal,"",Rect2(38,100,716,340),20,MARFIL)
 	ficha.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	ficha.text = "\n\n".join(datos)
 	_cerrar_boton()
@@ -727,7 +530,7 @@ func _construir_modal() -> void:
 
 func _abrir_modal(titulo: String) -> void:
 	_terminar_revelacion()
-	_detener_feedback()
+	_respuesta.detener()
 	_cancelar_seleccion_llave()
 	_limpiar_patron()
 	_panel_modal.position = Vector2(340, 62)
@@ -742,7 +545,7 @@ func _abrir_modal(titulo: String) -> void:
 	for nodo in _contenido_modal.get_children():
 		_contenido_modal.remove_child(nodo)
 		nodo.queue_free()
-	_etiqueta(_contenido_modal, titulo, Rect2(32, 22, 660, 54), 32, ORO, true)
+	Piezas.etiqueta(_contenido_modal, titulo, Rect2(32, 22, 660, 54), 32, ORO, true)
 	_modal.show()
 
 func cerrar_modal() -> void:
@@ -757,23 +560,10 @@ func cerrar_modal() -> void:
 		_enfocar_accion_legal()
 
 func _cerrar_boton(texto := "VOLVER A LA MESA") -> Button:
-	var boton := _boton_texto(_contenido_modal, "boton_cerrar_modal", texto + "  ·  Esc", Rect2(32, 618, 696, 42), cerrar_modal)
-	_estilo_modal(boton)
+	var boton := Piezas.boton_texto(_contenido_modal, "boton_cerrar_modal", texto + "  ·  Esc", Rect2(32, 618, 696, 42), cerrar_modal)
+	Piezas.estilo_modal(boton)
 	boton.grab_focus()
 	return boton
-
-func _estilo_modal(boton: Button, principal := false) -> void:
-	var fondo := StyleBoxFlat.new()
-	fondo.bg_color = ORO if principal else Color("1d3628")
-	fondo.border_color = ORO if principal else Color("6c7951")
-	fondo.set_border_width_all(1)
-	boton.add_theme_stylebox_override("normal", fondo)
-	var hover := fondo.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("e7c993") if principal else Color("2c4532")
-	boton.add_theme_stylebox_override("hover", hover)
-	boton.add_theme_stylebox_override("pressed", hover)
-	for estado in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		boton.add_theme_color_override(estado, TINTA if principal else MARFIL)
 
 func mostrar_ayuda() -> void:
 	_abrir_modal("El libro de la casa" if campana != null else "El libro del Custodio")
@@ -790,7 +580,7 @@ func mostrar_ayuda() -> void:
 	var cerrar := _cerrar_boton()
 	cerrar.position = Vector2(278, 649)
 	cerrar.size = Vector2(810, 42)
-	_etiqueta(_contenido_modal, "REGLAMENTO DE LA CASA", Rect2(32, 650, 220, 39), 12, MUTED)
+	Piezas.etiqueta(_contenido_modal, "REGLAMENTO DE LA CASA", Rect2(32, 650, 220, 39), 12, MUTED)
 	guia.navegacion[0].grab_focus()
 
 ## Elección de la persona en el libro: se aplica y se recuerda para la próxima sesión.
@@ -802,10 +592,8 @@ func establecer_movimiento_reducido(reducido: bool) -> void:
 	movimiento_reducido = reducido
 	if reducido:
 		_terminar_revelacion()
-		_detener_feedback()
-		if _aviso_umbral != null and _aviso_umbral.is_valid(): _aviso_umbral.kill()
-		_umbral.scale = Vector2.ONE
-		_umbral.modulate = Color.WHITE
+		_respuesta.detener()
+		_respuesta.detener_aviso()
 	for carta in fila_cartas.get_children():
 		carta.establecer_movimiento_reducido(reducido)
 	if reducido:
@@ -825,17 +613,17 @@ func mostrar_carta(carta: Dictionary) -> void:
 	ampliada.presentar(carta)
 	var palo := str(carta.get("palo", Palos.MASCARAS))
 	var nombres := Palos.NOMBRES
-	_etiqueta(_contenido_modal, nombres.get(palo, "Carta"), Rect2(350, 144, 370, 58), 40, ORO, true)
+	Piezas.etiqueta(_contenido_modal, nombres.get(palo, "Carta"), Rect2(350, 144, 370, 58), 40, ORO, true)
 	var efectos := {
 		Palos.VELAS: "Cada Vela conservada suma +1 al multiplicador, siempre que la mano no quiebre.",
 		Palos.LLAVES: "Puedes devolver una Llave elegible para recibir otra carta gratis. Solo una vez por mano; el reemplazo se añade al final.",
 		Palos.RELOJES: "Su valor efectivo es el impreso menos uno, con mínimo uno. Pedirlo es gratis en campanadas, igual que las demás cartas.",
 		Palos.MASCARAS: "Su valor permanece oculto hasta plantarte. El intervalo usa de 1 a 10 por Máscara y no predice el valor real.",
 	}
-	var detalle := _etiqueta(_contenido_modal, efectos.get(palo, ""), Rect2(350, 230, 362, 220), 21, MARFIL)
+	var detalle := Piezas.etiqueta(_contenido_modal, efectos.get(palo, ""), Rect2(350, 230, 362, 220), 21, MARFIL)
 	detalle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var lectura := "VALOR OCULTO · 1–10" if carta.get("oculta", false) else "VALOR EFECTIVO: %s" % carta.get("valor_efectivo", carta.get("valor", "—"))
-	_etiqueta(_contenido_modal, lectura, Rect2(350, 489, 362, 65), 18, ORO)
+	Piezas.etiqueta(_contenido_modal, lectura, Rect2(350, 489, 362, 65), 18, ORO)
 	_cerrar_boton()
 
 func mostrar_devolucion() -> void:
@@ -855,16 +643,16 @@ func _construir_eleccion_llave() -> void:
 	fondo.set_border_width_all(1)
 	_acciones_llave.add_theme_stylebox_override("panel", fondo)
 	lienzo.add_child(_acciones_llave)
-	_confirmacion_llave = _etiqueta(_acciones_llave, "", Rect2(5, 0, 270, 21), 12, ORO)
+	_confirmacion_llave = Piezas.etiqueta(_acciones_llave, "", Rect2(5, 0, 270, 21), 12, ORO)
 	_confirmacion_llave.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_boton_confirmar_llave = _boton_texto(_acciones_llave, "ConfirmarLlave", "Confirmar", Rect2(4, 22, 132, 36), _confirmar_llave, 13)
-	_boton_cancelar_llave = _boton_texto(_acciones_llave, "CancelarLlave", "Cancelar", Rect2(144, 22, 132, 36), _cancelar_seleccion_llave, 13)
+	_boton_confirmar_llave = Piezas.boton_texto(_acciones_llave, "ConfirmarLlave", "Confirmar", Rect2(4, 22, 132, 36), _confirmar_llave, 13)
+	_boton_cancelar_llave = Piezas.boton_texto(_acciones_llave, "CancelarLlave", "Cancelar", Rect2(144, 22, 132, 36), _cancelar_seleccion_llave, 13)
 	_boton_confirmar_llave.icon = preload("res://recursos/figma/confirmar-llave.svg")
 	_boton_cancelar_llave.icon = preload("res://recursos/figma/cancelar-llave.svg")
 	for boton in [_boton_confirmar_llave, _boton_cancelar_llave]:
 		boton.add_theme_constant_override("icon_max_width", 22)
-	_estilo_modal(_boton_confirmar_llave, true)
-	_estilo_modal(_boton_cancelar_llave)
+	Piezas.estilo_modal(_boton_confirmar_llave, true)
+	Piezas.estilo_modal(_boton_cancelar_llave)
 	_boton_cancelar_llave.tooltip_text = "Cancelar elección sin cambiar cartas ni campanadas. Esc."
 	_acciones_llave.hide()
 	cartas_scroll.get_h_scroll_bar().value_changed.connect(func(_valor: float) -> void: _posicionar_eleccion_llave())
@@ -948,18 +736,18 @@ func _actualizar_orientacion() -> void:
 	_mensaje.size = Vector2(380, 58) if vista.get("terminado", false) else Vector2(684, 40)
 	_mensaje.text = Lectura.pista(vista)
 	_mensaje.visible = not _mensaje.text.is_empty()
-	_texto_accion(boton_plantarse, "PLANTARSE", "Revelar y puntuar")
+	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "Revelar y puntuar")
 	boton_plantarse.tooltip_text += ". Sin coste en campanadas."
 	if vista.get("fase", "preparado") == "decision":
 		var resultado: Dictionary = vista.get("resultado_visible", {})
 		if not resultado.is_empty():
-			_texto_accion(boton_plantarse, "PLANTARSE", "%s puntos" % resultado.puntos)
+			Piezas.texto_accion(boton_plantarse, "PLANTARSE", "%s puntos" % resultado.puntos)
 	elif vista.get("terminado", false):
 		boton_iniciar_pedir.disabled = false
 		boton_iniciar_pedir.get_node("Fondo").modulate.a = 1.0
 		if campana != null:
-			_texto_accion(boton_iniciar_pedir, "LEVANTARSE", "Volver a la sala" if vista.victoria else "Fin del intento")
-		else: _texto_accion(boton_iniciar_pedir, "VOLVER A JUGAR", "Nuevo intento")
+			Piezas.texto_accion(boton_iniciar_pedir, "LEVANTARSE", "Volver a la sala" if vista.victoria else "Fin del intento")
+		else: Piezas.texto_accion(boton_iniciar_pedir, "VOLVER A JUGAR", "Nuevo intento")
 
 func _presentar_patrones() -> void:
 	# Conserva los botones: actualizar progreso no debe destruir el foco.
@@ -1050,16 +838,16 @@ func _confirmar(titulo: String, mensaje: String, accion: Callable) -> void:
 	_panel_modal.size = Vector2(820, 470)
 	_contenido_modal.size = _panel_modal.size
 	_accion_confirmada = accion
-	var detalle := _etiqueta(_contenido_modal, mensaje, Rect2(48, 112, 724, 175), 22, MARFIL)
+	var detalle := Piezas.etiqueta(_contenido_modal, mensaje, Rect2(48, 112, 724, 175), 22, MARFIL)
 	detalle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var confirmar := _boton_texto(_contenido_modal, "boton_confirmar", "CONFIRMAR", Rect2(424, 315, 348, 54), func() -> void:
+	var confirmar := Piezas.boton_texto(_contenido_modal, "boton_confirmar", "CONFIRMAR", Rect2(424, 315, 348, 54), func() -> void:
 		cerrar_modal()
 		_accion_confirmada.call())
-	_estilo_modal(confirmar, true)
+	Piezas.estilo_modal(confirmar, true)
 	var cancelar := _cerrar_boton("CANCELAR")
 	cancelar.position = Vector2(48, 315)
 	cancelar.size = Vector2(348, 54)
-	_etiqueta(_contenido_modal, "Tu partida solo cambia al confirmar.", Rect2(48, 406, 724, 32), 16, MUTED)
+	Piezas.etiqueta(_contenido_modal, "Tu partida solo cambia al confirmar.", Rect2(48, 406, 724, 32), 16, MUTED)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
 	if not evento is InputEventKey or not evento.pressed or evento.echo:
