@@ -9,6 +9,7 @@ const ARTE := {
 	"relojes": preload("res://recursos/arte/carta-relojes-grabado.png"),
 	"mascaras": preload("res://recursos/arte/carta-mascaras-grabado.png"),
 }
+const DURACION_SACUDIDA := 0.42
 const NOMBRES := {"velas": "VELAS", "llaves": "LLAVES", "relojes": "RELOJES", "mascaras": "MÁSCARAS"}
 var _vista: Dictionary = {}
 var _valor: Label
@@ -72,10 +73,11 @@ func presentar(carta: Dictionary) -> void:
 	if is_node_ready():
 		_actualizar()
 		if revelar and not _movimiento_reducido:
+			# Volteo: la carta se cierra de canto y se abre con un leve rebote al mostrar su valor.
 			_cancelar_animacion()
-			_visual.scale = Vector2(0.88, 1.0)
+			_visual.scale = Vector2(0.08, 1.06)
 			_animacion = create_tween()
-			_animacion.tween_property(_visual, "scale", Vector2.ONE, 0.19).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			_animacion.tween_property(_visual, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _etiqueta(tamano: int, color: Color) -> Label:
 	var etiqueta := Label.new()
@@ -170,7 +172,8 @@ func _cancelar_animacion() -> void:
 		_animacion.kill()
 	_visual.position = Vector2.ZERO
 	_visual.scale = Vector2.ONE
-	_visual.modulate.a = 1.0
+	_visual.rotation = 0.0
+	_visual.modulate = Color.WHITE
 
 func animar_entrada(retraso: float = 0.0) -> void:
 	if _movimiento_reducido:
@@ -191,3 +194,41 @@ func _actualizar_enfasis() -> void:
 	_animacion = create_tween().set_parallel(true)
 	_animacion.tween_property(_visual, "position:y", -5.0, 0.13).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_animacion.tween_property(_visual, "scale", Vector2.ONE * 1.018, 0.13)
+
+## Quiebra: sacudida breve que decae con trauma². Solo mueve el dibujo, nunca el botón ni su foco.
+func sacudir(intensidad: float = 0.8) -> void:
+	if _movimiento_reducido or not is_instance_valid(_visual):
+		return
+	_cancelar_animacion()
+	_animacion = create_tween()
+	_animacion.tween_method(_aplicar_sacudida.bind(intensidad, randf() * TAU), 1.0, 0.0, DURACION_SACUDIDA)
+	_animacion.tween_callback(_volver_a_reposo)
+
+func _aplicar_sacudida(trauma: float, intensidad: float, fase: float) -> void:
+	var fuerza := trauma * trauma * intensidad
+	# Senos a ritmos distintos: un temblor suave en lugar de ruido aleatorio cada frame.
+	var t := (1.0 - trauma) * DURACION_SACUDIDA * 30.0
+	_visual.position = Vector2(10.0 * fuerza * sin(t * 1.7 + fase), 3.0 * fuerza * sin(t * 2.3))
+	_visual.rotation = 0.035 * fuerza * sin(t * 1.1 + fase)
+	# Un solo tinte cálido que se desvanece: sin destellos repetidos.
+	_visual.modulate = Color(1.0, 1.0 - 0.28 * trauma, 1.0 - 0.32 * trauma)
+
+## Punto exacto: la carta salta y se asienta con rebote.
+func celebrar(retraso: float = 0.0) -> void:
+	if _movimiento_reducido or not is_instance_valid(_visual):
+		return
+	_cancelar_animacion()
+	_animacion = create_tween()
+	if retraso > 0.0:
+		_animacion.tween_interval(retraso)
+	_animacion.tween_property(_visual, "position:y", -16.0, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_animacion.parallel().tween_property(_visual, "scale", Vector2.ONE * 1.06, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_animacion.tween_property(_visual, "position:y", 0.0, 0.26).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_animacion.parallel().tween_property(_visual, "scale", Vector2.ONE, 0.26).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_animacion.tween_callback(_volver_a_reposo)
+
+func _volver_a_reposo() -> void:
+	_visual.position = Vector2.ZERO
+	_visual.scale = Vector2.ONE
+	_visual.rotation = 0.0
+	_visual.modulate = Color.WHITE

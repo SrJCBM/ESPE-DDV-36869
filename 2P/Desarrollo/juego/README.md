@@ -27,7 +27,7 @@ La ayuda no consume recursos. **Movimiento reducido**, en «A tu ritmo», desact
 
 Los cinco indicadores muestran progreso y bonos de patrones. Señalarlos con el ratón o enfocarlos con Tab resalta las cartas relacionadas y muestra una explicación breve; Racha señala las últimas tres. Pulsarlos abre ejemplos. Solo una indicación contextual acompaña la mano: las reglas completas siguen en el libro y el desglose.
 
-Plantarse inicia una revelación breve antes del resultado; se puede saltar con S/Esc y es inmediata con movimiento reducido. Una Quiebra demostrable avisa, pero no cierra la mano automáticamente. Al resolver, la mesa muestra la cuenta y los bonos aplicados; en Quiebra, indica cuánto se excedió el umbral y el aporte cero. El final resume manos válidas y Quiebras y ofrece **Volver a jugar / P**, que abre un intento normal nuevo sin cobrar ni iniciar una mano automáticamente.
+Plantarse inicia una revelación breve antes del resultado; se puede saltar con S/Esc y es inmediata con movimiento reducido. Una Quiebra demostrable avisa, pero no cierra la mano automáticamente. Al resolver, la mesa muestra la cuenta y los bonos aplicados; en Quiebra, indica cuánto se excedió el umbral y el aporte cero. Cada Máscara se voltea al revelarse, los puntos de la mano se cuentan hasta su aporte y las cartas saltan con un Punto exacto o tiemblan con una Quiebra. Estas respuestas solo recorren textos ya calculados, se interrumpen al iniciar otra mano y desaparecen con movimiento reducido. El final resume manos válidas y Quiebras y ofrece **Volver a jugar / P**, que abre un intento normal nuevo sin cobrar ni iniciar una mano automáticamente.
 
 ## Demostración repetible
 

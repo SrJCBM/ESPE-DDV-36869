@@ -10,6 +10,7 @@ const Carta = preload("res://cartas/carta.tscn")
 const Guia = preload("res://mesa/guia_custodio.gd")
 const Marco = preload("res://mesa/marco_casa.gd")
 const Lectura = preload("res://mesa/lectura_mesa.gd")
+const DURACION_CUENTA := 0.45
 const ORO := Color("d5b578")
 const MARFIL := Color("f1e4c9")
 const MUTED := Color("b9c4a8")
@@ -66,6 +67,9 @@ var _patron_foco := -1
 var _revelando := false
 var _revision_revelacion := 0
 var _vista_por_revelar: Dictionary = {}
+## Respuesta visual al resolver: cuenta de puntos y gesto de las cartas. Nunca altera la vista.
+var _feedback: Tween
+var _textos_finales: Dictionary = {}
 
 func _ready() -> void:
 	_construir()
@@ -322,6 +326,9 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 		return
 	_cancelar_seleccion_llave(false)
 	_limpiar_patron()
+	_detener_feedback()
+	var recien_resuelta: bool = vista.get("fase", "") == "decision" and nueva_vista.get("fase", "") != "decision" and not nueva_vista.get("ultima_mano", {}).is_empty()
+	var puntos_previos: int = int(vista.get("puntos", 0))
 	var anteriores: Array = vista.get("cartas", [])
 	var ultimo_anterior: String = str(anteriores.back().get("id", "")) if not anteriores.is_empty() else ""
 	_revision_vista += 1
@@ -433,6 +440,48 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 			_enfocar_accion_legal()
 	if cartas.size() >= 6 and str(cartas.back().get("id", "")) != ultimo_anterior and not _modal.visible:
 		_mostrar_ultima_carta(_revision_vista)
+	if recien_resuelta and not movimiento_reducido and not _modal.visible:
+		_celebrar_resultado(puntos_previos)
+
+## Los textos ya contienen el resultado final; la animación solo los recorre y vuelve a ellos.
+func _celebrar_resultado(puntos_previos: int) -> void:
+	var mano: Dictionary = vista.get("ultima_mano", {})
+	var cartas := fila_cartas.get_children()
+	_textos_finales = {_lectura: _lectura.text, _puntos: _puntos.text}
+	_lectura.pivot_offset = _lectura.size * 0.5
+	_feedback = create_tween()
+	if mano.get("quiebra", false):
+		for carta in cartas:
+			carta.sacudir(0.8)
+		_feedback.tween_property(_lectura, "modulate", Color(1.0, 0.62, 0.55), 0.08)
+		_feedback.tween_property(_lectura, "modulate", Color.WHITE, 0.4)
+		_feedback.tween_callback(_detener_feedback)
+		return
+	var total: int = int(mano.get("total", 0))
+	var multiplicador: int = int(mano.get("multiplicador", 1))
+	var aporte: int = int(mano.get("puntos", 0))
+	var meta: int = int(vista.get("meta", 200))
+	var cuenta := func(valor: float) -> void:
+		_lectura.text = "%s × %s = %s" % [total, multiplicador, roundi(valor)]
+		_puntos.text = "%s / %s" % [puntos_previos + roundi(valor), meta]
+	cuenta.call(0.0)
+	_feedback.tween_method(cuenta, 0.0, float(aporte), DURACION_CUENTA).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_feedback.tween_property(_lectura, "scale", Vector2.ONE * 1.12, 0.07)
+	_feedback.tween_property(_lectura, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_feedback.tween_callback(_detener_feedback)
+	if mano.get("patrones", []).has("Punto exacto"):
+		for i in range(cartas.size()):
+			cartas[i].celebrar(DURACION_CUENTA * 0.6 + i * 0.05)
+
+func _detener_feedback() -> void:
+	if _feedback != null and _feedback.is_valid():
+		_feedback.kill()
+	_feedback = null
+	for etiqueta in _textos_finales:
+		etiqueta.text = _textos_finales[etiqueta]
+	_textos_finales.clear()
+	_lectura.scale = Vector2.ONE
+	_lectura.modulate = Color.WHITE
 
 func _mostrar_ultima_carta(revision: int) -> void:
 	# Los Containers necesitan ordenar sus hijos antes de conocer el rango final.
@@ -608,6 +657,7 @@ func _construir_modal() -> void:
 
 func _abrir_modal(titulo: String) -> void:
 	_terminar_revelacion()
+	_detener_feedback()
 	_cancelar_seleccion_llave()
 	_limpiar_patron()
 	_panel_modal.position = Vector2(340, 62)
@@ -675,7 +725,9 @@ func mostrar_ayuda() -> void:
 
 func establecer_movimiento_reducido(reducido: bool) -> void:
 	movimiento_reducido = reducido
-	if reducido: _terminar_revelacion()
+	if reducido:
+		_terminar_revelacion()
+		_detener_feedback()
 	for carta in fila_cartas.get_children():
 		carta.establecer_movimiento_reducido(reducido)
 	if reducido:
