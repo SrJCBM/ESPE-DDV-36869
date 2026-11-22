@@ -10,7 +10,7 @@
 | I3-02 | Balance de la Coleccionista, el Dueño y el Sello | 3 | **Completado** | `d477d3a`. [BALANCE_CAMPANA.md](BALANCE_CAMPANA.md); Word v2.4 y MD alineados |
 | I3-03 | Regla del crupier visible en la mesa | 5 | **Completado** | Placa de regla, aviso del umbral y Dueño sin bajar tras Quiebra. 149 pruebas, 7 nuevas en `test_regla_crupier.gd` |
 | I3-04 | Pruebas de invariantes de zonas y de barajado | 7 | **Completado** | 3 pruebas en `test_invariantes.gd`; comprobadas con dos errores introducidos a propósito |
-| I3-05 | Deuda técnica | 6 | Pendiente | Strategy por crupier, catálogo en Resources, palos como constantes, dividir `mesa_ui.gd`, ajustes persistentes |
+| I3-05 | Deuda técnica | 6 | **Completado** | Cinco reorganizaciones en commits separados, sin cambiar reglas. 159 pruebas |
 | I3-06 | Recompensa de cartas tras cada mesa | 4 | En pausa | Diseño acordado; se retoma cuando el equipo lo indique |
 | I3-07 | Sonido | 1 | Diferido | Se hará con la tarea del docente sobre sonido diegético y no diegético |
 | I3-08 | Colisiones de la exploración | — | Pendiente | Comentario 3 de Damián; no formaba parte de los siete puntos |
@@ -25,7 +25,7 @@ Al plantarse, cada Máscara se voltea con un leve rebote al revelarse. La fórmu
 - Se interrumpen sin dejar valores a medias al iniciar otra mano, abrir una ventana o activar movimiento reducido. Con movimiento reducido no hay ninguna.
 - Solo se mueve el dibujo de la carta, no el botón: el foco y los clics no cambian.
 - Archivos: `cartas/carta_ui.gd`, `mesa/mesa_ui.gd`, `tests/test_feedback_resultado.gd` y `juego/README.md`.
-- Duraciones ajustables: `DURACION_SACUDIDA` en `carta_ui.gd` y `DURACION_CUENTA` en `mesa_ui.gd`. Kenned lo probó con la demostración guiada y se aceptó sin cambios.
+- Duraciones ajustables: `DURACION_SACUDIDA` en `carta_ui.gd` y `DURACION_CUENTA` en `mesa/respuesta_resultado.gd` (antes en `mesa_ui.gd`, ver I3-05). Kenned lo probó con la demostración guiada y se aceptó sin cambios.
 
 ### I3-02 · Balance de la campaña
 
@@ -50,7 +50,7 @@ Antes la regla especial solo se leía en la ayuda (H) y el umbral del Dueño cam
 - Una placa **«Regla de la mesa»** bajo el retrato del crupier explica su regla aplicada a la mano en curso: la comisión y el saldo en el Recaudador, la carta que retiene y cuántas lleva la Coleccionista, y el umbral del Dueño. El Custodio y la mesa suelta de I1 no tienen regla especial y no la muestran.
 - Con el Dueño, la línea junto al umbral cambia de «No lo excedas.» a «Baja a 23 sin Quiebra.» durante la mano y a «Próxima mano: 23.» entre manos. Al iniciar la mano siguiente, el número del umbral late en oro y la placa dice «El umbral bajó de 24 a 23». Tras una Quiebra explica que el umbral se mantiene; en el mínimo, que ya no baja.
 - Todo cambio se explica con texto; con movimiento reducido el número no se anima.
-- El controlador añade a la vista pública la mesa, las cartas retenidas y los umbrales anterior y siguiente del Dueño. El tope de 17 queda en una constante y el valor inicial sale de `CampanaCasino.REGLAS`.
+- El controlador añade a la vista pública la mesa, las cartas retenidas y los umbrales anterior y siguiente del Dueño. El tope de 17 es `ReglaDueno.MINIMO` y el valor inicial sale de los datos de la mesa (ver I3-05).
 - Archivos: `mesa/controlador_mesa.gd`, `mesa/lectura_mesa.gd`, `mesa/mesa_ui.gd`, `tests/test_regla_crupier.gd` y `tests/qa_regla.gd`, que genera las capturas en `juego/exportaciones/qa/`. Revisado a 1024 × 576 y 1280 × 720: la placa no tapa umbral, cartas ni acciones.
 - **Regla nueva del Dueño (decisión de Julio):** como propuso Damián, el umbral solo baja tras una mano cerrada sin Quiebra. La ayuda, el diálogo del Dueño y el Word lo explican. La regla resultó facilitar la mesa (sin compras, del 35 % al 42 %), así que el Dueño pasa de 18 a 17 campanadas y vuelve al 34 % ([balance](BALANCE_CAMPANA.md#el-dueño-solo-baja-tras-una-mano-sin-quiebra)).
 
@@ -64,16 +64,23 @@ Red de seguridad para reorganizar el código en I3-05 sin romper reglas. `tests/
 - **Las pruebas detectan errores reales.** Se comprobaron introduciendo dos errores a propósito y restaurando el código después. Si `cerrar_mano` no pasa la mano al descarte, la prueba de zonas falla en el paso 9 del Custodio (17 cartas de 24). Si el barajado elige el intercambio entre todas las posiciones, el chi-cuadrado sube a 6.218.
 - No se encontró ningún defecto en el código actual.
 
-## Por implementar
-
 ### I3-05 · Deuda técnica
 
-- **Strategy por crupier:** las reglas del Recaudador, la Coleccionista y el Dueño dejan de ser comparaciones de texto repartidas por el controlador y la campaña; añadir una mesa será crear una clase. Ya estaba previsto en [ARQUITECTURA_Y_PATRONES.md](ARQUITECTURA_Y_PATRONES.md).
-- **Catálogo en Resources:** objetos de tienda y reglas de mesa en `.tres`, como las cartas.
-- **Palos como constantes:** sustituir los textos sueltos (`"velas"`, `"mascaras"`) para que una errata falle al cargar.
-- **Dividir `mesa_ui.gd`** (unas 1.000 líneas) en franja de patrones, boleto, controles y revelación.
-- **Ajustes persistentes:** guardar movimiento reducido con `ConfigFile` en `user://`, como pide el documento de diseño.
-- Todo sin cambiar reglas: las pruebas existentes y las de I3-04 deben seguir pasando.
+Cinco reorganizaciones, cada una en su commit, sin cambiar reglas ni lo que se ve. Después de cada una pasaron las pruebas, incluidas las de I3-04. En las que tocan reglas, la simulación de campaña dio exactamente los mismos porcentajes que antes.
+
+| Commit | Cambio | Detalle |
+| --- | --- | --- |
+| `12f8597` | Palos como constantes | `datos/cartas/palos.gd` define los cuatro palos y sus nombres. El dominio, el controlador y la interfaz dejan de comparar textos sueltos, y la fábrica rechaza un palo desconocido |
+| `f8f39c0` | Strategy por crupier | `dominio/crupieres/`: `ReglaCrupier` es la mesa sin regla especial, y `ReglaRecaudador`, `ReglaColeccionista` y `ReglaDueno` aplican la suya. `FabricaCrupieres` elige la clase según la mesa; añadir una mesa es crear su clase y registrarla. El controlador y la campaña ya no comparan nombres de mesa |
+| `4e9f51b` | Datos en Resources | Las condiciones de cada mesa (`datos/mesas/mesas_campana.tres`) y los productos de la tienda (`datos/tienda/catalogo_tienda.tres`) se editan en el inspector, como el catálogo de cartas. El código lee campos con nombre en lugar de posiciones de un arreglo |
+| `85421c1` | Ajustes persistentes | `ajustes/ajustes_juego.gd` guarda «movimiento reducido» en `user://ajustes.cfg` con `ConfigFile`. El vestíbulo y la mesa suelta lo aplican al abrir cada mesa; antes se perdía al cambiar de mesa o cerrar el juego. Sin Autoload: solo los puntos de entrada leen el archivo, y las pruebas usan uno propio para no tocar las preferencias reales |
+| `90578d6` | Dividir `mesa_ui.gd` | Salen a sus propios scripts los constructores de controles (`piezas_mesa.gd`), el desglose de la mano (`desglose_mano.gd`), la placa de regla (`placa_regla.gd`) y la respuesta visual al resultado (`respuesta_resultado.gd`). El archivo pasa de 1.088 a 876 líneas y conserva la misma interfaz para el controlador y las pruebas |
+
+Al separar las piezas apareció un texto que se había quedado atrás en I3-03: el inventario de la mesa del Dueño seguía diciendo que cada mano bajaba el umbral. Se corrigió en `e21dfce`.
+
+**Lo que queda en `mesa_ui.gd`:** la franja de patrones, la secuencia de revelación y la elección de Llave siguen ahí. Comparten estado con la mesa (foco, ventana abierta, Llave elegida) y unas cincuenta comprobaciones de las pruebas leen ese estado. Separarlas exige rehacer esas pruebas, así que queda para cuando haya que modificar esas partes.
+
+## Por implementar
 
 ### I3-06 · Recompensa de cartas (en pausa)
 
@@ -98,4 +105,4 @@ Comentario 3 de Damián: en algunas esquinas el visitante pasa por encima de mes
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/sim_campana.gd -- --semillas=1000
 ```
 
-Estado al cerrar I3-04: **152 pruebas, 1.554 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.
+Estado al cerrar I3-05: **159 pruebas, 1.604 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.

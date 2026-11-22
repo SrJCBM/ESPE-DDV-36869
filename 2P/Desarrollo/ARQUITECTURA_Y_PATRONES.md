@@ -22,7 +22,7 @@ El primer documento contiene muchas diapositivas como imágenes; se revisaron vi
 | Motor lógico | Evaluador, comandos y estados | Valida acciones y calcula costes, patrones, puntuación y cierre |
 | Datos estáticos | Resources de cartas, objetos y condiciones de mesa | Definiciones compartidas que se tratan como inmutables durante el juego |
 | Datos temporales | EstadoPartida y cartas del intento | Mazo, descarte, mano, recursos, sellos e inventario mientras dura el intento |
-| Datos persistentes | Servicio de ajustes, cuando se incorpore | Volumen, accesibilidad y preferencias previstas; la campaña sigue reiniciándose al cerrar según el GDD |
+| Datos persistentes | `AjustesJuego` con `ConfigFile` en `user://ajustes.cfg` | Hoy guarda «movimiento reducido»; el volumen se añadirá con el audio. La campaña sigue reiniciándose al cerrar según el GDD |
 | Interfaz | Control, Containers, Theme y escenas de cartas | Presenta una vista autorizada y emite solicitudes; no modifica reglas |
 | Red, en el siguiente incremento | Adaptador de comandos y vistas | Anfitrión valida; cada cliente recibe la información que le corresponda |
 
@@ -51,9 +51,9 @@ La vista que recibe la UI excluye el orden futuro del mazo y los valores de Más
 | **Observer** | Cartas, indicadores e historial reaccionan al mismo cambio. El controlador emite señales y la UI se suscribe | Iteración 1. Una acción actualiza la vista una vez; reiniciar no duplica conexiones |
 | **Command** | La misma intención debe poder provenir de un botón, teclado, prueba y después red. Cada comando concreto encapsula una operación y la ejecuta sobre el receptor del estado activo | Iteración 1. Comandos aceptados/rechazados reproducibles; adaptación LAN en la 2 |
 | **Factory** | Crear cartas de manera consistente a partir del catálogo y asignar identidades de instancia | Iteración 1 con una fábrica simple. Se documenta como simplificación, no como una jerarquía completa de Factory Method |
-| **Strategy** | Los crupieres comparten el ciclo de cartas y cambian reglas de entrada, comisión o cierre | Al integrar las mesas de campaña. Políticas intercambiables y pruebas del Recaudador, Coleccionista y Dueño |
+| **Strategy** | Los crupieres comparten el ciclo de cartas y cambian reglas de entrada, comisión o cierre | **Implementado en la iteración 3** (`dominio/crupieres/`). `ReglaCrupier` y sus subclases del Recaudador, la Coleccionista y el Dueño; `FabricaCrupieres` elige la regla por mesa. Lo comprueban las pruebas de campaña, de reglas y de invariantes |
 | **Prototype** | Preparar variantes del intento sin alterar las definiciones originales al ajustar cartas | Al implementar modificaciones de baraja. Copia controlada de datos y prueba de independencia entre catálogo e intentos |
-| **Singleton** | Un servicio de ajustes/audio necesita estar disponible entre escenas | Evaluar al incorporar ajustes. Autoload limitado a ese servicio y política de instancia única; el núcleo de cartas sigue siendo instanciable para pruebas |
+| **Singleton** | Un servicio de ajustes/audio necesita estar disponible entre escenas | **Evaluado en la iteración 3 y descartado por ahora.** `AjustesJuego` es una clase con métodos estáticos sin Autoload: solo la leen los puntos de entrada, y las mesas y las pruebas no dependen de un estado global. Se reconsiderará con el servicio de audio |
 
 La tabla distingue aplicación inmediata de incorporación posterior. Un patrón se acepta si se puede señalar el problema, el código que lo resuelve y la prueba que evita una regresión.
 
@@ -86,7 +86,7 @@ En la primera iteración, la fábrica crea estados propios a partir de definicio
 
 ### Autoload y Singleton
 
-Godot advierte que Autoload **no impide crear otra instancia**. Facilita un servicio global, pero no garantiza por sí solo el Singleton estricto. El equipo documentará la política de instancia única si adopta ese servicio. Las reglas, la mano y los puntos no se convertirán en variables globales necesarias para ejecutar un test.
+Godot advierte que Autoload **no impide crear otra instancia**. Facilita un servicio global, pero no garantiza por sí solo el Singleton estricto. Para los ajustes se eligió una clase con métodos estáticos y un archivo `ConfigFile`, sin Autoload: el vestíbulo y la mesa suelta leen la preferencia al abrir una mesa y las pruebas redirigen la ruta a un archivo propio. Las reglas, la mano y los puntos no se convertirán en variables globales necesarias para ejecutar un test.
 
 ## Revisión de arquitectura por tarea
 
@@ -99,7 +99,7 @@ Godot advierte que Autoload **no impide crear otra instancia**. Facilita un serv
 - [x] Los patrones implementados coinciden con su nombre; las simplificaciones se reconocen.
 - [x] La versión del motor y de los addons coincide con la guía de entorno.
 
-La primera iteración se acepta con State, Observer, Command y la fábrica simple. Strategy, Prototype y el posible servicio global quedan ubicados en el plan de evolución; incorporarlos exige una necesidad y sus pruebas, no solo una mención en un diagrama.
+La primera iteración se acepta con State, Observer, Command y la fábrica simple. La iteración 3 incorpora Strategy para las reglas de los crupieres, con su fábrica. Prototype queda en el plan de evolución; incorporarlo exige una necesidad y sus pruebas, no solo una mención en un diagrama.
 
 ## Fuentes técnicas
 
