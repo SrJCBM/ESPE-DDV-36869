@@ -20,6 +20,64 @@ const NOTAS := {
 	"dueno": ["La inscripción", "El sol está tallado en el suelo, pero la luz que pasa bajo el portón es real."]
 }
 
+## Base de cada mueble dibujado, en coordenadas del mundo (1280 × 720): el visitante choca con sus pies.
+## El fondo del muro ya lo cierran los límites de la sala; aquí va lo que sobresale hacia el suelo.
+## Las capturas con los obstáculos pintados encima se generan con tests/qa_colisiones.gd.
+const SILLA_JEFE := Rect2(600,240,84,70)
+const SILLA_VISITANTE := Rect2(592,440,96,62)
+## Paredes laterales en perspectiva o en curva: el límite rectangular de la sala deja fuera estas franjas.
+const PAREDES := {
+	"custodio": [
+		[Vector2(87,178), Vector2(128,178), Vector2(125,260), Vector2(100,520), Vector2(87,650)],
+		[Vector2(1193,178), Vector2(1152,178), Vector2(1155,260), Vector2(1180,520), Vector2(1193,650)],
+	],
+	"dueno": [
+		# Esquinas curvas del fondo, entre el muro y las columnas con lámpara.
+		[Vector2(87,178), Vector2(350,178), Vector2(313,201), Vector2(267,225), Vector2(183,262), Vector2(133,281), Vector2(87,300)],
+		[Vector2(1193,178), Vector2(930,178), Vector2(967,201), Vector2(1013,225), Vector2(1095,262), Vector2(1147,281), Vector2(1193,300)],
+	],
+}
+const MUEBLES := {
+	"vestibulo": [
+		Rect2(846,165,265,102), # mostrador de la anfitriona
+		Rect2(80,463,50,175), Rect2(1152,463,55,175), # bancos
+		Rect2(440,178,60,62), # maceta
+		Rect2(570,178,140,38), # base del reloj
+	],
+	"tienda": [
+		Rect2(315,165,650,128), # mostrador
+		Rect2(82,178,77,375), Rect2(1120,178,78,375), # vitrinas laterales, hasta el muro del fondo
+		Rect2(85,558,240,90), Rect2(955,558,240,90), # vitrinas bajas
+	],
+	"custodio": [
+		Rect2(450,305,380,150), SILLA_JEFE, SILLA_VISITANTE, # mesa y sillas
+		Rect2(135,278,67,165), Rect2(1078,278,67,165), # aparadores laterales
+		Rect2(320,178,190,58), Rect2(770,178,195,58), # consolas y jarrones
+		Rect2(600,178,115,32), # base del reloj; deja paso entre ella y la silla (y 220–230)
+		Rect2(130,178,38,60), Rect2(1112,178,38,60), # columnas del fondo junto a las esquinas
+	],
+	"recaudador": [
+		Rect2(432,305,413,150), SILLA_JEFE, SILLA_VISITANTE,
+		Rect2(250,178,270,70), # escritorio del libro mayor
+		Rect2(570,178,145,50), # balanza
+		Rect2(790,178,260,55), # cajonera
+		Rect2(175,288,75,220), Rect2(1030,288,75,220), # vitrinas de monedas
+		Rect2(87,178,25,45), Rect2(1168,178,25,45), # columnas de las esquinas
+	],
+	"coleccionista": [
+		Rect2(456,305,369,146), SILLA_JEFE, SILLA_VISITANTE,
+		Rect2(220,186,85,307), Rect2(975,186,85,307), # vitrinas laterales
+		Rect2(240,513,180,125), Rect2(860,513,180,125), # vitrinas bajas
+		Rect2(340,178,600,20), # expositores del fondo
+		Rect2(87,178,95,140), Rect2(1098,178,95,140), # columnas y paneles de las esquinas
+	],
+	"dueno": [
+		# Mesa más ancha que en las otras salas. Detrás del Dueño queda paso hacia el portón.
+		Rect2(425,305,430,150), SILLA_JEFE, SILLA_VISITANTE,
+		Rect2(182,238,68,52), Rect2(1028,238,64,52), # columnas con lámpara
+	],
+}
+
 var campana := CampanaCasino.new()
 var sala := ""
 var pagina := Control.new()
@@ -168,39 +226,23 @@ func entrar(destino: String, origen := "") -> void:
 func _agregar_sala() -> void:
 	_limites(Rect2(87,178,1106,475))
 	_punto("puerta",Vector2(640,651),"Volver a la galería","corredor")
+	for rect: Rect2 in MUEBLES.get(sala, []): _obstaculo(rect)
+	for contorno: Array in PAREDES.get(sala, []): _pared(PackedVector2Array(contorno))
 	match sala:
 		"vestibulo":
 			_figura("anfitriona",Vector2(990,231),84)
-			_obstaculo(Rect2(846,165,265,102))
-			_obstaculo(Rect2(80,463,50,154))
-			_obstaculo(Rect2(1152,463,55,154))
 			_punto("anfitriona",Vector2(985,279),"Hablar con la anfitriona")
 			_punto("nota",Vector2(640,190),"Examinar el reloj")
 		"tienda":
 			_figura("anfitriona",Vector2(650,174),84)
-			_obstaculo(Rect2(287,165,695,114))
-			_obstaculo(Rect2(82,237,77,265))
-			_obstaculo(Rect2(1120,237,78,265))
-			_obstaculo(Rect2(85,563,218,61))
-			_obstaculo(Rect2(971,563,218,61))
 			_punto("tienda",Vector2(645,290),"Abrir el mostrador")
 			_punto("nota",Vector2(168,385),"Examinar la vitrina")
 		_:
 			_figura(sala,Vector2(640,310),95)
-			_obstaculo(Rect2(456,305,369,146))
-			# Solo la silla del jefe: no se puede pasar entre él y su silla, pero sí rodearlo por detrás.
-			_obstaculo(Rect2(600,240,84,70))
-			if sala == "coleccionista":
-				_obstaculo(Rect2(196,187,93,306))
-				_obstaculo(Rect2(994,187,93,306))
-				_obstaculo(Rect2(216,541,198,61))
-				_obstaculo(Rect2(869,541,198,61))
-			if sala == "recaudador":
-				_obstaculo(Rect2(152,299,87,182))
-				_obstaculo(Rect2(1048,299,87,182))
-			_obstaculo(Rect2(592,440,96,62))
 			_punto("mesa",Vector2(640,521),"Acercarse a la mesa")
-			_punto("nota",Vector2(235,262),"Examinar " + str(NOTAS[sala][0]).to_lower())
+			# En la Coleccionista la nota queda al frente de la vitrina lateral, no encima.
+			var nota := Vector2(318,262) if sala == "coleccionista" else Vector2(235,262)
+			_punto("nota",nota,"Examinar " + str(NOTAS[sala][0]).to_lower())
 			if sala == "dueno": _punto("salida",Vector2(640,188),"Examinar el portón")
 
 func _figura(id: String, pies: Vector2, alto: float) -> void:
@@ -227,6 +269,13 @@ func _obstaculo(rect: Rect2) -> void:
 	var col := CollisionShape2D.new()
 	col.shape = forma
 	fijo.add_child(col)
+	decorado.add_child(fijo)
+
+func _pared(contorno: PackedVector2Array) -> void:
+	var fijo := StaticBody2D.new()
+	var forma := CollisionPolygon2D.new()
+	forma.polygon = contorno
+	fijo.add_child(forma)
 	decorado.add_child(fijo)
 
 func _punto(tipo: String, pos: Vector2, accion: String, destino := "") -> void:

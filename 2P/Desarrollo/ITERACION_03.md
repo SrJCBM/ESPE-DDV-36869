@@ -11,9 +11,9 @@
 | I3-03 | Regla del crupier visible en la mesa | 5 | **Completado** | Placa de regla, aviso del umbral y Dueño sin bajar tras Quiebra. 149 pruebas, 7 nuevas en `test_regla_crupier.gd` |
 | I3-04 | Pruebas de invariantes de zonas y de barajado | 7 | **Completado** | 3 pruebas en `test_invariantes.gd`; comprobadas con dos errores introducidos a propósito |
 | I3-05 | Deuda técnica | 6 | **Completado** | Cinco reorganizaciones en commits separados, sin cambiar reglas. 159 pruebas |
+| I3-08 | Colisiones de la exploración | — | **Completado** | Comentario 3 de Damián. Muebles, paredes en perspectiva y esquinas corregidos en las seis salas; 3 pruebas nuevas en `test_colisiones.gd` |
 | I3-06 | Recompensa de cartas tras cada mesa | 4 | En pausa | Diseño acordado; se retoma cuando el equipo lo indique |
 | I3-07 | Sonido | 1 | Diferido | Se hará con la tarea del docente sobre sonido diegético y no diegético |
-| I3-08 | Colisiones de la exploración | — | Pendiente | Comentario 3 de Damián; no formaba parte de los siete puntos |
 
 ## Completado
 
@@ -80,6 +80,24 @@ Al separar las piezas apareció un texto que se había quedado atrás en I3-03: 
 
 **Lo que queda en `mesa_ui.gd`:** la franja de patrones, la secuencia de revelación y la elección de Llave siguen ahí. Comparten estado con la mesa (foco, ventana abierta, Llave elegida) y unas cincuenta comprobaciones de las pruebas leen ese estado. Separarlas exige rehacer esas pruebas, así que queda para cuando haya que modificar esas partes.
 
+### I3-08 · Colisiones de la exploración
+
+Comentario 3 de Damián: en algunas esquinas el visitante pasaba por encima de mesas u objetos. `tests/qa_colisiones.gd` pinta los obstáculos sobre cada sala, y con esas capturas se vio qué muebles no tenían colisión o la tenían desplazada:
+
+| Sala | Corrección |
+| --- | --- |
+| Vestíbulo | Maceta y base del reloj; bancos hasta sus patas |
+| Gabinete | Mostrador, vitrinas laterales y bajas ajustados a su base; las laterales llegan hasta el muro del fondo |
+| El Custodio | Aparadores laterales, consolas con jarrones, base del reloj, columnas junto a las esquinas y paredes laterales en perspectiva |
+| El Recaudador | Escritorio del libro mayor, balanza, cajonera, columnas de las esquinas y mesa más ancha; la vitrina derecha estaba desplazada |
+| La Coleccionista | Vitrinas laterales y bajas ajustadas, expositores del fondo y columnas de las esquinas. La nota «Examinar el expositor» pasa al frente de la vitrina, que antes la tapaba |
+| El Dueño | Columnas con lámpara, esquinas curvas del fondo y mesa más ancha que en las otras salas |
+
+- Los obstáculos de cada sala están en la tabla `MUEBLES` de `casino/casino.gd`, con un comentario por mueble, en lugar de repartidos en condiciones. Las paredes que el dibujo pone en perspectiva o en curva son polígonos en `PAREDES`: el límite rectangular de la sala dejaba fuera esas franjas.
+- `tests/test_colisiones.gd` comprueba dos cosas en las seis salas. Primero, que el visitante que camina hacia cada mueble se detiene. Segundo, recorriendo el suelo libre desde la entrada, que se puede llegar a cada puerta, personaje, mesa y nota sin que un mueble cierre el paso. Esta segunda prueba detectó el caso del expositor.
+- Se conserva el paso por detrás del jefe hacia el portón del Dueño. En el Custodio la base del reloj deja una franja entre ella y la silla, y la prueba existente de rodear al jefe ahora camina por esa franja.
+- **Prueba manual de Kenned.** Tras la primera corrección, el visitante aún se subía a la pared lateral del Custodio, a su esquina superior derecha y al hueco sobre la vitrina derecha del Gabinete. Con capturas ampliadas y una cuadrícula de coordenadas (`qa_colisiones.gd --bordes=1`) se midieron las paredes de las seis salas. Una tercera prueba comprueba que esos puntos, y los equivalentes en el resto de salas, quedan cerrados.
+
 ## Por implementar
 
 ### I3-06 · Recompensa de cartas (en pausa)
@@ -90,14 +108,6 @@ Diseño acordado el 22 de noviembre. Tras superar el Custodio, el Recaudador y l
 
 Queda para la tarea que pondrá el docente sobre sonido diegético y no diegético. Cuando llegue, partir de buses separados (música, efectos, interfaz y ambiente), sliders en decibelios y variación de los efectos repetidos. La campanada al iniciar cada mano es un candidato natural.
 
-### I3-08 · Colisiones de la exploración
-
-Comentario 3 de Damián: en algunas esquinas el visitante pasa por encima de mesas u objetos. Criterios:
-
-- Revisar cada sala y ajustar los obstáculos al mobiliario dibujado, sin cerrar pasos necesarios hacia puertas, mesas y personajes.
-- Añadir una prueba por sala que intente atravesar cada mueble y compruebe que el visitante se detiene.
-- Revisión visual a 1024 × 576 y 1280 × 720.
-
 ## Verificación
 
 ```powershell
@@ -105,4 +115,4 @@ Comentario 3 de Damián: en algunas esquinas el visitante pasa por encima de mes
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/sim_campana.gd -- --semillas=1000
 ```
 
-Estado al cerrar I3-05: **159 pruebas, 1.604 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.
+Estado al cerrar I3-08: **162 pruebas, 1.679 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.
