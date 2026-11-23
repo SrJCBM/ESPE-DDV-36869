@@ -35,10 +35,22 @@ flowchart LR
 ## Decisiones
 
 - **La tienda no es accesible antes del Custodio.** Queda en el pasillo del Recaudador, detrás del primer sello.
-- **Elección inicial de objeto.** Al recibir la invitación, la anfitriona entrega las fichas de inicio y ofrece elegir uno de tres objetos. Se construye sobre la escena de diálogos de I4-06 cuando esté afinada: una intervención con tres opciones, cada una con su solicitud a la campaña. Así la primera mesa no se juega sin objetos.
+- **Elección inicial de objeto.** La anfitriona entrega la baraja, diez fichas y un objeto a elegir al aceptar la invitación. El objeto es gratis y queda disponible antes de la mesa del Custodio. Ver [oferta inicial](#oferta-inicial-de-la-anfitriona).
 - **El Dueño tiene su propio pasillo**, igual que los otros tres jefes.
 - **Sin atajos a la tienda.** El jugador camina de vuelta por los pasillos. Al volver de una mesa aparece frente a su puerta, como en I4-02.
 - Cada puerta cerrada indica el sello que falta. Se conservan la luz de la puerta siguiente, el candado y las placas de I4-02.
+
+## Oferta inicial de la anfitriona
+
+**Estado:** definida, pendiente de implementación. La anfitriona muestra las tres opciones en una intervención de la escena de diálogos de I4-06. Cada opción enseña el icono, el nombre y el efecto en una línea. Se reutilizan los objetos del [catálogo](juego/datos/tienda/catalogo_tienda.tres).
+
+| Opción | Efecto para mostrar al jugador | Decisión que ofrece |
+| --- | --- | --- |
+| **Lente de humo** | Revela todas las Máscaras ocultas de tu mano. Un uso. | Saber si conviene pedir otra carta. |
+| **Sello del prudente** | Recupera 1 campanada si quedas 3 o más por debajo del umbral. Una vez por mesa. | Plantarte temprano para ganar otra oportunidad. |
+| **Moneda mellada** | Gana 2 fichas al lograr Punto exacto. Hasta tres veces por mesa. | Buscar el umbral exacto y ahorrar para la tienda. |
+
+**Aceptación.** Al confirmar una opción, el inventario muestra solo el objeto elegido y el saldo inicial queda en diez fichas. Si el jugador cierra el diálogo antes de elegir, puede volver a abrir la oferta. Volver a hablar después de confirmar o enviar dos veces la misma elección conserva el inventario y el saldo. Las tres opciones se pueden elegir con ratón o teclado.
 
 ## Arte y sonido
 
@@ -52,8 +64,8 @@ flowchart LR
 
 - `PlanoGaleria` pasa de una lista de puertas a una lista de pasillos. Cada pasillo tendrá su fondo, sus puertas, su lado y el sello que exige. La luz, los candados, las placas y los puntos de regreso de I4-02 se reutilizan.
 - La entrada se monta como una sala más en `PlanoSalas` y `SalaExplorable`.
-- La elección inicial añade una solicitud a `CampanaCasino.atender` y opciones en `datos/dialogos/anfitriona.tres`.
-- Hay que revisar el balance del Custodio con el objeto inicial y sin acceso a la tienda. La simulación de `tests/sim_campana.gd` compraba una Lente antes de la primera mesa.
+- La elección inicial se configura en `datos/dialogos/anfitriona.tres`. `CampanaCasino.atender` valida la opción y aplica la baraja, las fichas y el objeto en una sola operación por intento.
+- Probar el balance del Custodio con cada opción inicial y con la tienda cerrada hasta obtener el primer sello. Adaptar `tests/sim_campana.gd`, que compraba una Lente antes de la primera mesa.
 
 ## Pendiente de I4
 
