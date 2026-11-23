@@ -1,7 +1,8 @@
 extends SceneTree
 ## Capturas de las pantallas de I4; excluido de la exportación.
 ## --script res://tests/qa_interfaz_i4.gd -- --vista=vitrina --tamano=1280x720
-## Vistas: vitrina, vitrina-detalle, vitrina-baraja, corredor, puerta-cerrada, mesa, mesa-mano.
+## Vistas: vitrina, vitrina-detalle, vitrina-baraja, corredor, puerta-cerrada, mesa, mesa-mano,
+## dialogo, inicio, pausa, opciones, mesa-pausa.
 
 func _init() -> void:
 	call_deferred("_revisar")
@@ -35,7 +36,17 @@ func _revisar() -> void:
 			juego.entrar("corredor", "vestibulo")
 			if vista == "puerta-cerrada" and opciones.has("x"):
 				juego.visitante.position = Vector2(float(opciones.get("x")), float(opciones.get("y", "420")))
-		"mesa", "mesa-mano":
+		"dialogo":
+			juego.campana = CampanaCasino.new()
+			juego._refrescar()
+			juego._recepcion()
+			juego.dialogo.completar()
+		"inicio":
+			juego.abrir_inicio()
+		"pausa", "opciones":
+			juego.pausar()
+			if vista == "opciones": juego.menu.botones[3].pressed.emit()
+		"mesa", "mesa-mano", "mesa-pausa":
 			juego.campana.superadas = 0
 			juego.entrar("custodio", "corredor")
 			juego._jugar()
@@ -47,6 +58,9 @@ func _revisar() -> void:
 				m.partida._barajar()
 				m.procesar_comando(IniciarMano.new())
 				m.procesar_comando(PedirCarta.new())
+			if vista == "mesa-pausa":
+				juego.mesa.controlador.procesar_comando(IniciarMano.new())
+				juego.pausar()
 	for i in range(6): await process_frame
 	await RenderingServer.frame_post_draw
 	var destino := "res://exportaciones/qa/i4_%s_%s.png" % [vista, opciones.get("tamano", "1280x720")]

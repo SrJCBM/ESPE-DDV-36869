@@ -27,6 +27,28 @@ func recibir_invitacion() -> void:
 	saldo = 10
 	baraja = FabricaCartas.crear_baraja()
 
+## Condiciones de progreso que usan los diálogos: «sin_invitacion», «con_invitacion»,
+## «sellos==N» y «sellos>=N». Una condición desconocida no se cumple.
+func cumple(condicion: String) -> bool:
+	match condicion:
+		"sin_invitacion": return not recibida
+		"con_invitacion": return recibida
+	if condicion.begins_with("sellos==") and condicion.trim_prefix("sellos==").is_valid_int():
+		return superadas == int(condicion.trim_prefix("sellos=="))
+	if condicion.begins_with("sellos>=") and condicion.trim_prefix("sellos>=").is_valid_int():
+		return superadas >= int(condicion.trim_prefix("sellos>="))
+	push_warning("Condición de diálogo desconocida: %s" % condicion)
+	return false
+
+## Una elección de diálogo pide un cambio; la campaña decide si corresponde y lo aplica.
+func atender(solicitud: String) -> bool:
+	match solicitud:
+		"entregar_invitacion":
+			if recibida: return false
+			recibir_invitacion()
+			return true
+	return false
+
 ## Objetivo de exploración derivado solo del progreso; tienda y paseos no lo cambian.
 func objetivo() -> String:
 	if not recibida: return "Habla con la anfitriona"

@@ -9,6 +9,9 @@ const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
 const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
 const CifrasMesa := preload("res://casino/interfaz/cifras_mesa.gd")
+const DialogoNovela := preload("res://casino/dialogos/dialogo_novela.gd")
+const MenuCasino := preload("res://casino/interfaz/menus/menu_casino.gd")
+const ANFITRIONA: Conversacion = preload("res://datos/dialogos/anfitriona.tres")
 const BASE := Vector2(1440,810)
 const DIALOGOS := {
 	"custodio": "He guardado la primera silla para ti. Escucha lo que calla la Máscara antes de pedir otra carta.",
@@ -41,11 +44,13 @@ var pista: Label
 var exploracion := SalaExplorable.new(decorado, capa_superior)
 var mesa: Control
 var audio := AudioCasino.new()
-var boton_sonido := Button.new()
 var indicador_objetivo := IndicadorObjetivo.new()
 var vitrina := VitrinaGabinete.new()
+var dialogo := DialogoNovela.new()
+var menu := MenuCasino.new()
 
 func _ready() -> void:
+	menu.visible = false # Hasta que entre en el árbol, un Control cuenta como visible.
 	get_window().min_size = Vector2i(1024,576)
 	add_child(audio)
 	visitante.pisada.connect(audio.reproducir.bind(&"paso"))
@@ -67,13 +72,6 @@ func _ready() -> void:
 	var marca := Libro.rotulo("LA ÚLTIMA MESA",24,Libro.ORO,true)
 	marca.position = Vector2(80,6)
 	pagina.add_child(marca)
-	boton_sonido.text = "Sonido · V"
-	boton_sonido.position = Vector2(290, 9)
-	boton_sonido.size = Vector2(104, 33)
-	boton_sonido.add_theme_stylebox_override("normal", Libro.caja(Color("10251f"), Color("645c44")))
-	boton_sonido.add_theme_color_override("font_color", Libro.PAPEL)
-	boton_sonido.pressed.connect(_sonido)
-	pagina.add_child(boton_sonido)
 	titulo = Libro.rotulo("",26,Libro.PAPEL,true)
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	titulo.position = Vector2(435,5)
@@ -87,6 +85,9 @@ func _ready() -> void:
 	pagina.add_child(pista)
 	indicador_objetivo.name = "IndicadorObjetivo"
 	pagina.add_child(indicador_objetivo)
+	pagina.add_child(dialogo)
+	dialogo.solicitud.connect(_solicitud)
+	dialogo.cerrado.connect(_cerrar)
 	velo.size = BASE
 	velo.color = Color(0.015,0.035,0.026,0.66)
 	pagina.add_child(velo)
@@ -101,9 +102,63 @@ func _ready() -> void:
 	resized.connect(_adaptar)
 	_adaptar()
 	entrar("vestibulo")
+	add_child(menu)
+	menu.audio = audio
+	menu.texto_inventario = _texto_inventario
+	menu.intento_activo = func() -> bool: return campana.recibida or is_instance_valid(mesa)
+	menu.entrar.connect(_reanudar)
+	menu.reanudar.connect(_reanudar)
+	menu.volver_al_inicio.connect(volver_al_inicio)
+	menu.salir.connect(func() -> void: get_tree().quit())
+	menu.movimiento_cambiado.connect(_cambiar_movimiento)
+	_inicio_si_principal.call_deferred()
+
+## El menú de inicio solo aparece al arrancar el juego, no cuando las pruebas montan el casino.
+func _inicio_si_principal() -> void:
+	if is_inside_tree() and get_tree().current_scene == self:
+		abrir_inicio()
+
+func abrir_inicio() -> void:
+	menu.abrir("inicio")
+	_congelar(true)
+
+## Esc en el juego libre o en una mano sin nada abierto. Congela sala, mesa y animaciones.
+func pausar() -> void:
+	if menu.visible:
+		return
+	menu.abrir("pausa")
+	_congelar(true)
+	audio.reproducir(&"interfaz")
+
+func _reanudar() -> void:
+	menu.cerrar()
+	_congelar(false)
+
+func _congelar(congelado: bool) -> void:
+	var modo := Node.PROCESS_MODE_DISABLED if congelado else Node.PROCESS_MODE_INHERIT
+	pagina.process_mode = modo
+	if is_instance_valid(mesa):
+		mesa.process_mode = modo
+	move_child(menu, -1)
+	_actualizar_objetivo()
+
+## Abandona el intento (el menú ya pidió confirmación) y vuelve a la pantalla de inicio.
+func volver_al_inicio() -> void:
+	if is_instance_valid(mesa):
+		remove_child(mesa)
+		mesa.queue_free()
+		mesa = null
+		pagina.show()
+	_nuevo_intento()
+	abrir_inicio()
+
+func _cambiar_movimiento(reducido: bool) -> void:
+	if is_instance_valid(mesa):
+		mesa.establecer_movimiento_reducido(reducido)
+	_refrescar()
 
 func _actualizar_objetivo() -> void:
-	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not is_instance_valid(mesa)
+	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not dialogo.visible and not menu.visible and not is_instance_valid(mesa)
 	indicador_objetivo.presentar(campana.objetivo(), mostrar)
 
 func _adaptar() -> void:
@@ -124,7 +179,7 @@ func cercano() -> Dictionary:
 
 func _process(_delta: float) -> void:
 	_actualizar_objetivo()
-	if libro.visible or vitrina.visible or is_instance_valid(mesa): return
+	if libro.visible or vitrina.visible or dialogo.visible or menu.visible or is_instance_valid(mesa): return
 	var elegido := cercano()
 	exploracion.marcar(elegido)
 	pista.text = _pista(elegido)
@@ -138,7 +193,13 @@ func _pista(elegido: Dictionary) -> String:
 	return "E · " + str(elegido.accion)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
-	if is_instance_valid(mesa) or vitrina.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	if menu.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	# La mesa, la vitrina y el diálogo resuelven antes su propio Esc; si llega aquí, pausa.
+	if evento.keycode == KEY_ESCAPE and not libro.visible:
+		pausar()
+		get_viewport().set_input_as_handled()
+		return
+	if is_instance_valid(mesa) or vitrina.visible or dialogo.visible: return
 	if libro.visible:
 		if evento.keycode == KEY_ESCAPE or (evento.keycode == KEY_I and libro.cierre == _cerrar):
 			if libro.cierre.is_valid(): libro.cierre.call()
@@ -172,19 +233,22 @@ func interactuar(p: Dictionary) -> void:
 			else:
 				_aviso(CampanaCasino.NOMBRES[p.destino], PlanoGaleria.requisito(p.destino) + ".")
 
+## Conversación con la anfitriona en la escena de diálogos (I4-06); sus líneas son datos.
 func _recepcion() -> void:
-	var retrato := "res://casino/arte/personaje_anfitriona.webp"
-	if not campana.recibida:
-		_abrir("La anfitriona","«Llegas a la hora exacta. Aquí todos los relojes se detuvieron esperando a alguien. ¿Me dejas ver tu invitación?»",retrato,_cerrar)
-		libro.opcion("Entregar la invitación",_entregar)
-	else:
-		var frases := ["«El reloj verde pertenece al Custodio. Cruza la puerta del sur y busca el primer sello en la galería.»","«El Recaudador adelanta quince fichas. Te cobrará una por cada carta que pidas tras el reparto.»","«Ella colecciona lo que más vale. Vigila qué carta se queda después de cada mano.»","«Tres sellos. El Dueño ya sabe que has llegado. Mira la luz tras su mesa.»","«Oigo el pestillo. Vuelve al portón detrás de la última mesa.»"]
-		_aviso("La anfitriona",frases[campana.superadas],retrato)
+	visitante.bloqueado = true
+	if not dialogo.abrir(ANFITRIONA, campana.cumple, AjustesJuego.movimiento_reducido()):
+		visitante.bloqueado = false
+	_actualizar_objetivo()
 
+## Una elección del diálogo pide un cambio; la campaña comprueba si corresponde.
+func _solicitud(id: String) -> void:
+	if campana.atender(id):
+		audio.reproducir(&"sello")
+		_refrescar()
+
+## Atajo de las pruebas y capturas: la misma solicitud que «Entregar la invitación».
 func _entregar() -> void:
-	campana.recibir_invitacion()
-	_refrescar()
-	_aviso("La anfitriona","«Veinticuatro cartas y diez fichas. Son tuyas. La tienda abre al otro lado de la galería. Cuando estés listo, toma asiento ante el Custodio.»","res://casino/arte/personaje_anfitriona.webp")
+	_solicitud("entregar_invitacion")
 
 func _presentar_jefe() -> void:
 	var nivel := CampanaCasino.MESAS.find(sala)
@@ -261,7 +325,6 @@ func _abrir(t: String, mensaje: String, foto: String, volver: Callable) -> void:
 
 func _preparar_libro() -> void:
 	visitante.bloqueado = true
-	boton_sonido.focus_mode = Control.FOCUS_NONE
 	velo.show()
 	_actualizar_objetivo()
 
@@ -271,9 +334,9 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 
 func _cerrar() -> void:
 	vitrina.hide()
+	dialogo.hide()
 	libro.hide()
 	velo.hide()
-	boton_sonido.focus_mode = Control.FOCUS_ALL
 	visitante.bloqueado = false
 	_refrescar()
 
@@ -283,12 +346,16 @@ func _refrescar() -> void:
 	_actualizar_objetivo()
 
 func inventario() -> void:
+	var datos := _texto_inventario()
+	_aviso(datos[0], datos[1])
+
+func _texto_inventario() -> Array:
 	var objetos := PackedStringArray()
 	for id in campana.amuletos: objetos.append(CampanaCasino.TIENDA.buscar(id).nombre)
 	var sellos := PackedStringArray()
 	for recuadro in hud.sellos.recuadros: sellos.append(recuadro.tooltip_text)
 	var mensaje := "%s cartas   ·   %s fichas\n%s.\n%s / 2 lentes de humo. Amuletos: %s." % [campana.baraja.size(),campana.saldo,", ".join(sellos),campana.lentes,", ".join(objetos) if objetos.size() else "ninguno"]
-	_aviso("Tus pertenencias",mensaje if campana.recibida else "Una invitación lacrada y una ficha antigua. Enséñale la invitación a la anfitriona.")
+	return ["Tus pertenencias", mensaje if campana.recibida else "Una invitación lacrada y una ficha antigua. Enséñale la invitación a la anfitriona."]
 
 func tienda() -> void:
 	if not campana.recibida:

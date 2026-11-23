@@ -100,10 +100,8 @@ func _adaptar() -> void:
 	lienzo.position = (size - BASE * factor) * 0.5
 
 func activar_audio(servicio: AudioCasino) -> void:
+	# El volumen vive en Opciones del menú de pausa (I4-07); V sigue abriendo el panel aquí.
 	audio = servicio
-	var boton := Piezas.boton_texto(lienzo, "boton_sonido", "SONIDO · V", Rect2(1052, 75, 118, 27), _sonido, 13)
-	lienzo.move_child(boton, modal.get_index())
-	modal.suspender_si_abierto(boton)
 
 func _sonido() -> void:
 	if audio == null or revelacion.activa or modal.visible:

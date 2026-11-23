@@ -88,15 +88,12 @@ func test_cambiar_el_dialogo_abierto_conserva_el_foco_original() -> void:
 	var audio := AudioCasino.new()
 	add_child_autofree(audio)
 	mesa.activar_audio(audio)
-	var sonido: Button = mesa.lienzo.get_node("boton_sonido")
-	assert_lt(sonido.get_index(), mesa.modal.get_index())
+	assert_false(mesa.lienzo.has_node("boton_sonido"), "El volumen está en el menú de pausa")
 	mesa.mostrar_carta(vista.cartas[1])
 	assert_false(mesa.modal.contenido.has_node("Reglamento"))
 	assert_eq(mesa.boton_ayuda.focus_mode, Control.FOCUS_NONE)
-	assert_eq(sonido.focus_mode, Control.FOCUS_NONE)
 	mesa.cerrar_modal()
 	assert_eq(mesa.boton_ayuda.focus_mode, Control.FOCUS_ALL)
-	assert_eq(sonido.focus_mode, Control.FOCUS_ALL)
 	assert_eq(mesa.get_viewport().gui_get_focus_owner(), mesa.boton_ayuda)
 
 func test_mano_larga_permanece_en_contenedor_desplazable() -> void:

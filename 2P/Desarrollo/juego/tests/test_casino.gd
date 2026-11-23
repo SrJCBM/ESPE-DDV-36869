@@ -187,12 +187,14 @@ func test_recorrido_f5_interaccion_compra_mesa_y_regreso() -> void:
 	e.physical_keycode = KEY_E
 	e.pressed = true
 	juego._unhandled_key_input(e)
-	assert_true(juego.libro.visible)
-	assert_lte(juego.libro.cuerpo.get_rect().end.x,juego.libro.size.x-30)
+	assert_true(juego.dialogo.visible, "La anfitriona habla en la escena de diálogos")
 	assert_true(juego.visitante.bloqueado)
-	juego.libro.primero.pressed.emit()
+	juego.dialogo.completar()
+	juego.dialogo.elegir(0)
 	assert_eq(juego.campana.saldo,10)
-	juego.libro.primero.pressed.emit()
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	assert_false(juego.visitante.bloqueado)
 	juego.entrar("corredor","vestibulo")
 	juego.entrar("tienda")
 	juego.tienda()

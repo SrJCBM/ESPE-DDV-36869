@@ -67,6 +67,16 @@ if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas' }
 
 El runner devuelve 0 si todas pasan y distinto de 0 si alguna falla. [Resultados registrados](../Archivo/I1/REVISION_I1.md).
 
+Capturas de I4. Vistas: `vitrina`, `vitrina-detalle`, `vitrina-baraja`, `corredor`, `puerta-cerrada`, `mesa`, `mesa-mano`, `dialogo`, `inicio`, `pausa`, `opciones` y `mesa-pausa`:
+
+```powershell
+foreach ($t in '1024x576','1280x720') {
+  foreach ($v in 'vitrina','corredor','mesa','dialogo','inicio','pausa','opciones','mesa-pausa') {
+    & $GodotExe --path '2P/Desarrollo/juego' --script res://tests/qa_interfaz_i4.gd -- --vista=$v --tamano=$t
+  }
+}
+```
+
 Capturas del objetivo de exploración (I2-K2). `progreso` va de -1 (sin invitación) a 4; las imágenes quedan en `exportaciones/qa/`:
 
 ```powershell
@@ -94,11 +104,11 @@ La ruta de salida del comando es relativa a `project.godot`. El preset incrusta 
 ## Estructura
 
 ```text
-casino/      entrada de campaña, fondos, geometría, movimiento, diálogos, vitrina, corredor y encabezado
+casino/      entrada de campaña, salas, corredor, vitrina, encabezado, diálogos tipo novela visual y menús de inicio y pausa
 audio/       mezcla, pistas y controles de volumen
 principal/   acceso independiente a la mesa de I1
 ajustes/     movimiento reducido y niveles de volumen
-datos/       Resources: 24 cartas y sus palos, condiciones de las mesas y tienda
+datos/       Resources: 24 cartas y sus palos, condiciones de las mesas, tienda y diálogos
 dominio/     campaña, economía, recompensas, zonas, cartas, comandos, estados y reglas de crupier
 mesa/        controlador, interfaz, libro del Custodio y arte de la mesa
 cartas/      carta visual, grabados por palo y sus transiciones
