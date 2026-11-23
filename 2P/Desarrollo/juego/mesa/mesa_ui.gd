@@ -18,6 +18,7 @@ const EleccionLlave := preload("res://mesa/interfaz/eleccion_llave.gd")
 const RevelacionMano := preload("res://mesa/interfaz/revelacion_mano.gd")
 const ManoMesa := preload("res://mesa/interfaz/mano_mesa.gd")
 const ModalMesa := preload("res://mesa/interfaz/modal_mesa.gd")
+const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
 const ORO := Piezas.ORO
 const MARFIL := Piezas.MARFIL
 const MUTED := Piezas.MUTED
@@ -52,6 +53,8 @@ var _explicacion: Label
 var _mensaje: Label
 var _mazo: Label
 var _subtitulo: Label
+## Sellos y saldo de la campaña (I4-04); solo existe dentro del casino.
+var hud: HudCampana
 var modal: ModalMesa
 var movimiento_reducido := false
 var _progreso: ProgressBar
@@ -132,6 +135,11 @@ func _construir() -> void:
 		boton_demostracion.hide()
 		boton_reiniciar.hide()
 		Piezas.boton_texto(lienzo,"bolsa_campana","OBJETOS · I",Rect2(1025,32,158,38),_ver_objetos,15)
+		_subtitulo.hide()
+		hud = HudCampana.new()
+		hud.position = Vector2(560, 30)
+		hud.size = Vector2(440, 40)
+		lienzo.add_child(hud)
 		boton_lente = Piezas.boton_texto(lienzo, "boton_lente", "LENTE", Rect2(510, 66, 340, 36), _usar_lente, 15)
 	Piezas.imagen(lienzo, retrato, Rect2(22, 124, 356, 534), true)
 	_construir_regla()
@@ -265,7 +273,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	boton_iniciar_pedir.disabled = not bool(acciones.get("iniciar", false) or acciones.get("pedir", false))
 	boton_plantarse.disabled = not bool(acciones.get("plantarse", false))
 	if campana != null:
-		_subtitulo.text = "%s FICHAS  ·  %s / 3 SELLOS" % [campana.saldo, mini(3, campana.superadas)]
+		hud.presentar(campana, movimiento_reducido)
 		boton_lente.text = "LENTE DE HUMO ×%s" % campana.lentes
 		boton_lente.visible = campana.lentes > 0
 		boton_lente.disabled = fase != "decision" or int(vista.intervalo.ocultas) == 0

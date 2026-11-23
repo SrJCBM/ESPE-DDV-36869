@@ -7,6 +7,7 @@ const Mesa := preload("res://mesa/mesa.tscn")
 const TiendaCasino := preload("res://casino/interfaz/tienda_casino.gd")
 const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
 const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
+const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
 const BASE := Vector2(1440,810)
 const DIALOGOS := {
 	"custodio": "He guardado la primera silla para ti. Escucha lo que calla la Máscara antes de pedir otra carta.",
@@ -34,7 +35,7 @@ var visitante := Visitante.new()
 var libro := Libro.new()
 var velo := ColorRect.new()
 var titulo: Label
-var cuenta: Label
+var hud := HudCampana.new()
 var pista: Label
 var exploracion := SalaExplorable.new(decorado, capa_superior)
 var mesa: Control
@@ -77,11 +78,9 @@ func _ready() -> void:
 	titulo.position = Vector2(435,5)
 	titulo.size.x = 570
 	pagina.add_child(titulo)
-	cuenta = Libro.rotulo("",16,Libro.ORO)
-	cuenta.position = Vector2(982,15)
-	cuenta.size.x = 376
-	cuenta.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	pagina.add_child(cuenta)
+	hud.position = Vector2(982,6)
+	hud.size = Vector2(376,40)
+	pagina.add_child(hud)
 	pista = Libro.rotulo("",17,Libro.PAPEL)
 	pista.position = Vector2(80,777)
 	pagina.add_child(pista)
@@ -274,13 +273,15 @@ func _cerrar() -> void:
 
 func _refrescar() -> void:
 	titulo.text = CampanaCasino.NOMBRES.get(sala,"")
-	cuenta.text = "%s fichas     ·     %s / 3 sellos" % [campana.saldo,mini(3,campana.superadas)] if campana.recibida else "La invitación"
+	hud.presentar(campana, AjustesJuego.movimiento_reducido())
 	_actualizar_objetivo()
 
 func inventario() -> void:
 	var objetos := PackedStringArray()
 	for id in campana.amuletos: objetos.append(CampanaCasino.TIENDA.buscar(id).nombre)
-	var mensaje := "%s cartas   ·   %s fichas   ·   %s / 3 sellos\n%s / 2 lentes de humo. Amuletos: %s." % [campana.baraja.size(),campana.saldo,mini(3,campana.superadas),campana.lentes,", ".join(objetos) if objetos.size() else "ninguno"]
+	var sellos := PackedStringArray()
+	for recuadro in hud.sellos.recuadros: sellos.append(recuadro.tooltip_text)
+	var mensaje := "%s cartas   ·   %s fichas\n%s.\n%s / 2 lentes de humo. Amuletos: %s." % [campana.baraja.size(),campana.saldo,", ".join(sellos),campana.lentes,", ".join(objetos) if objetos.size() else "ninguno"]
 	_aviso("Tus pertenencias",mensaje if campana.recibida else "Una invitación lacrada y una ficha antigua. Enséñale la invitación a la anfitriona.")
 
 func tienda() -> void:
