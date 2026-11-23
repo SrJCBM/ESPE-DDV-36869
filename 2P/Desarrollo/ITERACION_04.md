@@ -12,7 +12,7 @@
 | I4-02 | Recorrido según el plano de la exposición | Pendiente | Corredor transitable con puertas arriba y abajo, puntos de retorno y cerrojos en el orden indicado |
 | I4-03 | Reducir el texto que aparece por defecto | Pendiente | Aplicar la jerarquía y los reemplazos de texto del apartado I4-03 en las pantallas jugables |
 | I4-04 | Sellos y fichas ilustrados | Arte listo · implementación pendiente | Tres espacios para los sellos, saldo con icono y prueba al obtener el primer sello |
-| I4-05 | Mesa visual y dial de campanadas | Arte listo · implementación pendiente | Composición del Custodio con dial animado en una mano real |
+| I4-05 | Mesa visual y dial de campanadas | Arte listo · implementación pendiente | Tapete más amplio, patrones en la franja inferior y acciones compactas a la derecha, con el dial animado en una mano real |
 | I4-06 | Base reutilizable de diálogos tipo novela visual | Pendiente | Una escena y un formato de conversación compartidos, probados con las líneas actuales de la anfitriona |
 | I4-07 | Menú de inicio y pausa con Esc | Pendiente | Entrada al casino, pausa, opciones y retorno a la misma mano o sala |
 | I4-08 | Integración y prueba de usabilidad | Pendiente | Recorrido completo, capturas a dos resoluciones y registro de dónde se detiene o duda el jugador |
@@ -68,10 +68,10 @@ flowchart TB
 | Encabezado de exploración y mesa | Los tres sellos ilustrados y la ficha con su saldo reemplazan **10 fichas · 0 / 3 sellos**. Ayuda, inventario y sonido pasan al menú | El inventario identifica cada sello y los objetos disponibles |
 | Vitrina | Imagen, nombre y precio por producto. El detalle se abre al seleccionar. **Faltan 2 fichas** identifica un bloqueo en el producto elegido | Efecto, condición de compra y saldo resultante antes de confirmar |
 | Presentación del crupier | Una intervención breve y **Tomar asiento**. Mostrar umbral, meta y campanadas en tres cifras junto a la elección, con sus etiquetas | La regla especial se consulta en el libro. Si cambia el coste de una acción, aparece junto a esa acción durante la mano |
-| Mano activa | Cartas, suma o intervalo, umbral, campanadas y puntuación de la mesa. Quitar **No lo excedas** junto al umbral y las explicaciones repetidas. **Pedir** muestra **−1 ficha** cuando hay comisión. El gasto de **Iniciar mano** sigue visible junto al botón | El nombre y el bono de cada patrón aparecen al enfocarlo o elegirlo. Los recuentos de mazo y descarte pasan a un detalle consultable |
+| Mano activa | Cartas, suma o intervalo, umbral, campanadas y puntuación. Los botones muestran solo la acción y su atajo. Se retiran **Gratis**, **Revelar y puntuar** y **No lo excedas**. Si hay coste real, indicarlo con una ficha breve al lado de la acción, como **−1 campanada** o **−1 ficha** | El nombre, el bono y el progreso de cada patrón aparecen al enfocarlo o elegirlo. Los recuentos de mazo y descarte pasan a un detalle consultable |
 | Resolución | Un resultado breve, como **+64 puntos** o **Quiebra · 19 supera 17**. Si hay Máscaras, la revelación precede al resultado | **Ver desglose** muestra la fórmula y los bonos |
 
-**Aceptación.** Durante la exploración solo hay un objetivo y una pista de acción cuando el jugador está cerca de algo. Durante la mano hay una acción principal visible y un coste junto a cada acción que lo tiene. El jugador puede averiguar por qué una puerta o compra está bloqueada, leer el intervalo de una Máscara y abrir el desglose con teclado. Revisar capturas comparables a 1024 × 576 y 1280 × 720, con movimiento reducido y audio silenciado.
+**Aceptación.** Durante la exploración solo hay un objetivo y una pista de acción cuando el jugador está cerca de algo. Durante la mano, **Pedir** y **Plantarse** se reconocen a primera vista y conservan sus atajos; los costes reales aparecen en indicadores separados. El jugador puede averiguar por qué una puerta o compra está bloqueada, leer el intervalo de una Máscara y abrir el desglose con teclado. Revisar capturas comparables a 1024 × 576 y 1280 × 720, con movimiento reducido y audio silenciado.
 
 ## I4-04 · HUD de sellos y fichas
 
@@ -83,12 +83,18 @@ flowchart TB
 
 ## I4-05 · Mesa visual y campanadas
 
-- **Composición.** Probar en el Custodio un tapete ilustrado que enmarque la mano, con el retrato, las cartas y el boleto de meta como focos. Usar motivos visuales de los patrones y reservar el nombre, el requisito y el bono para el detalle. Los números, costes, atajos y botones se dibujan en Godot con el estilo del casino.
+La captura marca dos problemas: los botones ocupan todo el pie de la mano y los textos de patrones pasan por encima del borde del tapete. En la siguiente composición, el tapete y las cartas ganan espacio central. Las acciones bajan a la columna derecha y los patrones tienen una franja propia bajo la mano.
+
+- **Acciones a la derecha.** Apilar **Pedir** y **Plantarse** debajo del boleto, con el mismo ancho y una sola línea por botón. Como punto de partida, probar **230 × 64** en el lienzo de 1440 × 810, frente a los 278 × 80 actuales. Así, la altura interactiva ronda 45 px a 1024 × 576. Mantener **P/S** y el foco visible. **Iniciar mano** y **Mostrar resultado** usan el mismo espacio cuando cambie la fase.
+- **Mesa más amplia.** Extender el paño hacia el espacio que dejan los botones. Conservar el tapete generado, con su borde de latón como único contorno de la mesa. Retirar los óvalos decorativos anteriores de esa zona y evitar que el borde pase por debajo de textos o botones.
+- **Patrones más abajo.** Colocar la lectura de la mano debajo del tapete y los cinco indicadores en una franja oscura al pie de la columna central. Mantener un símbolo y un estado breve dentro de cada indicador. Al enfocarlo o seleccionarlo, mostrar nombre, progreso y bono en un único espacio de detalle. Después de resolver, destacar los patrones aplicados.
 - **Dial.** Al gastar una campanada, el aro ilustrado hace un giro corto mientras la cifra baja. El número permanece horizontal y se asienta en su valor real. El efecto se activa con el gasto confirmado, dura unos **0,25 s** como punto de partida y termina en el valor correcto aunque el jugador abra el menú. Una devolución de campanada actualiza la cifra con su propio aviso. Con movimiento reducido la cifra cambia de inmediato.
 - **Resultado.** Al terminar la cuenta de puntos, iluminar brevemente el borde del boleto cuando se suma el aporte. Conservar la secuencia de revelación de Máscaras y evitar que el realce compita con ella.
 - **Arte disponible.** Tapete del Custodio y dial en dos capas con el mismo centro de giro. Los grabados, el retrato y el boleto se reutilizan. [Archivos y montaje](Diseno/ARTE_I4.md).
 
-**Aceptación.** Iniciar una mano consume una campanada y dispara un giro. Pedir, cancelar una acción, reiniciar o cambiar de pantalla dejan el aro quieto. Se identifican la mano, el umbral y la acción disponible a ambas resoluciones, con animación normal o reducida.
+**Ajustes propuestos.** Mostrar el intervalo y el umbral juntos en una sola línea. Dejar el retrato como ancla visual a la izquierda. Compactar el boleto alrededor de la cifra **acumulado / meta** y la barra. Llevar los accesos secundarios al menú de I4-07 para que la cabecera tenga espacio para los sellos y el saldo.
+
+**Aceptación.** A 1024 × 576 y 1280 × 720, los botones quedan debajo del boleto, los patrones quedan fuera del tapete y una mano larga conserva el desplazamiento horizontal. Se puede jugar con P/S y consultar los patrones con Tab. Iniciar una mano consume una campanada y dispara un giro. Pedir, cancelar una acción, reiniciar o cambiar de pantalla dejan el aro quieto.
 
 ## I4-06 · Base reutilizable de diálogos tipo novela visual
 
