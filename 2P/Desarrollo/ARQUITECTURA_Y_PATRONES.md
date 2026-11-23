@@ -62,9 +62,22 @@ La vista que recibe la UI excluye el orden futuro del mazo y los valores de Más
 - `dominio/campana/` controla progresión e inventario. `objetos_mesa.gd` aplica los efectos de la Lente y los amuletos por encuentro. `dominio/recompensas/` genera las ofertas y `FabricaCartas` crea la instancia elegida.
 - `controlador_mesa.gd` coordina comandos, costes y transiciones. Reutiliza las mismas guardas para habilitar una acción y para ejecutarla. `vista_mano.gd` decide qué valores proyectar y conserva una copia de la mano al cierre, antes de que la Coleccionista pueda retener una carta.
 - `sala_explorable.gd` monta fondo, figuras, colisiones y puntos de interacción. `casino.gd` autoriza el acceso y coordina exploración, diálogo y encuentros.
-- `casino/interfaz/` reutiliza el libro para compras e inventario. La tienda solicita la compra a la campaña y las cartas de recompensa emiten el índice elegido. El indicador de objetivo administra su propio texto y animación.
+- `casino/interfaz/` reutiliza el libro para el inventario y los diálogos. Desde I4 las compras pasan por la vitrina ([distribución en I4](#distribución-en-i4)), que solicita la compra a la campaña y las cartas de recompensa emiten el índice elegido. El indicador de objetivo administra su propio texto y animación.
 - `audio/` mezcla los cuatro buses y presenta el control de niveles. Los eventos de la mesa se reproducen después de que el comando o la resolución hayan sido aceptados.
 - `mesa/interfaz/` contiene la mano visual, la franja de patrones, el panel de Llaves, la secuencia de revelación y el diálogo modal. La mano conserva la identidad de cada carta y se ocupa del desplazamiento. El diálogo aísla el foco y lo devuelve al control anterior. `mesa_ui.gd` conecta estos componentes y traduce las acciones del jugador a comandos.
+
+### Distribución en I4
+
+Cada pantalla nueva de I4 es un componente con una sola responsabilidad. Los coordinadores (`casino.gd` y `mesa_ui.gd`) los crean, les pasan datos y escuchan sus señales; no dibujan su contenido.
+
+| Componente | Responsabilidad | Patrón |
+| --- | --- | --- |
+| `casino/interfaz/vitrina/` | `VitrinaGabinete` coordina `FichaProducto`, `DetalleProducto` y `SelectorCartas`. La campaña valida y aplica la compra; la vitrina emite `compra_realizada` y `cerrada` | Observer y composición |
+| `casino/interfaz/hud/` | `HudCampana` reúne `SellosCampana` y `SaldoFichas`; solo lee la campaña. El mismo recuadro sirve en exploración, mesa y vitrina | Composición |
+| `casino/exploracion/plano_galeria.gd` | Plano del corredor como datos: puertas, lado, posiciones de regreso, requisito, puerta siguiente y estado. La galería lo dibuja y `SalaExplorable` crea las interacciones | Datos separados de la presentación |
+| `casino/interfaz/cifras_mesa.gd` | Umbral, meta y campanadas de una `ReglaMesa` junto a Tomar asiento | Composición |
+| `mesa/interfaz/dial_campanadas.gd` | Cifra real, giro del aro solo ante un gasto de la misma partida y aviso propio de las devoluciones | Componente con estado visual propio |
+| `mesa/interfaz/composicion_mesa.gd` | Medidas de la mesa en un solo lugar | Datos de distribución |
 
 La tabla distingue aplicación inmediata de incorporación posterior. Un patrón se acepta si se puede señalar el problema, el código que lo resuelve y la prueba que evita una regresión.
 

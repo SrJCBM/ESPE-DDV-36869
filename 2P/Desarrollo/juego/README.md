@@ -94,7 +94,7 @@ La ruta de salida del comando es relativa a `project.godot`. El preset incrusta 
 ## Estructura
 
 ```text
-casino/      entrada de campaña, fondos, geometría, movimiento y diálogos
+casino/      entrada de campaña, fondos, geometría, movimiento, diálogos, vitrina, corredor y encabezado
 audio/       mezcla, pistas y controles de volumen
 principal/   acceso independiente a la mesa de I1
 ajustes/     movimiento reducido y niveles de volumen
