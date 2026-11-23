@@ -20,7 +20,7 @@ func _mesa_campana(nivel: int):
 
 func _libro(mesa):
 	mesa.mostrar_ayuda()
-	return mesa._contenido_modal.get_node("Reglamento")
+	return mesa.modal.contenido.get_node("Reglamento")
 
 func _casino():
 	var juego = load("res://casino/casino.tscn").instantiate()
@@ -111,17 +111,18 @@ func test_objetivo_sigue_el_progreso_y_no_cambia_con_la_tienda() -> void:
 	for nivel in range(4):
 		assert_true(c.iniciar(CampanaCasino.MESAS[nivel]))
 		c.cerrar(true, 0)
+		c.resolver_recompensa()
 		assert_eq(c.objetivo(), textos[nivel])
 
 func test_indicador_cambia_una_vez_y_se_oculta_con_ventanas() -> void:
 	var juego = _casino()
-	assert_eq(juego.texto_objetivo.text, "Habla con la anfitriona")
+	assert_eq(juego.indicador_objetivo.texto.text, "Habla con la anfitriona")
 	assert_true(juego.indicador_objetivo.visible)
 	juego._recepcion()
 	assert_false(juego.indicador_objetivo.visible, "Diálogo abierto")
 	juego.libro.primero.pressed.emit()
-	assert_eq(juego.texto_objetivo.text, "Encuentra la mesa del Custodio")
-	assert_eq(juego.cambios_objetivo, 1)
+	assert_eq(juego.indicador_objetivo.texto.text, "Encuentra la mesa del Custodio")
+	assert_eq(juego.indicador_objetivo.cambios, 1)
 	assert_false(juego.indicador_objetivo.visible)
 	juego._cerrar()
 	assert_true(juego.indicador_objetivo.visible)
@@ -135,7 +136,7 @@ func test_indicador_cambia_una_vez_y_se_oculta_con_ventanas() -> void:
 	juego._cerrar()
 	juego.entrar("vestibulo")
 	assert_true(juego.indicador_objetivo.visible)
-	assert_eq(juego.cambios_objetivo, 1, "Pasear y abrir la tienda no cambia el objetivo.")
+	assert_eq(juego.indicador_objetivo.cambios, 1, "Pasear y abrir la tienda no cambia el objetivo.")
 	juego.entrar("custodio")
 	juego._presentar_jefe()
 	juego.libro.primero.pressed.emit()
@@ -149,12 +150,12 @@ func test_indicador_cambia_una_vez_y_se_oculta_con_ventanas() -> void:
 	m.procesar_comando(IniciarMano.new())
 	m.procesar_comando(Plantarse.new())
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
-	assert_eq(juego.texto_objetivo.text, "Encuentra la mesa del Recaudador")
-	assert_eq(juego.cambios_objetivo, 2)
+	assert_eq(juego.indicador_objetivo.texto.text, "Encuentra la mesa del Recaudador")
+	assert_eq(juego.indicador_objetivo.cambios, 2)
 	juego.libro.primero.pressed.emit()
 	await get_tree().process_frame
 	assert_true(juego.indicador_objetivo.visible)
-	assert_eq(juego.cambios_objetivo, 2)
+	assert_eq(juego.indicador_objetivo.cambios, 2)
 
 func test_indicador_deja_pasar_clics_y_no_tapa_el_juego() -> void:
 	var juego = _casino()
@@ -165,7 +166,7 @@ func test_indicador_deja_pasar_clics_y_no_tapa_el_juego() -> void:
 	juego.campana.superadas = 2
 	await get_tree().process_frame
 	var caja: Rect2 = juego.indicador_objetivo.get_rect()
-	assert_eq(juego.texto_objetivo.text, "Encuentra la mesa de la Coleccionista")
+	assert_eq(juego.indicador_objetivo.texto.text, "Encuentra la mesa de la Coleccionista")
 	assert_gte(caja.position.y, juego.mundo.position.y, "Debajo del encabezado")
 	assert_lte(caja.size.y, 60.0, "Como máximo dos líneas")
 	assert_lte(caja.end.x, 560.0, "Ocupa solo la esquina izquierda")
@@ -173,7 +174,7 @@ func test_indicador_deja_pasar_clics_y_no_tapa_el_juego() -> void:
 	for sala in ["vestibulo", "corredor", "tienda", "custodio", "dueno"]:
 		juego.campana.superadas = 4
 		juego.entrar(sala)
-		for punto in juego.puntos:
+		for punto in juego.exploracion.puntos:
 			assert_false(caja.has_point(juego.mundo.position + punto.pos), "%s · %s" % [sala, punto.accion])
 	await get_tree().process_frame
 	await get_tree().process_frame

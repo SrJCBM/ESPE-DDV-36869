@@ -8,6 +8,7 @@ const PAPEL := Color("eee0c2")
 const TINTA := Color("263a2b")
 const SECUNDARIO := Color("4e5a42")
 const Carta = preload("res://cartas/carta.tscn")
+const CartaVisual := preload("res://cartas/carta_ui.gd")
 var pagina_actual := 0
 var navegacion: Array[Button] = []
 var movimiento: CheckButton
@@ -16,6 +17,7 @@ var _folio: Label
 var _patron_ejemplo := "Punto exacto"
 ## Reglas de la mesa que se consulta. Sin datos, el libro describe al Custodio de I1.
 var reglas: Dictionary = {}
+var en_campana := false
 const CUSTODIO := {"mesa": "custodio", "nombre": "El Custodio", "umbral": 17, "meta": 200, "presupuesto": 10, "ficha_por_pedir": 0, "umbral_minimo": 17}
 
 func regla(clave: String) -> Variant:
@@ -182,7 +184,7 @@ func _palos() -> void:
 		var y: int = 61 + indice * 103
 		var arte := TextureRect.new()
 		arte.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		arte.texture = load("res://recursos/arte/carta-%s-grabado.png" % filas[indice][0])
+		arte.texture = CartaVisual.ARTE[filas[indice][0]]
 		arte.position = Vector2(0, y)
 		arte.size = Vector2(95, 91)
 		arte.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -238,11 +240,13 @@ func _puntos() -> void:
 func _controles() -> void:
 	_texto(_pagina, "Decide a tu ritmo", Rect2(0, 0, 758, 51), 36, TINTA, true)
 	_texto(_pagina, "Elige una Llave en la mano y confirma junto a la carta. Las demás cartas se amplían. Consultar este libro es gratis.", Rect2(0, 56, 758, 58), 20)
-	var teclas := [["P", "Iniciar / pedir"], ["S", "Plantarse"], ["L", "Elegir / cambiar Llave; confirmar en mesa"], ["H", "Abrir este libro"], ["R", "Reiniciar con confirmación"]]
+	var teclas := [["P", "Iniciar / pedir"], ["S", "Plantarse"], ["L", "Elegir / cambiar Llave; confirmar en mesa"], ["H", "Abrir este libro"], ["V", "Ajustar el sonido" if en_campana else "Ajustar el sonido · R reinicia la mesa"]]
 	for indice in range(teclas.size()):
 		var y: int = 128 + indice * 35
 		_texto(_pagina, teclas[indice][0], Rect2(0, y, 52, 30), 21)
 		_texto(_pagina, teclas[indice][1], Rect2(62, y, 670, 30), 19)
 	_linea(311)
 	_texto(_pagina, "Tab / Mayús+Tab: recorrer · Enter / Espacio: activar · Esc: cancelar / volver.\nEl foco claro indica qué control estás usando.", Rect2(0, 320, 758, 55), 17)
-	_texto(_pagina, "24 cartas: al agotarse el mazo se mezcla el descarte, sin incluir la mano actual. Si no puedes robar, puedes plantarte.", Rect2(0, 380, 758, 54), 17, SECUNDARIO)
+	var reciclaje := "Al agotarse el mazo, se mezcla el descarte sin la mano actual."
+	var recompensa := "\nTras los tres primeros sellos puedes añadir una carta a tu baraja." if en_campana else ""
+	_texto(_pagina, reciclaje + recompensa, Rect2(0, 380, 758, 54), 17, SECUNDARIO)

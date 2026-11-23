@@ -16,3 +16,7 @@ func valor_efectivo() -> int:
 	if definicion.palo == Palos.RELOJES:
 		return maxi(1, definicion.valor_impreso - 1)
 	return definicion.valor_impreso
+
+
+func es_mascara_oculta(vistas: Dictionary) -> bool:
+	return definicion.palo == Palos.MASCARAS and not vistas.has(id_instancia)

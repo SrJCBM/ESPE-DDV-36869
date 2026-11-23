@@ -47,7 +47,7 @@ static func boton_texto(padre: Node, nombre: String, texto: String, rect: Rect2,
 ## Botón principal de la mesa (Iniciar/Pedir, Plantarse): fondo, tecla, título y coste.
 static func boton_accion(padre: Node, nombre: String, rect: Rect2, primario: bool, accion: Callable, tecla: String) -> Button:
 	var boton := boton_texto(padre, nombre, "", rect, accion)
-	var ruta := "res://recursos/figma/accion-primaria.svg" if primario else "res://recursos/figma/accion-secundaria.svg"
+	var ruta := "res://mesa/arte/accion-primaria.svg" if primario else "res://mesa/arte/accion-secundaria.svg"
 	var fondo := imagen(boton, ruta, Rect2(Vector2.ZERO, rect.size))
 	fondo.name = "Fondo"
 	var atajo := Panel.new()

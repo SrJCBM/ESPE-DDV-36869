@@ -1,5 +1,7 @@
 extends GutTest
 
+const Galeria := preload("res://casino/exploracion/galeria.gd")
+
 
 func nueva() -> CampanaCasino:
 	var c := CampanaCasino.new()
@@ -39,6 +41,7 @@ func test_recepcion_unica_y_puertas() -> void:
 	assert_false(c.comprar("lente"))
 	assert_eq(c.cerrar(true,2),20)
 	assert_eq(c.cerrar(true,2),0)
+	assert_true(c.resolver_recompensa())
 	assert_true(c.puerta_abierta("recaudador"))
 	assert_false(c.iniciar("custodio"))
 	assert_false(c.iniciar("dueno"))
@@ -103,6 +106,24 @@ func test_lente_sin_mascara_nueva_y_limites_de_amuletos() -> void:
 	assert_eq(c.saldo,16)
 	assert_eq(m.exactos,4)
 
+func test_usar_lente_publica_una_vista_sin_aceptar_comandos_reentrantes() -> void:
+	var c := nueva()
+	c.lentes = 1
+	var m := control(c)
+	reparto(m, ["llaves", "mascaras", "velas"], [3, 4, 5])
+	assert_true(m.procesar_comando(IniciarMano.new()).aceptado)
+	var recibidas: Array[Dictionary] = []
+	var aceptados: Array[bool] = []
+	m.vista_actualizada.connect(func(vista: Dictionary) -> void:
+		recibidas.append(vista)
+		aceptados.append(m.procesar_comando(PedirCarta.new()).aceptado), CONNECT_ONE_SHOT)
+	assert_true(m.usar_lente())
+	assert_eq(aceptados, [false])
+	assert_eq(recibidas.size(), 1)
+	assert_eq(recibidas[0].cartas[1].valor, 4)
+	assert_eq(m.partida.mano.size(), 2)
+	assert_true(m.procesar_comando(PedirCarta.new()).aceptado)
+
 func test_recaudador_cobra_solo_si_entrega_carta() -> void:
 	var c := nueva()
 	var m := control(c,1)
@@ -132,12 +153,16 @@ func test_retencion_desempata_por_ultima_y_dueno_puntua_con_umbral_vigente() -> 
 	var ultima := m.partida.mazo[1]
 	m.procesar_comando(IniciarMano.new())
 	m.procesar_comando(Plantarse.new())
-	assert_eq(m.retenidas,[ultima])
+	assert_eq(m.partida.retenidas,[ultima])
+	var vista := m.obtener_vista()
+	assert_eq(vista.cartas[1].id, ultima.id_instancia)
+	assert_eq(vista.retenidas, 1)
 	assert_eq(m.partida.disponibles(),2)
 	m.procesar_comando(IniciarMano.new())
 	m.procesar_comando(Plantarse.new())
-	assert_eq(m.retenidas.size(),1)
+	assert_eq(m.partida.retenidas.size(),1)
 	c.cerrar(true,0)
+	c.resolver_recompensa()
 	var final := control(c,3)
 	reparto(final,["llaves","mascaras","velas"],[8,9,8])
 	final.procesar_comando(IniciarMano.new())
@@ -237,7 +262,7 @@ func test_campana_completa_con_baraja_normal_y_recompensas_unicas() -> void:
 			if not c.amuletos.has("prudente"): c.comprar("prudente")
 			if c.lentes == 0: c.comprar("lente")
 		juego.entrar("corredor",juego.sala)
-		juego.visitante.position = Vector2(juego.Galeria.eje(nivel+2),310)
+		juego.visitante.position = Vector2(Galeria.eje(nivel+2),310)
 		juego.interactuar(juego.cercano())
 		assert_eq(juego.sala,CampanaCasino.MESAS[nivel])
 		juego.visitante.position = Vector2(640,536)

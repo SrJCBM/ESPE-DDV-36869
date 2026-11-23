@@ -2,7 +2,7 @@
 
 **Objetivo:** que una persona pueda completar una mesa local del Custodio, comprender sus decisiones y reiniciar la partida.
 
-**Estado al 13 de noviembre de 2026:** implementación jugable y revisión técnica disponibles, versión 0.1.0. I1-02 e I1-04 (Ariel) Completado; I1-01, I1-03, I1-05, I1-06 e I1-08 Por revisar. I1-00 sigue En curso por la verificación del tercer equipo; I1-07 queda Pendiente y lo realizará Julio. La base de Kenned `5d73d50` se conserva en el historial y el incremento se integra en `main` local. [Resultados y límites](REVISION_I1.md).
+**Estado al 13 de noviembre de 2026:** implementación jugable y revisión técnica disponibles, versión 0.1.0. I1-02 e I1-04 (Ariel) Completado; I1-01, I1-03, I1-05, I1-06 e I1-08 Por revisar. I1-00 sigue En curso por la verificación del tercer equipo; I1-07 queda Pendiente y lo realizará Julio. La base de Kenned `5d73d50` se conserva en el historial y el incremento se integra en `main` local. [Resultados y límites](Archivo/I1/REVISION_I1.md).
 
 **Coordinación actual:** [README con responsables, estados y primera demostración](README.md).
 

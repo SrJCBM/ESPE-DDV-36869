@@ -53,7 +53,7 @@ static func intervalo(mano: Array, reveladas: bool = false, vistas: Dictionary =
 	var conocido: int = 0
 	var ocultas: int = 0
 	for carta: CartaEnPartida in mano:
-		if carta.definicion.palo == Palos.MASCARAS and not reveladas and not vistas.has(carta.id_instancia):
+		if not reveladas and carta.es_mascara_oculta(vistas):
 			# No se consulta su valor: estas cotas no dependen del valor oculto real.
 			ocultas += 1
 		else:

@@ -25,6 +25,8 @@ Sin Máscaras, el botón Plantarse anticipa los puntos que ofrece la mano. Con v
 
 En la campaña, una placa bajo el retrato muestra la regla del crupier aplicada a la mano en curso; con el Dueño anuncia cuándo baja el umbral y el número late al cambiar. La ayuda no consume recursos. **Movimiento reducido**, en «A tu ritmo», desactiva las transiciones de cartas y progreso; se guarda en `user://ajustes.cfg` y se conserva entre mesas y sesiones. Toda información necesaria se muestra sin depender de animaciones o sonido.
 
+Al superar cualquiera de las tres primeras mesas, elige una de las tres cartas ofrecidas o continúa sin añadir ninguna. El mazo de la siguiente mesa recoge tu elección. En exploración o en la mesa, **V** abre los cuatro niveles de volumen persistentes. [Sonido](audio/README.md).
+
 Los cinco indicadores muestran progreso y bonos de patrones. Señalarlos con el ratón o enfocarlos con Tab resalta las cartas relacionadas y muestra una explicación breve; Racha señala las últimas tres. Pulsarlos abre ejemplos. Solo una indicación contextual acompaña la mano: las reglas completas siguen en el libro y el desglose.
 
 Plantarse inicia una revelación breve antes del resultado; se puede saltar con S/Esc y es inmediata con movimiento reducido. Una Quiebra demostrable avisa, pero no cierra la mano automáticamente. Al resolver, la mesa muestra la cuenta y los bonos aplicados; en Quiebra, indica cuánto se excedió el umbral y el aporte cero. Cada Máscara se voltea al revelarse, los puntos de la mano se cuentan hasta su aporte y las cartas saltan con un Punto exacto o tiemblan con una Quiebra. Estas respuestas solo recorren textos ya calculados, se interrumpen al iniciar otra mano y desaparecen con movimiento reducido. El final resume manos válidas y Quiebras y ofrece **Volver a jugar / P**, que abre un intento normal nuevo sin cobrar ni iniciar una mano automáticamente.
@@ -63,7 +65,7 @@ Para abrir directamente el juego, sin el editor:
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas' }
 ```
 
-El runner devuelve 0 si todas pasan y distinto de 0 si alguna falla. [Resultados registrados](../REVISION_I1.md).
+El runner devuelve 0 si todas pasan y distinto de 0 si alguna falla. [Resultados registrados](../Archivo/I1/REVISION_I1.md).
 
 Capturas del objetivo de exploración (I2-K2). `progreso` va de -1 (sin invitación) a 4; las imágenes quedan en `exportaciones/qa/`:
 
@@ -92,15 +94,16 @@ La ruta de salida del comando es relativa a `project.godot`. El preset incrusta 
 ## Estructura
 
 ```text
-casino/      entrada de I2, salas, movimiento, diálogos y economía
+casino/      entrada de campaña, fondos, geometría, movimiento y diálogos
+audio/       mezcla, pistas y controles de volumen
 principal/   acceso independiente a la mesa de I1
-ajustes/     preferencias guardadas entre sesiones (movimiento reducido)
+ajustes/     movimiento reducido y niveles de volumen
 datos/       Resources: 24 cartas y sus palos, condiciones de las mesas y tienda
-dominio/     cartas del intento, fábrica, zonas, evaluador, comandos, estados y reglas de crupier
-mesa/        controlador, interfaz y sus piezas, libro del Custodio y marco de ventanas
-cartas/      carta visual y transiciones
+dominio/     campaña, economía, recompensas, zonas, cartas, comandos, estados y reglas de crupier
+mesa/        controlador, interfaz, libro del Custodio y arte de la mesa
+cartas/      carta visual, grabados por palo y sus transiciones
 temas/       tipografía y estilos
-recursos/    ilustraciones originales, vectores y fuentes con sus licencias
+recursos/    retrato compartido del Custodio y fuentes con sus licencias
 tests/       reglas, privacidad, interfaz, arranque y capturas reproducibles
 addons/gut/  GUT 9.7.1; procedencia y licencia incluidas
 ```

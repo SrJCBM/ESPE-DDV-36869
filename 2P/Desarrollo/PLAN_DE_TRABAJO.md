@@ -2,7 +2,7 @@
 
 El diseño v2.4 y el entorno aprobado por el docente guían la campaña. Ariel completó I1-00 e I1-08 y entregó el ejecutable. I1-07 espera los comentarios. El balance, la respuesta visual y las refactorizaciones están registrados en la [iteración 03](ITERACION_03.md).
 
-Figma permanece como referencia de diseño; la implementación activa está en `2P/Desarrollo/juego/`. La base de Kenned (`5d73d50`) forma parte del historial y los cambios aprobados se integran en `main`. [Tablero actualizado](README.md) y [revisión técnica](REVISION_I1.md).
+Figma permanece como referencia de diseño; la implementación activa está en `2P/Desarrollo/juego/`. La base de Kenned (`5d73d50`) forma parte del historial y los cambios aprobados se integran en `main`. [Tablero actualizado](README.md) y [revisión técnica](Archivo/I1/REVISION_I1.md).
 
 ## Guía para comenzar
 

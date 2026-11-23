@@ -38,7 +38,7 @@ func _accion_aleatoria(m: ControladorMesa, azar: RandomNumberGenerator) -> void:
 func _comprobar_zonas(m: ControladorMesa, contexto: String) -> bool:
 	var vistas := {}
 	var total := 0
-	for zona: Array in [m.partida.mazo, m.partida.mano, m.partida.descarte, m.retenidas]:
+	for zona: Array in [m.partida.mazo, m.partida.mano, m.partida.descarte, m.partida.retenidas]:
 		for carta: CartaEnPartida in zona:
 			total += 1
 			if vistas.has(carta.id_instancia):
@@ -98,7 +98,7 @@ func test_el_barajado_reparte_los_24_ordenes_de_4_cartas_por_igual() -> void:
 ## Huella del intento por definiciones: las identidades de instancia son aleatorias a propósito.
 func _huella(m: ControladorMesa) -> String:
 	var partes := PackedStringArray()
-	for zona: Array in [m.partida.mazo, m.partida.mano, m.partida.descarte, m.retenidas]:
+	for zona: Array in [m.partida.mazo, m.partida.mano, m.partida.descarte, m.partida.retenidas]:
 		var ids := PackedStringArray()
 		for carta: CartaEnPartida in zona: ids.append(carta.definicion.id)
 		partes.append(",".join(ids))

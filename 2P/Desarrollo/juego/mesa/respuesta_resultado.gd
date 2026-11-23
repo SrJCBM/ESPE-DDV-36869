@@ -1,4 +1,4 @@
-extends RefCounted
+extends Node
 ## Respuesta visual al resolver una mano (I3-01) y aviso del cambio de umbral (I3-03).
 ## Solo recorre textos que el controlador ya calculó y siempre termina en ellos. Nunca altera la vista.
 
@@ -7,13 +7,11 @@ const DURACION_CUENTA := 0.45
 var tween: Tween
 var _aviso_umbral: Tween
 var _textos_finales: Dictionary = {}
-var _duenio: Control
 var _lectura: Label
 var _puntos: Label
 var _umbral: Label
 
-func _init(duenio: Control, lectura: Label, puntos: Label, umbral: Label) -> void:
-	_duenio = duenio
+func _init(lectura: Label, puntos: Label, umbral: Label) -> void:
 	_lectura = lectura
 	_puntos = puntos
 	_umbral = umbral
@@ -23,7 +21,7 @@ func celebrar(vista: Dictionary, cartas: Array, puntos_previos: int) -> void:
 	var mano: Dictionary = vista.get("ultima_mano", {})
 	_textos_finales = {_lectura: _lectura.text, _puntos: _puntos.text}
 	_lectura.pivot_offset = _lectura.size * 0.5
-	tween = _duenio.create_tween()
+	tween = create_tween()
 	if mano.get("quiebra", false):
 		for carta in cartas:
 			carta.sacudir(0.8)
@@ -65,7 +63,7 @@ func avisar_cambio_umbral(reducido: bool) -> void:
 	_umbral.pivot_offset = _umbral.size * 0.5
 	_umbral.scale = Vector2.ONE * 1.3
 	_umbral.modulate = Color(1.25, 1.12, 0.8)
-	_aviso_umbral = _duenio.create_tween().set_parallel(true)
+	_aviso_umbral = create_tween().set_parallel(true)
 	_aviso_umbral.tween_property(_umbral, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_aviso_umbral.tween_property(_umbral, "modulate", Color.WHITE, 0.9)
 

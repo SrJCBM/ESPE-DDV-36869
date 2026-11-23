@@ -1,7 +1,7 @@
 extends GutTest
 ## Tamaño de los personajes y orden de dibujo por la altura de los pies.
 
-const Visitante := preload("res://casino/visitante.gd")
+const Visitante := preload("res://casino/exploracion/visitante.gd")
 
 func _casino():
 	var juego = load("res://casino/casino.tscn").instantiate()
@@ -33,7 +33,7 @@ func test_las_figuras_se_ordenan_por_los_pies() -> void:
 	var anfitriona: Sprite2D = _figuras(juego)[0]
 	assert_eq(anfitriona.position, Vector2(990, 231), "El origen de la figura está en sus pies.")
 	assert_almost_eq(anfitriona.offset.y, -anfitriona.texture.get_height() * 0.5, 0.01)
-	for punto in juego.puntos: assert_eq(punto.marca.get_parent(), juego.capa_superior)
+	for punto in juego.exploracion.puntos: assert_eq(punto.marca.get_parent(), juego.capa_superior)
 
 func test_rombos_y_placas_quedan_sobre_el_mundo_y_bajo_los_dialogos() -> void:
 	var juego = _casino()

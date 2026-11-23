@@ -38,9 +38,16 @@ __pycache__/
 # Salidas de exportación del proyecto Godot
 /2P/Desarrollo/juego/exportaciones/
 
+# Grafos y cachés generados localmente
+graphify-out/
+
 # Cargas Figma regenerables y registro de una migración ya aplicada
 /2P/Desarrollo/Diseno/figma-src/cargas_preparadas/
 /2P/Desarrollo/Diseno/figma-src/estado-lumIntegration.json
 
 # Preferencias locales de herramientas de desarrollo.
 /.claude/settings.local.json
+
+# Skills de agentes instaladas localmente
+/.agents/
+/skills-lock.json

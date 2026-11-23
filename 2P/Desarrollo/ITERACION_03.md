@@ -11,9 +11,9 @@
 | I3-03 | Regla del crupier visible en la mesa | 5 | **Completado** | Placa de regla, aviso del umbral y Dueño sin bajar tras Quiebra. 149 pruebas, 7 nuevas en `test_regla_crupier.gd` |
 | I3-04 | Pruebas de invariantes de zonas y de barajado | 7 | **Completado** | 3 pruebas en `test_invariantes.gd`; comprobadas con dos errores introducidos a propósito |
 | I3-05 | Deuda técnica | 6 | **Completado** | Cinco reorganizaciones en commits separados, sin cambiar reglas. 159 pruebas |
-| I3-06 | Recompensa de cartas tras cada mesa | 4 | En pausa | Diseño acordado; se retoma cuando el equipo lo indique |
-| I3-07 | Sonido | 1 | Diferido | Se hará con la tarea del docente sobre sonido diegético y no diegético |
-| I3-08 | Colisiones de la exploración | — | Pendiente | Comentario 3 de Damián; no formaba parte de los siete puntos |
+| I3-06 | Recompensa de cartas tras cada mesa | 4 | **Implementado** | Una de tres cartas o ninguna tras las primeras tres mesas. |
+| I3-07 | Sonido | 1 | **Implementado** | Bucle musical, ambiente, efectos de juego y cuatro controles de volumen. |
+| I3-08 | Colisiones de la exploración | — | **Implementado** | Huellas por sala, pruebas por mueble y capturas a dos resoluciones. |
 
 ## Completado
 
@@ -78,31 +78,37 @@ Cinco reorganizaciones, cada una en su commit, sin cambiar reglas ni lo que se v
 
 Al separar las piezas apareció un texto que se había quedado atrás en I3-03: el inventario de la mesa del Dueño seguía diciendo que cada mano bajaba el umbral. Se corrigió en `e21dfce`.
 
-**Lo que queda en `mesa_ui.gd`:** la franja de patrones, la secuencia de revelación y la elección de Llave siguen ahí. Comparten estado con la mesa (foco, ventana abierta, Llave elegida) y unas cincuenta comprobaciones de las pruebas leen ese estado. Separarlas exige rehacer esas pruebas, así que queda para cuando haya que modificar esas partes.
+La interfaz de mesa compone la mano visual, la franja de patrones, la selección de Llaves, la revelación y el diálogo modal. El casino delega el montaje de salas, la tienda y la presentación de recompensas. Las reglas de crupier reciben el estado de partida y el controlador publica la mano mediante una proyección que protege los valores todavía ocultos. [Arquitectura y patrones](ARQUITECTURA_Y_PATRONES.md#distribución-en-i3).
 
-## Por implementar
+### I3-06 · Recompensa de cartas
 
-### I3-06 · Recompensa de cartas (en pausa)
+Tras superar el Custodio, el Recaudador y la Coleccionista, la casa ofrece tres combinaciones distintas de palo y valor (1 a 10). El visitante escoge una carta o continúa sin llevarse ninguna. Se aplica una sola elección por victoria y la baraja inicial puede crecer de 24 a 27. La carta se construye con la fábrica existente y entra al mazo de la siguiente mesa. La derrota y la victoria final cierran el encuentro sin abrir una oferta.
 
-Diseño acordado el 22 de noviembre. Tras superar el Custodio, el Recaudador y la Coleccionista, la casa ofrece tres cartas normales distintas entre sí (palo y valor del 1 al 10, con las reglas de siempre). Se elige una o ninguna; cada carta nueva también diluye las demás. La baraja crece como máximo de 24 a 27. Al retomarlo: medir el efecto con `sim_campana.gd` y actualizar Word y ayuda.
+El generador está en `dominio/recompensas`. La campaña valida la decisión y la interfaz reutiliza la carta de mesa. La simulación compara el margen 6 omitiendo las recompensas y tomando la opción de menor valor efectivo.
 
-### I3-07 · Sonido (diferido)
+| Estrategia (1.000 semillas por variante) | Campañas ganadas sin recompensa | Campañas ganadas con recompensa | Dueño superado con recompensa, entre quienes llegaron |
+| --- | ---: | ---: | ---: |
+| Sin compras | 253 | 316 | 316 de 738 (43 %) |
+| Lente, Corona y Sello | 740 | 751 | 751 de 763 (98 %) |
 
-Queda para la tarea que pondrá el docente sobre sonido diegético y no diegético. Cuando llegue, partir de buses separados (música, efectos, interfaz y ambiente), sliders en decibelios y variación de los efectos repetidos. La campanada al iniciar cada mano es un candidato natural.
+Sin compras, seleccionar la carta de menor valor supera el objetivo anterior del 30–40 % para el Dueño. La selección es opcional y los resultados corresponden a esa estrategia simulada. El siguiente piloto puede comprobar si los jugadores eligen por valor, palo o preferencia.
+
+### I3-07 · Sonido
+
+**Sonido · V** abre el mezclador en exploración y en mesa. Música, Ambiente, Efectos e Interfaz se ajustan por separado y se conservan en `user://ajustes.cfg`. El juego aplica la ganancia en decibelios y silencia el bus en 0 %. Las pistas y los efectos son síntesis original para el proyecto. [Recursos y eventos](juego/audio/README.md).
 
 ### I3-08 · Colisiones de la exploración
 
-Comentario 3 de Damián: en algunas esquinas el visitante pasa por encima de mesas u objetos. Criterios:
+Las huellas de mesas, sillas, vitrinas y mostradores siguen el arte de cada sala. Las mesas usan polígonos convexos con esquinas recortadas. Las pruebas lanzan al visitante contra los muebles de las seis salas, comprueban el collider que lo detiene y verifican que desde la entrada existe un camino hasta cada interacción. La revisión en 1024 × 576 y 1280 × 720 incluyó las seis salas y la galería.
 
-- Revisar cada sala y ajustar los obstáculos al mobiliario dibujado, sin cerrar pasos necesarios hacia puertas, mesas y personajes.
-- Añadir una prueba por sala que intente atravesar cada mueble y compruebe que el visitante se detiene.
-- Revisión visual a 1024 × 576 y 1280 × 720.
+La construcción de obstáculos vive en `casino/exploracion/plano_salas.gd`. Al sustituir un fondo, revisar sus huellas en la misma escala de 1280 × 720.
 
 ## Verificación
 
 ```powershell
 & $GodotExe --headless --path '2P/Desarrollo/juego' -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/sim_campana.gd -- --semillas=1000
+& $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/sim_campana.gd -- --semillas=1000 --margen=6 --recompensas
 ```
 
-Estado al cerrar I3-05: **159 pruebas, 1.604 aserciones, todas pasan**. Cada punto se cierra con su commit, sus pruebas y la actualización de esta tabla.
+I3 pasó **167 pruebas y 1.764 aserciones** en Godot 4.7.2. Los casos cubren el recorrido completo, las recompensas y compras, la validez de las acciones, el orden de revelación de dos Máscaras, la vista de la Coleccionista y la restauración del foco al sustituir un diálogo.

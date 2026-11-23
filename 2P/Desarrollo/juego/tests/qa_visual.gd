@@ -59,25 +59,26 @@ func _revisar() -> void:
 			mesa.mostrar_devolucion()
 		if caso == "llave-confirmada":
 			mesa.mostrar_devolucion()
-			mesa._confirmar_llave()
+			mesa.eleccion_llave.confirmar()
 		if caso == "confirmacion": mesa._solicitar_demostracion()
 		if caso == "patron-racha": mesa._mostrar_patron(4)
 		if caso == "patron-larga": mesa._mostrar_patron(3)
 		if caso.begins_with("ayuda"):
 			mesa.mostrar_ayuda()
 			var pagina: int = {"ayuda": 0, "ayuda-palos": 1, "ayuda-puntos": 2, "ayuda-controles": 3}.get(caso, 0)
-			mesa._contenido_modal.get_node("Reglamento").ir_a_pagina(pagina)
+			mesa.modal.contenido.get_node("Reglamento").ir_a_pagina(pagina)
 		if caso == "desglose":
 			controlador.procesar_comando(Plantarse.new())
 			mesa.mostrar_desglose()
 		if caso == "carta-oculta":
-			mesa.mostrar_carta(mesa.fila_cartas.get_child(2)._vista)
+			mesa.mostrar_carta(mesa.mano.fila.get_child(2)._vista)
 	for i in range(4): await process_frame
 	if caso != "revelacion":
 		await create_timer(0.4).timeout
-		while mesa._revelando: await process_frame
+		while mesa.revelacion.activa: await process_frame
+		while mesa._feedback != null and mesa._feedback.is_running(): await process_frame
 	if caso in ["resaltado-racha", "resaltado-ascenso"]:
-		mesa._patrones_ui.get_child(4 if caso == "resaltado-racha" else 2).grab_focus()
+		mesa.franja_patrones.get_child(4 if caso == "resaltado-racha" else 2).grab_focus()
 		await process_frame
 	await RenderingServer.frame_post_draw
 	var destino := "res://exportaciones/qa/%s_%s.png" % [caso, opciones.get("tamano", "1280x720")]
@@ -85,11 +86,14 @@ func _revisar() -> void:
 	var error := root.get_texture().get_image().save_png(destino)
 	print(JSON.stringify({"caso": caso, "tamano": root.size, "captura": destino,
 		"puntos": controlador.partida.puntos, "campanadas": controlador.partida.campanadas,
-		"revelando": mesa._revelando, "salida": error}))
+		"revelando": mesa.revelacion.activa, "salida": error}))
 	var recortes: Array = []
 	for etiqueta in principal.find_children("*", "Label", true, false):
 		if etiqueta.is_visible_in_tree() and etiqueta.get_visible_line_count() < etiqueta.get_line_count():
 			var necesario: int = etiqueta.get_line_count() * etiqueta.get_line_height() + maxi(0, etiqueta.get_line_count() - 1) * etiqueta.get_theme_constant("line_spacing")
 			recortes.append({"texto": etiqueta.text, "alto": etiqueta.size.y, "necesario": necesario})
 	print(JSON.stringify({"recortes_verticales": recortes}))
+	# Da al mezclador tiempo de liberar los sonidos tras desmontar la escena.
+	principal.queue_free()
+	await create_timer(0.15).timeout
 	quit(error)

@@ -26,7 +26,7 @@ func _esperar(segundos: float) -> void:
 	await get_tree().create_timer(segundos).timeout
 
 func _assert_cartas_en_reposo(mesa) -> void:
-	for carta in mesa.fila_cartas.get_children():
+	for carta in mesa.mano.fila.get_children():
 		assert_eq(carta._visual.position, Vector2.ZERO, "posición de reposo")
 		assert_eq(carta._visual.scale, Vector2.ONE, "escala de reposo")
 		assert_eq(carta._visual.rotation, 0.0, "sin giro residual")
@@ -51,7 +51,7 @@ func test_quiebra_sacude_las_cartas_y_vuelve_al_reposo() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var movidas := 0
-	for carta in mesa.fila_cartas.get_children():
+	for carta in mesa.mano.fila.get_children():
 		if carta._visual.position != Vector2.ZERO or carta._visual.modulate != Color.WHITE: movidas += 1
 	assert_gt(movidas, 0, "la Quiebra se nota en las cartas")
 	assert_string_contains(mesa._lectura.text, "0 puntos")
@@ -63,9 +63,9 @@ func test_revelacion_de_mascara_termina_con_resultado_y_cartas_en_reposo() -> vo
 	var mesa = _mesa(["llaves_04", "relojes_06", "mascaras_08"])
 	mesa.controlador.procesar_comando(PedirCarta.new())
 	mesa.controlador.procesar_comando(Plantarse.new())
-	assert_true(mesa._revelando)
+	assert_true(mesa.revelacion.activa)
 	await _esperar(1.8)
-	assert_false(mesa._revelando)
+	assert_false(mesa.revelacion.activa)
 	assert_eq(mesa._lectura.text, Lectura().resultado(mesa.vista).formula)
 	_assert_cartas_en_reposo(mesa)
 

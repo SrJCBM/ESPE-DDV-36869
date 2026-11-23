@@ -5,11 +5,14 @@ extends RefCounted
 var mazo: Array[CartaEnPartida] = []
 var mano: Array[CartaEnPartida] = []
 var descarte: Array[CartaEnPartida] = []
+var retenidas: Array[CartaEnPartida] = []
 var campanadas: int = 10
 var puntos: int = 0
 var umbral: int = 17
 var meta: int = 200
 var llave_usada: bool = false
+var manos_resueltas := 0
+var quiebras := 0
 var _rng := RandomNumberGenerator.new()
 
 func _init(semilla: int = -1) -> void:
@@ -30,6 +33,10 @@ func disponibles() -> int:
 	return mazo.size() + descarte.size()
 
 
+func manos_validas() -> int:
+	return manos_resueltas - quiebras
+
+
 func cerrar_mano() -> void:
 	descarte.append_array(mano)
 	mano.clear()
@@ -43,11 +50,14 @@ func reiniciar(semilla: int = -1) -> void:
 	mazo = FabricaCartas.crear_baraja()
 	mano.clear()
 	descarte.clear()
+	retenidas.clear()
 	campanadas = 10
 	puntos = 0
 	umbral = 17
 	meta = 200
 	llave_usada = false
+	manos_resueltas = 0
+	quiebras = 0
 	_barajar()
 
 

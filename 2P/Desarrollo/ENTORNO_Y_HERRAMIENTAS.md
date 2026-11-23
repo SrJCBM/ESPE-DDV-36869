@@ -1,6 +1,6 @@
 # Entorno común y herramientas del equipo
 
-Guía preparada el **9 de noviembre de 2026**; actualizada el **13 de noviembre de 2026**. Versión acordada: **Godot 4.7.2 estándar con GDScript**. Kenned entregó la base; la mesa jugable actual se comprobó técnicamente en Julio. La homologación de los tres equipos y la aceptación humana siguen pendientes. [Revisión actual](REVISION_I1.md) y [antecedente I1-00](ENTREGA_I1_00.md).
+Guía preparada el **9 de noviembre de 2026**; actualizada el **13 de noviembre de 2026**. Versión acordada: **Godot 4.7.2 estándar con GDScript**. Kenned entregó la base; la mesa jugable actual se comprobó técnicamente en Julio. Ariel completó la homologación de I1-00. La revisión del piloto espera comentarios. [Revisión actual](Archivo/I1/REVISION_I1.md) y [antecedente I1-00](Archivo/I1/ENTREGA_I1_00.md).
 
 ## Qué necesita cada equipo
 
@@ -9,7 +9,7 @@ Guía preparada el **9 de noviembre de 2026**; actualizada el **13 de noviembre 
 | Godot estándar para Windows | Los tres desarrolladores | **4.7.2**, misma versión exacta. Abrir y consultar Acerca de; usar la edición estándar para GDScript |
 | Plantillas de exportación | Los tres para poder verificar una entrega | **4.7.2**, coincidentes con el editor; comprobar exportación Windows |
 | Git para Windows y acceso a GitHub | Los tres | Versión estable y acceso propio a [SrJCBM/ESPE-DDV-36869](https://github.com/SrJCBM/ESPE-DDV-36869); registrar versión y comprobar lectura/escritura autorizada del repositorio |
-| GUT dentro del proyecto | Los tres al clonar el proyecto | **9.7.1**, incorporado y fijado en la base `5d73d50`; cuatro pruebas de arranque pasan en Kenned y Julio; falta la comprobación de Ariel |
+| GUT dentro del proyecto | Los tres al clonar el proyecto | **9.7.1**, incorporado y fijado en la base `5d73d50`; cuatro pruebas de arranque pasan en Kenned y Julio; Ariel completó su revisión según el reporte de Julio |
 | Navegador | Los tres | Acceso al tablero de tareas, documentación y bocetos compartidos |
 | Figma | Principalmente quien diseña y quienes revisan | Aplicación web suficiente para el flujo propuesto; acceso al archivo compartido |
 | Cliente de IA con soporte MCP | Quienes decidan usar asistencia con herramientas | Codex es el cliente usado en esta sesión; cada persona configura su cuenta y permisos |
@@ -30,7 +30,7 @@ La edición estándar de Godot se distribuye como archivo para extraer y ejecuta
 6. Ejecutar una prueba que pase y un fallo preparado para comprobar el runner. Corregir o retirar el fallo preparado antes de integrar la tarea.
 7. Ejecutar una escena mínima, crear un preset Windows y abrir su exportación en otro equipo. Registrar editor, plantillas, addon, commit y resultado.
 
-Kenned registró importación, arranque, pruebas y exportación por CLI; su observación visual humana sigue pendiente. Julio repitió importación, arranque, las cuatro pruebas y el fallo temporal; el primer intento de exportación falló por plantillas ausentes. Tras instalar las plantillas Windows 4.7.2 y verificar el SHA-512 oficial, la exportación y el ejecutable en modos headless y gráfico pasan. Se inspeccionaron visualmente editor, escena y ejecutable mediante herramientas; la aceptación humana sigue pendiente. Ariel aún no registra comprobaciones. La tarea sigue En curso; la compatibilidad declarada de una dependencia no sustituye la comprobación en cada equipo.
+Kenned registró importación, arranque, pruebas y exportación por CLI; su observación visual humana sigue pendiente. Julio repitió importación, arranque, las cuatro pruebas y el fallo temporal; el primer intento de exportación falló por plantillas ausentes. Tras instalar las plantillas Windows 4.7.2 y verificar el SHA-512 oficial, la exportación y el ejecutable en modos headless y gráfico pasan. Se inspeccionaron visualmente editor, escena y ejecutable mediante herramientas; la aceptación humana sigue pendiente. El 18 de noviembre Julio confirmó que Ariel terminó I1-00 e I1-08 y entregó el ejecutable.
 
 ### Comandos de comprobación
 
@@ -62,7 +62,7 @@ Aceptación: importación sin errores y tests del incremento sin fallos ni error
 
 | Persona | Godot 4.7.2 | Plantillas 4.7.2 | GUT fijado | Proyecto y tests | Exportación | MCP, si usa |
 | --- | --- | --- | --- | --- | --- | --- |
-| Ariel | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Por decidir |
+| Ariel | Entorno de I1-00 completado | Comprobación incluida en I1-00 | Sin registro de consola adjunto | I1-00 completada según Julio | I1-08 completada y ejecutable compartido | Sin registro |
 | Julio | 4.7.2.stable.official.ed1daf0bf, comprobado por CLI y MCP el 13 nov 2026 | Windows 4.7.2.stable instaladas; archivo oficial verificado con SHA-512 | GUT 9.7.1 recibido por Git y ejecutado | Base: 4/4 pruebas y fallo temporal detectado; incremento actual: suite de reglas, vista, UI y arranque aprobada, con recuento en REVISION_I1.md | Primer fallo por plantillas resuelto; exportación y `.exe` headless/gráfico: código 0; ventana inspeccionada | Godot MCP local compilado; devuelve 4.7.2, nombre correcto y UID; editor, ejecución, depuración y parada verificados. Documentación consultada con Context7 |
 | Kenned | 4.7.2.stable.official.ed1daf0bf (13 nov 2026; zip verificado con SHA-512) | 4.7.2.stable instaladas (solo Windows) | GUT 9.7.1 incorporado | Importación, arranque y 4 pruebas pasan (CLI); fallo preparado detectado | Exportación Windows generada y abierta (CLI); apertura visual humana pendiente | Por decidir; Context7 no se usó |
 

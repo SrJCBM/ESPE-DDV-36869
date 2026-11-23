@@ -6,7 +6,7 @@ El pulido de presentación reduce el texto permanente a una indicación contextu
 
 El reglamento visual «El libro del Custodio» organiza ayuda, palos, puntuación y controles en cuatro páginas. Usa las ilustraciones originales y ejemplos preparados. La mesa mantiene información oculta, foco por teclado, confirmaciones y movimiento reducido durante la sesión.
 
-Ariel completó I1-00 e I1-08 y compartió el ejecutable de I1, según la confirmación recibida el 18 de noviembre. Faltan los comentarios de I1-07. [Revisión de I1](REVISION_I1.md).
+Ariel completó I1-00 e I1-08 y compartió el ejecutable de I1, según la confirmación recibida el 18 de noviembre. Faltan los comentarios de I1-07. [Revisión de I1](Archivo/I1/REVISION_I1.md).
 
 ## Responsabilidades
 
@@ -24,7 +24,7 @@ Las responsabilidades se mantienen aunque haya colaboración. La UI solicita acc
 
 | ID | Tarea | Responsable | Estado | Evidencia o pendiente |
 | --- | --- | --- | --- | --- |
-| I1-00 | Base y comprobación de los tres entornos | Kenned coordina, cada integrante comprueba su equipo | **Completado** | Ariel terminó su verificación. [Registro](ENTREGA_I1_00.md) |
+| I1-00 | Base y comprobación de los tres entornos | Kenned coordina, cada integrante comprueba su equipo | **Completado** | Ariel terminó su verificación. [Registro](Archivo/I1/ENTREGA_I1_00.md) |
 | I1-01 | Aceptar diseño y reglas del Custodio | Julio; Ariel y Kenned revisan | Por revisar | Figma, implementación y contraste técnico con GDD disponibles; aceptación del equipo pendiente |
 | I1-02 | Catálogo y datos del intento | Ariel | **Completado** | 24 cartas exactas, identidades, fábrica, zonas, reciclaje e independencia comprobados |
 | I1-03 | Comandos y fases | Kenned | Por revisar | Iniciar, pedir, devolver y plantarse implementados; costes y rechazos probados |
@@ -53,6 +53,8 @@ Los comandos de pruebas y exportación están en [juego/README.md](juego/README.
 - [Iteración 02: campaña y revisión con Damián](ITERACION_02.md).
 - [Iteración 03: pulido, balance y deuda técnica](ITERACION_03.md), con el estado de cada mejora.
 - [Balance de la campaña y del Recaudador](BALANCE_CAMPANA.md).
-- [Revisión técnica y pendientes de cierre](REVISION_I1.md).
+- [Revisión técnica y pendientes de cierre](Archivo/I1/REVISION_I1.md).
 - [Plan general](PLAN_DE_TRABAJO.md), [arquitectura](ARQUITECTURA_Y_PATRONES.md) y [entorno](ENTORNO_Y_HERRAMIENTAS.md).
 - [Figma y alcance del prototipo](Diseno/FIGMA.md): referencia de diseño; sus repartos preparados no sustituyen pruebas del juego.
+- [Dirección artística](Diseno/DIRECCION_ARTISTICA.md) para generar arte, pantallas y sonido coherentes.
+- [Archivo de I1](Archivo/README.md) con las revisiones y evidencias históricas.

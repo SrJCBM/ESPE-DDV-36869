@@ -32,8 +32,10 @@ func _revisar() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://exportaciones/qa"))
 	var error := root.get_texture().get_image().save_png(destino)
 	var caja: Rect2 = juego.indicador_objetivo.get_global_rect()
-	print(JSON.stringify({"sala": sala, "objetivo": juego.texto_objetivo.text, "visible": juego.indicador_objetivo.is_visible_in_tree(),
+	print(JSON.stringify({"sala": sala, "objetivo": juego.indicador_objetivo.texto.text, "visible": juego.indicador_objetivo.is_visible_in_tree(),
 		"rect_pantalla": [caja.position.x, caja.position.y, caja.size.x, caja.size.y],
-		"alto_texto_px": juego.texto_objetivo.get_line_height() * juego.indicador_objetivo.get_global_transform().get_scale().y,
+		"alto_texto_px": juego.indicador_objetivo.texto.get_line_height() * juego.indicador_objetivo.get_global_transform().get_scale().y,
 		"captura": ProjectSettings.globalize_path(destino), "salida": error}))
+	juego.queue_free()
+	await create_timer(0.15).timeout
 	quit(error)

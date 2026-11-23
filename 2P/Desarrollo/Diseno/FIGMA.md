@@ -1,6 +1,6 @@
 # La Última Mesa · diseño de la primera iteración
 
-**Estado:** prototipo de interacción completado y utilizado como referencia de la implementación Godot 0.1.0. La mesa, cartas, ayuda y controles ya están implementados; la aceptación del equipo y las pruebas con usuarios siguen pendientes. [Revisión del juego](../REVISION_I1.md).
+**Estado:** prototipo de interacción completado y utilizado como referencia de la implementación Godot 0.1.0. La mesa, cartas, ayuda y controles ya están implementados; la aceptación del equipo y las pruebas con usuarios siguen pendientes. [Revisión del juego](../Archivo/I1/REVISION_I1.md).
 
 **Figma, cuenta Julio ESPE, equipo Education Videojuegos:** [Mesa del Custodio](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=13-103). [Baraja revisada](https://www.figma.com/design/FtJBoUubQ3lC4jlsZ9RxNq?node-id=20-482).
 
@@ -65,6 +65,8 @@ Las cargas generadas se excluyen de Git. Para regenerarlas desde la raíz del re
 Dirección utilizada para la generación: retrato vertical de un crupier sobrenatural llamado El Custodio; máscara de latón envejecido con un ojo de reloj; halo de campanas; vestimenta de terciopelo oscuro y guantes sosteniendo una carta de marfil sin texto; grabado antiguo con tramado fino, marfil y latón; fondo transparente. Sin interfaz, números, marcas de agua ni personajes de otras obras. Esta descripción conserva la dirección artística y no pretende ser una transcripción literal del prompt.
 
 `recursos/carta-velas-grabado.png`, `carta-llaves-grabado.png`, `carta-relojes-grabado.png` y `carta-mascaras-grabado.png`: cuatro ilustraciones generadas con la herramienta integrada `image_gen`, PNG RGBA de 1024 × 1536, incorporadas a las cartas de Figma. Los prompts exactos se conservan en [cartas-prompts.json](recursos/cartas-prompts.json). Valores, nombres, efectos y geometría de las cartas permanecen editables.
+
+En Godot, la carta visual y el libro de ayuda usan los mismos [grabados por palo](../juego/cartas/arte/). Los [SVG de la mesa](../juego/mesa/arte/) se cargan junto con su interfaz.
 
 ## Revisión de diseño y aceptación
 

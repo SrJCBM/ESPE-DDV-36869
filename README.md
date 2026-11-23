@@ -31,9 +31,9 @@ El material del primer parcial está agrupado en `1P/`:
 
 El segundo parcial se trabaja en `2P/`:
 
-- `Desarrollo/`: plan general, primera iteración, arquitectura y entorno común. La versión acordada es Godot 4.7.2 con GDScript.
+- `Desarrollo/`: campaña local, plan de iteraciones, arquitectura y entorno común. La versión acordada es Godot 4.7.2 con GDScript.
 - `Referencias/Clase/`: material docente sobre ingeniería de software, creación con motores y patrones de diseño.
 
-La mesa local del Custodio está implementada en `2P/Desarrollo/juego/`, versión 0.1.0, sobre la base de Kenned (`5d73d50`). Incluye cartas, reglas, estados, interfaz, libro de ayuda, victoria, derrota y reinicio. El incremento se integra en `main` local. Las pruebas técnicas están registradas en la [revisión I1](2P/Desarrollo/REVISION_I1.md); el [tablero](2P/Desarrollo/README.md) mantiene pendientes la aceptación humana, el piloto de Julio y la comprobación en otro equipo. [Ejecutar y exportar](2P/Desarrollo/juego/README.md).
+La campaña local de La Última Mesa está en `2P/Desarrollo/juego/`. Desde el vestíbulo puedes recorrer el casino, preparar tu baraja y superar las cuatro mesas. La iteración 3 añade cartas de recompensa, controles de sonido y colisiones por sala. [Ejecutar y exportar](2P/Desarrollo/juego/README.md) · [Iteración 3](2P/Desarrollo/ITERACION_03.md) · [Dirección artística](2P/Desarrollo/Diseno/DIRECCION_ARTISTICA.md).
 
 Se conserva una versión vigente por entrega, junto con sus formatos editables y material de apoyo. Las versiones superadas y las carpetas temporales de generación y revisión se retiraron durante la limpieza del 9 de noviembre de 2026.

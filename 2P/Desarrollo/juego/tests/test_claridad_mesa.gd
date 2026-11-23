@@ -28,54 +28,54 @@ func test_senalar_racha_muestra_solo_las_ultimas_tres_sin_cambiar_la_mano() -> v
 	mesa.controlador.procesar_comando(PedirCarta.new())
 	mesa.controlador.procesar_comando(PedirCarta.new())
 	var antes: Dictionary = mesa.controlador.obtener_vista()
-	var patron: Button = mesa._patrones_ui.get_child(4)
+	var patron: Button = mesa.franja_patrones.get_child(4)
 	patron.mouse_entered.emit()
-	assert_false(mesa.fila_cartas.get_child(0).get_meta("patron_resaltado", false))
+	assert_false(mesa.mano.fila.get_child(0).get_meta("patron_resaltado", false))
 	for indice in range(1, 4):
-		assert_true(mesa.fila_cartas.get_child(indice).get_meta("patron_resaltado", false))
+		assert_true(mesa.mano.fila.get_child(indice).get_meta("patron_resaltado", false))
 	assert_string_contains(mesa._mensaje.text, "últimas 3")
 	assert_eq(mesa.controlador.obtener_vista(), antes)
 	patron.mouse_exited.emit()
-	for carta in mesa.fila_cartas.get_children():
+	for carta in mesa.mano.fila.get_children():
 		assert_false(carta.get_meta("patron_resaltado", false))
 
 func test_foco_de_teclado_explica_ascenso_y_al_salir_limpia_resaltado() -> void:
 	var mesa = _mesa()
 	mesa.controlador.procesar_comando(PedirCarta.new())
-	mesa._patrones_ui.get_child(2).grab_focus()
-	for carta in mesa.fila_cartas.get_children():
+	mesa.franja_patrones.get_child(2).grab_focus()
+	for carta in mesa.mano.fila.get_children():
 		assert_true(carta.get_meta("patron_resaltado", false))
 	assert_string_contains(mesa._mensaje.text, "menor a mayor")
 	mesa.boton_plantarse.grab_focus()
-	for carta in mesa.fila_cartas.get_children():
+	for carta in mesa.mano.fila.get_children():
 		assert_false(carta.get_meta("patron_resaltado", false))
 
 func test_racha_con_mascaras_no_filtra_valores_ni_promete_puntos() -> void:
 	var mesa = _mesa(["mascaras_01", "mascaras_03", "mascaras_05"])
 	mesa.controlador.procesar_comando(PedirCarta.new())
-	mesa._patrones_ui.get_child(4).mouse_entered.emit()
+	mesa.franja_patrones.get_child(4).mouse_entered.emit()
 	var texto: String = mesa._mensaje.text
 	assert_string_contains(texto, "revelar")
-	for carta in mesa.fila_cartas.get_children():
+	for carta in mesa.mano.fila.get_children():
 		assert_eq(carta._valor.text, "?")
 		assert_null(carta._vista.valor)
 	mesa.controlador.partida.mano[-1].definicion.valor_impreso = 10
 	mesa.presentar_vista(mesa.controlador.obtener_vista())
-	mesa._patrones_ui.get_child(4).mouse_entered.emit()
+	mesa.franja_patrones.get_child(4).mouse_entered.emit()
 	assert_eq(mesa._mensaje.text, texto)
 
 func test_ayuda_y_eleccion_llave_no_dejan_un_patron_activo_detras() -> void:
 	var mesa = _mesa()
-	mesa._patrones_ui.get_child(2).grab_focus()
+	mesa.franja_patrones.get_child(2).grab_focus()
 	mesa.mostrar_devolucion()
-	assert_true(mesa._acciones_llave.visible)
-	assert_true(mesa.fila_cartas.get_child(0)._seleccionada)
-	for carta in mesa.fila_cartas.get_children():
+	assert_true(mesa.eleccion_llave.visible)
+	assert_true(mesa.mano.fila.get_child(0)._seleccionada)
+	for carta in mesa.mano.fila.get_children():
 		assert_false(carta.get_meta("patron_resaltado", false))
-	mesa._cancelar_seleccion_llave()
-	mesa._patrones_ui.get_child(2).grab_focus()
+	mesa.eleccion_llave.cancelar()
+	mesa.franja_patrones.get_child(2).grab_focus()
 	mesa.mostrar_ayuda()
-	for carta in mesa.fila_cartas.get_children():
+	for carta in mesa.mano.fila.get_children():
 		assert_false(carta.get_meta("patron_resaltado", false))
 	mesa.cerrar_modal()
 	await get_tree().process_frame
@@ -117,7 +117,7 @@ func test_final_resume_manos_y_quiebras_una_sola_vez_y_reintentar_limpia() -> vo
 	mesa._iniciar_o_pedir()
 	assert_eq(mesa.vista.puntos, 0)
 	assert_eq(mesa.vista.campanadas, 10)
-	assert_eq(mesa.fila_cartas.get_child_count(), 0)
+	assert_eq(mesa.mano.fila.get_child_count(), 0)
 	assert_eq(mesa.vista.get("resumen_intento", {}).get("quiebras", -1), 0)
 
 func test_enter_en_volver_a_jugar_reinicia_una_vez_sin_iniciar_otra_mano() -> void:
@@ -135,7 +135,7 @@ func test_enter_en_volver_a_jugar_reinicia_una_vez_sin_iniciar_otra_mano() -> vo
 	assert_eq(mesa.vista.campanadas, 10)
 	assert_eq(mesa.vista.numero_mano, 0)
 	assert_false(mesa.vista.terminado)
-	assert_false(mesa._modal.visible)
+	assert_false(mesa.modal.visible)
 
 func test_resumen_solo_cuenta_manos_resueltas_y_vista_no_modifica_contadores() -> void:
 	var mesa = _mesa()

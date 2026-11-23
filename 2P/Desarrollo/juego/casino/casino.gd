@@ -1,9 +1,12 @@
 extends Control
 
-const Visitante := preload("res://casino/visitante.gd")
-const Galeria := preload("res://casino/galeria.gd")
-const Libro := preload("res://casino/libro.gd")
+const Visitante := preload("res://casino/exploracion/visitante.gd")
+const SalaExplorable := preload("res://casino/exploracion/sala_explorable.gd")
+const Libro := preload("res://casino/interfaz/libro.gd")
 const Mesa := preload("res://mesa/mesa.tscn")
+const TiendaCasino := preload("res://casino/interfaz/tienda_casino.gd")
+const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
+const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
 const BASE := Vector2(1440,810)
 const DIALOGOS := {
 	"custodio": "He guardado la primera silla para ti. Escucha lo que calla la Máscara antes de pedir otra carta.",
@@ -33,15 +36,17 @@ var velo := ColorRect.new()
 var titulo: Label
 var cuenta: Label
 var pista: Label
-var puntos: Array[Dictionary] = []
+var exploracion := SalaExplorable.new(decorado, capa_superior)
 var mesa: Control
-var indicador_objetivo := PanelContainer.new()
-var texto_objetivo: Label
-var cambios_objetivo := 0
-var _tween_objetivo: Tween
+var audio := AudioCasino.new()
+var boton_sonido := Button.new()
+var indicador_objetivo := IndicadorObjetivo.new()
+var _tienda := TiendaCasino.new(libro, _cerrar)
 
 func _ready() -> void:
 	get_window().min_size = Vector2i(1024,576)
+	add_child(audio)
+	visitante.pisada.connect(audio.reproducir.bind(&"paso"))
 	var fondo := ColorRect.new()
 	fondo.color = Color("0a1915")
 	add_child(fondo)
@@ -60,6 +65,13 @@ func _ready() -> void:
 	var marca := Libro.rotulo("LA ÚLTIMA MESA",24,Libro.ORO,true)
 	marca.position = Vector2(80,6)
 	pagina.add_child(marca)
+	boton_sonido.text = "Sonido · V"
+	boton_sonido.position = Vector2(290, 9)
+	boton_sonido.size = Vector2(104, 33)
+	boton_sonido.add_theme_stylebox_override("normal", Libro.caja(Color("10251f"), Color("645c44")))
+	boton_sonido.add_theme_color_override("font_color", Libro.PAPEL)
+	boton_sonido.pressed.connect(_sonido)
+	pagina.add_child(boton_sonido)
 	titulo = Libro.rotulo("",26,Libro.PAPEL,true)
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	titulo.position = Vector2(435,5)
@@ -76,7 +88,9 @@ func _ready() -> void:
 	var controles := Libro.rotulo("WASD / flechas · caminar     E · interactuar     I · inventario",16,Libro.ORO)
 	controles.position = Vector2(918,779)
 	pagina.add_child(controles)
-	_crear_objetivo()
+	indicador_objetivo.name = "IndicadorObjetivo"
+	pagina.add_child(indicador_objetivo)
+	_tienda.compra_realizada.connect(_refrescar)
 	velo.size = BASE
 	velo.color = Color(0.015,0.035,0.026,0.66)
 	pagina.add_child(velo)
@@ -87,50 +101,9 @@ func _ready() -> void:
 	_adaptar()
 	entrar("vestibulo")
 
-## Objetivo discreto bajo el encabezado: no recibe clics ni compite con el aviso de E.
-func _crear_objetivo() -> void:
-	var franja := StyleBoxFlat.new()
-	franja.bg_color = Color(0.02,0.055,0.043,0.62)
-	franja.set_corner_radius_all(3)
-	franja.content_margin_left = 10
-	franja.content_margin_right = 14
-	franja.content_margin_top = 5
-	franja.content_margin_bottom = 6
-	indicador_objetivo.name = "IndicadorObjetivo"
-	indicador_objetivo.add_theme_stylebox_override("panel",franja)
-	indicador_objetivo.position = Vector2(96,64)
-	indicador_objetivo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var fila := HBoxContainer.new()
-	fila.add_theme_constant_override("separation",9)
-	fila.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	indicador_objetivo.add_child(fila)
-	var rombo := Libro.rotulo("◆",12,Libro.ORO)
-	rombo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	fila.add_child(rombo)
-	texto_objetivo = Libro.rotulo("",18,Libro.PAPEL)
-	texto_objetivo.name = "TextoObjetivo"
-	texto_objetivo.add_theme_constant_override("shadow_offset_x",1)
-	texto_objetivo.add_theme_constant_override("shadow_offset_y",1)
-	texto_objetivo.add_theme_color_override("font_shadow_color",Color(0,0,0,0.75))
-	fila.add_child(texto_objetivo)
-	pagina.add_child(indicador_objetivo)
-
-func objetivo_visible() -> bool:
-	return not libro.visible and not velo.visible and not is_instance_valid(mesa)
-
 func _actualizar_objetivo() -> void:
-	var texto := campana.objetivo()
-	if texto != texto_objetivo.text:
-		var habia_texto := not texto_objetivo.text.is_empty()
-		texto_objetivo.text = texto
-		indicador_objetivo.reset_size()
-		if habia_texto:
-			cambios_objetivo += 1
-			if _tween_objetivo != null: _tween_objetivo.kill()
-			indicador_objetivo.modulate.a = 0.0
-			_tween_objetivo = indicador_objetivo.create_tween()
-			_tween_objetivo.tween_property(indicador_objetivo,"modulate:a",1.0,0.4)
-	indicador_objetivo.visible = objetivo_visible()
+	var mostrar := not libro.visible and not velo.visible and not is_instance_valid(mesa)
+	indicador_objetivo.presentar(campana.objetivo(), mostrar)
 
 func _adaptar() -> void:
 	var escala := minf(size.x/BASE.x, size.y/BASE.y)
@@ -138,121 +111,21 @@ func _adaptar() -> void:
 	pagina.position = (size-BASE*escala)*0.5
 
 func entrar(destino: String, origen := "") -> void:
-	if not CampanaCasino.NOMBRES.has(destino) or not campana.puerta_abierta(destino): return
+	if not CampanaCasino.NOMBRES.has(destino) or not campana.puerta_abierta(destino):
+		return
 	sala = destino
-	for capa in [decorado, capa_superior]:
-		for hijo in capa.get_children():
-			capa.remove_child(hijo)
-			hijo.queue_free()
-	puntos.clear()
-	if sala == "corredor":
-		var galeria := Galeria.new()
-		galeria.campana = campana
-		galeria.capa_placas = capa_superior
-		decorado.add_child(galeria)
-		for i in range(Galeria.DESTINOS.size()):
-			var puerta: String = Galeria.DESTINOS[i]
-			_punto("puerta",Vector2(Galeria.eje(i),302),CampanaCasino.NOMBRES[puerta],puerta)
-		visitante.position = Vector2(Galeria.eje(maxi(0,Galeria.DESTINOS.find(origen))),375)
-		_limites(Rect2(48,288,1184,310))
-	else:
-		var arte := Sprite2D.new()
-		arte.texture = load("res://casino/arte/%s.webp" % sala)
-		arte.centered = false
-		arte.scale = Vector2(1280,720) / arte.texture.get_size()
-		decorado.add_child(arte)
-		_agregar_sala()
-		visitante.position = Vector2(640,550 if sala == "vestibulo" else 593)
+	var nota: String = NOTAS.get(sala, [""])[0]
+	visitante.position = exploracion.montar(sala, origen, campana, nota)
 	_refrescar()
 
-func _agregar_sala() -> void:
-	_limites(Rect2(87,178,1106,475))
-	_punto("puerta",Vector2(640,651),"Volver a la galería","corredor")
-	match sala:
-		"vestibulo":
-			_figura("anfitriona",Vector2(990,231),84)
-			_obstaculo(Rect2(846,165,265,102))
-			_obstaculo(Rect2(80,463,50,154))
-			_obstaculo(Rect2(1152,463,55,154))
-			_punto("anfitriona",Vector2(985,279),"Hablar con la anfitriona")
-			_punto("nota",Vector2(640,190),"Examinar el reloj")
-		"tienda":
-			_figura("anfitriona",Vector2(650,174),84)
-			_obstaculo(Rect2(287,165,695,114))
-			_obstaculo(Rect2(82,237,77,265))
-			_obstaculo(Rect2(1120,237,78,265))
-			_obstaculo(Rect2(85,563,218,61))
-			_obstaculo(Rect2(971,563,218,61))
-			_punto("tienda",Vector2(645,290),"Abrir el mostrador")
-			_punto("nota",Vector2(168,385),"Examinar la vitrina")
-		_:
-			_figura(sala,Vector2(640,310),95)
-			_obstaculo(Rect2(456,305,369,146))
-			# Solo la silla del jefe: no se puede pasar entre él y su silla, pero sí rodearlo por detrás.
-			_obstaculo(Rect2(600,240,84,70))
-			if sala == "coleccionista":
-				_obstaculo(Rect2(196,187,93,306))
-				_obstaculo(Rect2(994,187,93,306))
-				_obstaculo(Rect2(216,541,198,61))
-				_obstaculo(Rect2(869,541,198,61))
-			if sala == "recaudador":
-				_obstaculo(Rect2(152,299,87,182))
-				_obstaculo(Rect2(1048,299,87,182))
-			_obstaculo(Rect2(592,440,96,62))
-			_punto("mesa",Vector2(640,521),"Acercarse a la mesa")
-			_punto("nota",Vector2(235,262),"Examinar " + str(NOTAS[sala][0]).to_lower())
-			if sala == "dueno": _punto("salida",Vector2(640,188),"Examinar el portón")
-
-func _figura(id: String, pies: Vector2, alto: float) -> void:
-	var npc := Sprite2D.new()
-	npc.texture = load("res://casino/arte/figura_%s.webp" % id)
-	npc.scale = Vector2.ONE * alto / npc.texture.get_height()
-	npc.offset = Vector2(0,-npc.texture.get_height()*0.5)
-	npc.position = pies
-	decorado.add_child(npc)
-
-func _limites(area: Rect2) -> void:
-	var a := area.position
-	var b := area.end
-	_obstaculo(Rect2(a-Vector2(30,30),Vector2(area.size.x+60,30)))
-	_obstaculo(Rect2(a.x-30,b.y,area.size.x+60,30))
-	_obstaculo(Rect2(a.x-30,a.y,30,area.size.y))
-	_obstaculo(Rect2(b.x,a.y,30,area.size.y))
-
-func _obstaculo(rect: Rect2) -> void:
-	var fijo := StaticBody2D.new()
-	fijo.position = rect.get_center()
-	var forma := RectangleShape2D.new()
-	forma.size = rect.size
-	var col := CollisionShape2D.new()
-	col.shape = forma
-	fijo.add_child(col)
-	decorado.add_child(fijo)
-
-func _punto(tipo: String, pos: Vector2, accion: String, destino := "") -> void:
-	var marca := Libro.rotulo("◇",24,Libro.ORO)
-	marca.add_theme_constant_override("outline_size",5)
-	marca.add_theme_color_override("font_outline_color",Color("15231e"))
-	marca.position = pos-Vector2(10,25)
-	capa_superior.add_child(marca)
-	puntos.append({"tipo":tipo,"pos":pos,"accion":accion,"destino":destino,"marca":marca})
-
 func cercano() -> Dictionary:
-	var distancia := 90.0
-	var elegido := {}
-	for punto in puntos:
-		var d := visitante.position.distance_to(punto.pos)
-		if d <= distancia:
-			distancia = d
-			elegido = punto
-	return elegido
+	return exploracion.cercano(visitante.position)
 
 func _process(_delta: float) -> void:
 	_actualizar_objetivo()
 	if libro.visible or is_instance_valid(mesa): return
 	var elegido := cercano()
-	for punto in puntos:
-		punto.marca.text = "◆" if punto == elegido else "◇"
+	exploracion.marcar(elegido)
 	if not elegido.is_empty(): pista.text = "E   /   " + str(elegido.accion)
 	elif not campana.recibida: pista.text = "La anfitriona te espera en el mostrador iluminado."
 	elif sala == "corredor": pista.text = "Acércate a una puerta para leer su placa."
@@ -270,6 +143,7 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		var p := cercano()
 		if not p.is_empty(): interactuar(p)
 	elif evento.keycode == KEY_I: inventario()
+	elif evento.keycode == KEY_V: _sonido()
 	else: return
 	get_viewport().set_input_as_handled()
 
@@ -281,11 +155,14 @@ func interactuar(p: Dictionary) -> void:
 		"mesa": _presentar_jefe()
 		"salida":
 			if campana.superadas == 4:
+				audio.reproducir(&"puerta")
 				_abrir("El primer amanecer","El cerrojo cede. Por primera vez oyes pájaros en lugar de campanas. Has salido de la casa.","",Callable())
 				libro.opcion("Comenzar otro viaje",_nuevo_intento)
 			else: _aviso("La verja del alba","Falta vencer al Dueño de la Casa.")
 		"puerta":
-			if campana.puerta_abierta(p.destino): entrar(p.destino,sala)
+			if campana.puerta_abierta(p.destino):
+				audio.reproducir(&"puerta")
+				entrar(p.destino,sala)
 			else:
 				var nivel := CampanaCasino.MESAS.find(p.destino)
 				var requisito := "Habla con la anfitriona del vestíbulo." if nivel == 0 else "Necesitas %s de los tres sellos." % nivel
@@ -325,6 +202,7 @@ func _jugar() -> void:
 	mesa.set("campana",campana)
 	mesa.connect("salir_de_mesa",_levantarse,CONNECT_ONE_SHOT)
 	add_child(mesa)
+	mesa.activar_audio(audio)
 	mesa.establecer_movimiento_reducido(AjustesJuego.movimiento_reducido())
 
 func _levantarse(victoria: bool, exactos: int) -> void:
@@ -337,10 +215,36 @@ func _levantarse(victoria: bool, exactos: int) -> void:
 	_refrescar()
 	if victoria:
 		var ruta := "Dirígete al portón del norte." if campana.superadas == 4 else "La siguiente sala está abierta."
-		_aviso("Mesa superada","La casa entrega %s fichas. %s" % [premio,ruta])
+		if campana.hay_recompensa():
+			_ofrecer_recompensa(premio, ruta)
+		else:
+			_aviso("Mesa superada","La casa entrega %s fichas. %s" % [premio,ruta])
 	else:
 		_abrir("La casa gana","La última campanada se apaga. Tu siguiente invitación abrirá un intento nuevo.","",Callable())
 		libro.opcion("Volver al vestíbulo",_nuevo_intento)
+
+func _ofrecer_recompensa(premio: int, ruta: String) -> void:
+	_abrir("Una carta de la casa", "Recibes %s fichas. Puedes añadir una carta a tu baraja.\n%s" % [premio, ruta], "", Callable())
+	var fila := CartasRecompensa.new()
+	libro.lista.add_child(fila)
+	fila.presentar(campana.opciones_recompensa())
+	fila.elegida.connect(_resolver_recompensa)
+	libro.opcion("Continuar sin carta", _resolver_recompensa.bind(-1))
+
+func _resolver_recompensa(indice: int) -> void:
+	if campana.resolver_recompensa(indice):
+		audio.reproducir(&"naipe" if indice >= 0 else &"interfaz")
+		_cerrar()
+
+func _sonido() -> void:
+	if libro.visible:
+		return
+	_abrir("Sonido","Ajusta el volumen de cada canal.","",_cerrar)
+	audio.reproducir(&"interfaz")
+	var controles := ControlesSonido.new()
+	controles.construir(audio)
+	libro.lista.add_child(controles)
+	libro.opcion("Volver al casino",_cerrar)
 
 func _nuevo_intento() -> void:
 	campana = CampanaCasino.new()
@@ -348,9 +252,13 @@ func _nuevo_intento() -> void:
 	entrar("vestibulo")
 
 func _abrir(t: String, mensaje: String, foto: String, volver: Callable) -> void:
+	_preparar_libro()
+	libro.presentar(t, mensaje, foto, volver)
+
+func _preparar_libro() -> void:
 	visitante.bloqueado = true
+	boton_sonido.focus_mode = Control.FOCUS_NONE
 	velo.show()
-	libro.presentar(t,mensaje,foto,volver)
 	_actualizar_objetivo()
 
 func _aviso(t: String, mensaje: String, foto := "") -> void:
@@ -360,6 +268,7 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 func _cerrar() -> void:
 	libro.hide()
 	velo.hide()
+	boton_sonido.focus_mode = Control.FOCUS_ALL
 	visitante.bloqueado = false
 	_refrescar()
 
@@ -376,39 +285,7 @@ func inventario() -> void:
 
 func tienda() -> void:
 	if not campana.recibida:
-		_aviso("Mostrador cerrado","Presenta primero tu invitación en el vestíbulo.")
+		_aviso("Mostrador cerrado", "Presenta primero tu invitación en el vestíbulo.")
 		return
-	_abrir("Gabinete de la anfitriona","«Mira bien antes de gastar. Algunas piezas te acompañan toda la noche.»\nSaldo disponible: %s fichas." % campana.saldo,"",_cerrar)
-	for item: ObjetoTienda in CampanaCasino.TIENDA.objetos:
-		libro.opcion("%s    ·    %s fichas" % [item.nombre,item.precio],_elegir_producto.bind(item.id))
-	libro.opcion("Salir del gabinete",_cerrar)
-
-func _elegir_producto(id: String) -> void:
-	if id not in ["eliminar","subir","bajar"]:
-		_confirmar_compra(id)
-		return
-	var item := CampanaCasino.TIENDA.buscar(id)
-	_abrir(item.nombre,"%s   ·   %s fichas. Saldo: %s." % [item.descripcion,item.precio,campana.saldo],"",tienda)
-	libro.opcion("Volver al catálogo",tienda)
-	for carta in campana.baraja:
-		var razon := campana.impedimento(id,carta)
-		var nombre := "%s · %s" % [carta.definicion.palo.capitalize(),carta.definicion.valor_impreso]
-		libro.opcion(nombre if razon.is_empty() else nombre+"   /   "+razon,_confirmar_compra.bind(id,carta),razon.is_empty())
-
-func _confirmar_compra(id: String, carta: CartaEnPartida = null) -> void:
-	var item := CampanaCasino.TIENDA.buscar(id)
-	var razon := campana.impedimento(id,carta)
-	var detalle := item.descripcion + "\nPrecio: %s fichas. Saldo actual: %s." % [item.precio,campana.saldo]
-	if carta != null: detalle += " Carta: %s de %s." % [carta.definicion.valor_impreso,carta.definicion.palo]
-	if not razon.is_empty(): detalle += "\n" + razon
-	var ilustracion := "res://casino/arte/objeto_%s.webp" % id if carta == null else ""
-	_abrir(item.nombre,detalle,ilustracion,tienda)
-	if razon.is_empty(): libro.opcion("Confirmar compra",_comprar.bind(id,carta))
-	libro.opcion("Volver al catálogo",tienda)
-
-func _comprar(id: String, carta: CartaEnPartida) -> void:
-	if not campana.comprar(id,carta): return
-	_refrescar()
-	_abrir("Trato cerrado","%s. Saldo tras la compra: %s fichas." % [CampanaCasino.TIENDA.buscar(id).nombre,campana.saldo],"",tienda)
-	libro.opcion("Ver el catálogo",tienda)
-	libro.opcion("Dejar el mostrador",_cerrar)
+	_preparar_libro()
+	_tienda.abrir(campana)

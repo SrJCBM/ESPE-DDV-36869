@@ -2,7 +2,8 @@ class_name ControladorMesa
 extends Node
 ## Única entrada de acciones; publica solo datos permitidos para la presentación.
 
-const Indicadores = preload("res://dominio/indicadores_patrones.gd")
+const ObjetosMesa := preload("res://dominio/campana/objetos_mesa.gd")
+const VistaMano := preload("res://mesa/vista_mano.gd")
 
 signal vista_actualizada(vista: Dictionary)
 signal encuentro_finalizado(victoria: bool)
@@ -11,20 +12,15 @@ var campana: CampanaCasino
 ## Regla especial del crupier activo (Strategy). Sin campaña, la mesa no tiene regla especial.
 var regla: ReglaCrupier = ReglaCrupier.new()
 var presupuesto := 10
-var exactos := 0
-var _vistas_con_lente := {}
-var _usos_prudente := 0
-var _usos_moneda := 0
-var retenidas: Array[CartaEnPartida] = []
+var exactos: int:
+	get: return _objetos.exactos
 var partida: EstadoPartida
 var estado_activo: EstadoMesaBase
+var _objetos := ObjetosMesa.new()
+var _vista_mano := VistaMano.new()
 var _llaves_habilitadas: Array[String] = []
-var _cartas_resueltas: Array[Dictionary] = []
-var _ultimo_resultado: Dictionary = {}
 var _mensaje: String = "Inicia una mano: dos cartas, una campanada."
 var _numero_mano: int = 0
-var _manos_resueltas: int = 0
-var _quiebras: int = 0
 var _terminado: bool = false
 var _victoria: bool = false
 var _modo_demostracion: bool = false
@@ -45,35 +41,30 @@ func configurar_campana(sesion: CampanaCasino) -> void:
 	partida._barajar()
 
 func usar_lente() -> bool:
-	if _procesando or campana == null or campana.lentes == 0 or estado_activo.nombre != "decision" or _intervalo().ocultas == 0: return false
-	for carta in partida.mano:
-		if carta.definicion.palo == Palos.MASCARAS: _vistas_con_lente[carta.id_instancia] = true
-	campana.lentes -= 1
+	if _procesando or campana == null or estado_activo.nombre != "decision":
+		return false
+	if not _objetos.usar_lente(campana, partida.mano):
+		return false
 	_llaves_habilitadas.clear()
+	_procesando = true
 	vista_actualizada.emit(obtener_vista())
+	_procesando = false
 	return true
 
 func _intervalo() -> Dictionary:
-	return EvaluadorMano.intervalo(partida.mano, false, _vistas_con_lente)
+	return EvaluadorMano.intervalo(partida.mano, false, _objetos.mascaras_vistas)
 
 ## Reglas públicas de la mesa activa para el libro de ayuda; no expone cartas ni el mazo.
 func reglas_ayuda() -> Dictionary:
 	var mesa := campana.activa if campana != null and not campana.activa.is_empty() else "custodio"
 	# Entre manos se muestra el umbral que tendrá la siguiente mano.
-	var umbral := partida.umbral if estado_activo.nombre == "decision" else regla.umbral_entre_manos(self)
+	var umbral := partida.umbral if estado_activo.nombre == "decision" else regla.umbral_entre_manos(partida)
 	return {
 		"mesa": mesa, "nombre": CampanaCasino.NOMBRES.get(mesa, "El Custodio"),
 		"umbral": umbral, "meta": partida.meta, "presupuesto": presupuesto,
 		"campanadas": partida.campanadas, "ficha_por_pedir": 1 if _cobra_comision() else 0,
 		"saldo": campana.saldo if campana != null else 0, "umbral_minimo": ReglaDueno.MINIMO,
 	}
-
-func manos_resueltas() -> int:
-	return _manos_resueltas
-
-## Manos cerradas sin Quiebra.
-func manos_validas() -> int:
-	return _manos_resueltas - _quiebras
 
 func _cobra_comision() -> bool:
 	return campana != null and regla.cobra_por_pedir()
@@ -104,12 +95,10 @@ func _preparar_intento(semilla: int) -> void:
 	partida = EstadoPartida.new(semilla)
 	estado_activo = EstadoPreparado.new(self)
 	_llaves_habilitadas.clear()
-	_cartas_resueltas.clear()
-	_ultimo_resultado.clear()
+	_vista_mano.limpiar()
+	_objetos = ObjetosMesa.new()
 	_numero_mano = 0
 	regla = FabricaCrupieres.para(campana.activa if campana != null else "")
-	_manos_resueltas = 0
-	_quiebras = 0
 	_terminado = false
 	_victoria = false
 	_modo_demostracion = false
@@ -140,18 +129,23 @@ func cargar_demostracion() -> void:
 	vista_actualizada.emit(obtener_vista())
 	_procesando = false
 
-func _iniciar_mano() -> ResultadoAccion:
+func _impedimento_inicio() -> String:
 	if partida.campanadas <= 0:
-		return ResultadoAccion.rechazar("No quedan campanadas para iniciar.")
+		return "No quedan campanadas para iniciar."
 	if partida.disponibles() < 2 or not partida.mano.is_empty():
-		return ResultadoAccion.rechazar("Se necesitan dos cartas disponibles y ninguna mano abierta.")
-	partida.umbral = regla.umbral_al_iniciar(self)
-	_vistas_con_lente.clear()
+		return "Se necesitan dos cartas disponibles y ninguna mano abierta."
+	return ""
+
+func _iniciar_mano() -> ResultadoAccion:
+	var impedimento := _impedimento_inicio()
+	if not impedimento.is_empty():
+		return ResultadoAccion.rechazar(impedimento)
+	partida.umbral = regla.umbral_al_iniciar(partida)
+	_objetos.mascaras_vistas.clear()
 	partida.campanadas -= 1
 	partida.llave_usada = false
 	_llaves_habilitadas.clear()
-	_cartas_resueltas.clear()
-	_ultimo_resultado.clear()
+	_vista_mano.limpiar()
 	_numero_mano += 1
 	for i in range(2):
 		var carta := partida.robar()
@@ -163,13 +157,20 @@ func _iniciar_mano() -> ResultadoAccion:
 	_comprobar_quiebra_demostrable()
 	return ResultadoAccion.aceptar()
 
-func _pedir_carta() -> ResultadoAccion:
+func _impedimento_pedir(minimo: int) -> String:
 	if partida.disponibles() == 0:
-		return ResultadoAccion.rechazar("No hay cartas disponibles; puedes plantarte.")
-	if int(_intervalo().minimo) > partida.umbral:
-		return ResultadoAccion.rechazar("El mínimo ya supera el umbral: devuelve la Llave disponible o resuelve plantándote.")
+		return "No hay cartas disponibles; puedes plantarte."
+	if minimo > partida.umbral:
+		return "El mínimo ya supera el umbral: devuelve la Llave disponible o resuelve plantándote."
+	if _cobra_comision() and campana.saldo < 1:
+		return "Falta una ficha para pedir. Puedes plantarte."
+	return ""
+
+func _pedir_carta() -> ResultadoAccion:
+	var impedimento := _impedimento_pedir(_intervalo().minimo)
+	if not impedimento.is_empty():
+		return ResultadoAccion.rechazar(impedimento)
 	if _cobra_comision():
-		if campana.saldo < 1: return ResultadoAccion.rechazar("Falta una ficha para pedir. Puedes plantarte.")
 		campana.saldo -= 1
 	_llaves_habilitadas.clear()
 	var carta := partida.robar()
@@ -228,14 +229,16 @@ func _comprobar_quiebra_demostrable() -> void:
 
 func _resolver_mano() -> void:
 	estado_activo = EstadoResolucion.new(self)
-	_ultimo_resultado = EvaluadorMano.evaluar(partida.mano, partida.umbral).duplicate(true)
-	_manos_resueltas += 1
-	if _ultimo_resultado.quiebra: _quiebras += 1
-	_cartas_resueltas = _vista_cartas(partida.mano, true)
+	var resultado := EvaluadorMano.evaluar(partida.mano, partida.umbral)
+	partida.manos_resueltas += 1
+	if resultado.quiebra:
+		partida.quiebras += 1
 	if campana != null:
-		_aplicar_objetos()
-		regla.al_resolver(self)
-	partida.puntos += int(_ultimo_resultado.puntos)
+		_objetos.aplicar(campana, partida, resultado, presupuesto)
+	_vista_mano.registrar_cierre(partida.mano, resultado)
+	if campana != null:
+		regla.al_resolver(partida)
+	partida.puntos += int(resultado.puntos)
 	partida.cerrar_mano()
 	_llaves_habilitadas.clear()
 	_victoria = partida.puntos >= partida.meta
@@ -245,57 +248,15 @@ func _resolver_mano() -> void:
 		_mensaje = "Mesa superada. Alcanzaste la meta del encuentro." if _victoria else "Sin campanadas y sin alcanzar la meta. Puedes reiniciar el encuentro."
 	else:
 		estado_activo = EstadoPreparado.new(self)
-		_mensaje = "Quiebra: esta mano aporta cero puntos. Quedan oportunidades para continuar." if _ultimo_resultado.quiebra else "Mano resuelta. Revisa el desglose o inicia otra mano."
-
-func _aplicar_objetos() -> void:
-	if _ultimo_resultado.quiebra: return
-	if campana.amuletos.has("corona") and _intervalo().ocultas > 0:
-		_ultimo_resultado.corona = 2
-		_ultimo_resultado.multiplicador += 2
-		_ultimo_resultado.puntos = _ultimo_resultado.total * _ultimo_resultado.multiplicador
-	if _ultimo_resultado.total == partida.umbral:
-		exactos += 1
-		if campana.amuletos.has("moneda") and _usos_moneda < 3:
-			campana.saldo += 2
-			_usos_moneda += 1
-	if campana.amuletos.has("prudente") and _usos_prudente < CampanaCasino.USOS_PRUDENTE and _ultimo_resultado.total <= partida.umbral - 3:
-		partida.campanadas = mini(presupuesto, partida.campanadas + 1)
-		_usos_prudente += 1
-
-func _vista_cartas(cartas: Array, revelar: bool) -> Array[Dictionary]:
-	var vista: Array[Dictionary] = []
-	var elegibles: Array[String] = []
-	if not revelar:
-		elegibles = _llaves_disponibles()
-	for carta: CartaEnPartida in cartas:
-		var oculta := carta.definicion.palo == Palos.MASCARAS and not revelar and not _vistas_con_lente.has(carta.id_instancia)
-		var valor: Variant = null
-		var efectivo: Variant = null
-		if not oculta:
-			valor = carta.definicion.valor_impreso
-			efectivo = carta.valor_efectivo()
-		vista.append({
-			"id": carta.id_instancia, "palo": carta.definicion.palo,
-			"valor": valor, "valor_efectivo": efectivo,
-			"oculta": oculta, "puede_devolver": elegibles.has(carta.id_instancia),
-		})
-	return vista
+		_mensaje = "Quiebra: esta mano aporta cero puntos. Quedan oportunidades para continuar." if resultado.quiebra else "Mano resuelta. Revisa el desglose o inicia otra mano."
 
 func obtener_vista() -> Dictionary:
 	var decision := estado_activo.nombre == "decision"
-	var intervalo := _intervalo()
-	var cartas := _vista_cartas(partida.mano, false)
-	if not decision and not _cartas_resueltas.is_empty():
-		cartas = _cartas_resueltas.duplicate(true)
-		intervalo = {"conocido": int(_ultimo_resultado.total), "ocultas": 0, "minimo": int(_ultimo_resultado.total), "maximo": int(_ultimo_resultado.total)}
 	var llaves := _llaves_disponibles()
-	var resultado_visible: Dictionary = {}
-	# Solo se anticipa una puntuación determinada por información ya pública.
-	if decision and int(intervalo.ocultas) == 0:
-		resultado_visible = EvaluadorMano.evaluar(partida.mano, partida.umbral).duplicate(true)
-	var vecinos := regla.umbrales_vecinos(self)
-	return {
-		"mesa": campana.activa if campana != null else "", "retenidas": retenidas.size(),
+	var mano := _vista_mano.proyectar(partida, decision, llaves, _objetos.mascaras_vistas)
+	var vecinos := regla.umbrales_vecinos(partida, decision)
+	var vista := {
+		"mesa": campana.activa if campana != null else "", "retenidas": partida.retenidas.size(),
 		"umbral_anterior": vecinos.anterior, "umbral_siguiente": vecinos.siguiente,
 		"comision": _cobra_comision(), "saldo": campana.saldo if campana != null else 0,
 		"fase": estado_activo.nombre, "campanadas": partida.campanadas, "presupuesto": presupuesto,
@@ -303,15 +264,13 @@ func obtener_vista() -> Dictionary:
 		"mazo": partida.mazo.size(), "descarte": partida.descarte.size(),
 		"numero_mano": _numero_mano, "modo_demostracion": _modo_demostracion,
 		"terminado": _terminado, "victoria": _victoria, "mensaje": _mensaje,
-		"cartas": cartas, "intervalo": intervalo, "llaves_disponibles": llaves,
-		"ultima_mano": _ultimo_resultado.duplicate(true),
-		"resumen_intento": {"manos": _manos_resueltas, "validas": _manos_resueltas - _quiebras, "quiebras": _quiebras},
-		"resultado_visible": resultado_visible,
-		"patrones_visibles": Indicadores.calcular(cartas, intervalo, partida.umbral),
+		"resumen_intento": {"manos": partida.manos_resueltas, "validas": partida.manos_validas(), "quiebras": partida.quiebras},
 		"acciones": {
-			"iniciar": estado_activo.nombre == "preparado" and partida.campanadas > 0 and partida.disponibles() >= 2 and partida.mano.is_empty(),
-			"pedir": decision and (not _cobra_comision() or campana.saldo > 0) and partida.disponibles() > 0 and int(intervalo.minimo) <= partida.umbral,
+			"iniciar": estado_activo.nombre == "preparado" and _impedimento_inicio().is_empty(),
+			"pedir": decision and _impedimento_pedir(mano.intervalo.minimo).is_empty(),
 			"plantarse": decision and not partida.mano.is_empty(),
 			"devolver": not llaves.is_empty(), "reiniciar": campana == null,
 		},
 	}
+	vista.merge(mano)
+	return vista

@@ -1,6 +1,6 @@
 # Arquitectura y patrones de La Última Mesa
 
-Estas decisiones guían la implementación en **Godot 4.7.2 con GDScript**, conforme al diseño v2.4 y los tres PDF del curso. Estado al **13 de noviembre de 2026**: State, Command, Observer mediante señales y la fábrica simple están implementados y probados. Los módulos del dominio no dependen de la UI. [Revisión y evidencia](REVISION_I1.md).
+Estas decisiones guían la implementación en **Godot 4.7.2 con GDScript**, conforme al diseño v2.4 y los tres PDF del curso. La campaña aplica State, Command, Strategy, Observer y una fábrica simple. Los módulos del dominio no dependen de los controles de interfaz. [Verificación de I3](ITERACION_03.md#verificación).
 
 ## Material del curso y aplicación
 
@@ -19,10 +19,10 @@ El primer documento contiene muchas diapositivas como imágenes; se revisaron vi
 | Módulo de clase | Implementación prevista | Responsabilidad y límite |
 | --- | --- | --- |
 | Programa principal | Escena principal y controlador de mesa | Inicia, coordina estados y conecta sistemas; Godot ejecuta el Game Loop |
-| Motor lógico | Evaluador, comandos y estados | Valida acciones y calcula costes, patrones, puntuación y cierre |
+| Motor lógico | Evaluador, comandos, estados y reglas de crupier | Valida acciones y calcula costes, patrones, puntuación y cierre |
 | Datos estáticos | Resources de cartas, objetos y condiciones de mesa | Definiciones compartidas que se tratan como inmutables durante el juego |
-| Datos temporales | EstadoPartida y cartas del intento | Mazo, descarte, mano, recursos, sellos e inventario mientras dura el intento |
-| Datos persistentes | `AjustesJuego` con `ConfigFile` en `user://ajustes.cfg` | Hoy guarda «movimiento reducido»; el volumen se añadirá con el audio. La campaña sigue reiniciándose al cerrar según el GDD |
+| Datos temporales | `EstadoPartida` y `CampanaCasino` | La partida guarda mano, mazo, descarte, cartas retenidas y cierre de manos. La campaña guarda fichas, sellos, baraja e inventario |
+| Datos persistentes | `AjustesJuego` con `ConfigFile` en `user://ajustes.cfg` | Guarda movimiento reducido y niveles de volumen. La campaña se reinicia al cerrar |
 | Interfaz | Control, Containers, Theme y escenas de cartas | Presenta una vista autorizada y emite solicitudes; no modifica reglas |
 | Red, en el siguiente incremento | Adaptador de comandos y vistas | Anfitrión valida; cada cliente recibe la información que le corresponda |
 
@@ -35,6 +35,8 @@ flowchart LR
     Control --> Estado[Estado activo]
     Estado --> Reglas[Reglas y evaluador]
     Reglas --> Datos[Estado del intento]
+    Datos --> Vista[Proyección pública de la mano]
+    Vista --> Control
     Control -->|señal con vista autorizada| UI
     Catalogo[Catálogo de Resources] --> Fabrica[Fábrica de cartas]
     Fabrica --> Datos
@@ -48,12 +50,21 @@ La vista que recibe la UI excluye el orden futuro del mazo y los valores de Más
 | Patrón | Problema del juego y aplicación | Momento y evidencia |
 | --- | --- | --- |
 | **State** | Las acciones legales cambian según la fase. Un contexto delega a estados concretos preparado, decisión, resolución y final | Iteración 1. Diagrama de transiciones, clases y pruebas de aceptación/rechazo por fase |
-| **Observer** | Cartas, indicadores e historial reaccionan al mismo cambio. El controlador emite señales y la UI se suscribe | Iteración 1. Una acción actualiza la vista una vez; reiniciar no duplica conexiones |
-| **Command** | La misma intención debe poder provenir de un botón, teclado, prueba y después red. Cada comando concreto encapsula una operación y la ejecuta sobre el receptor del estado activo | Iteración 1. Comandos aceptados/rechazados reproducibles; adaptación LAN en la 2 |
+| **Observer** | El controlador publica la vista por señal y los componentes notifican selecciones y cierres | Una acción aceptada publica una vista. El uso de una Lente también publica una sola vista y bloquea acciones reentrantes durante la señal |
+| **Command** | La misma intención puede venir de un botón, teclado o prueba. Cada comando concreto encapsula una operación y la ejecuta sobre el estado activo | Iteración 1. Comandos aceptados y rechazados reproducibles. El adaptador LAN queda para un incremento posterior |
 | **Factory** | Crear cartas de manera consistente a partir del catálogo y asignar identidades de instancia | Iteración 1 con una fábrica simple. Se documenta como simplificación, no como una jerarquía completa de Factory Method |
-| **Strategy** | Los crupieres comparten el ciclo de cartas y cambian reglas de entrada, comisión o cierre | **Implementado en la iteración 3** (`dominio/crupieres/`). `ReglaCrupier` y sus subclases del Recaudador, la Coleccionista y el Dueño; `FabricaCrupieres` elige la regla por mesa. Lo comprueban las pruebas de campaña, de reglas y de invariantes |
+| **Strategy** | Los crupieres comparten el ciclo de cartas y cambian reglas de entrada, comisión o cierre | Iteración 3. `FabricaCrupieres` elige la regla. Las estrategias reciben `EstadoPartida` o `CampanaCasino` según la operación. Las pruebas de campaña e invariantes comprueban umbrales, comisión y retención |
 | **Prototype** | Preparar variantes del intento sin alterar las definiciones originales al ajustar cartas | Al implementar modificaciones de baraja. Copia controlada de datos y prueba de independencia entre catálogo e intentos |
-| **Singleton** | Un servicio de ajustes/audio necesita estar disponible entre escenas | **Evaluado en la iteración 3 y descartado por ahora.** `AjustesJuego` es una clase con métodos estáticos sin Autoload: solo la leen los puntos de entrada, y las mesas y las pruebas no dependen de un estado global. Se reconsiderará con el servicio de audio |
+| **Composición** | La misma mesa puede abrirse de forma independiente o dentro del casino | Cada punto de entrada crea un nodo `AudioCasino` e inyecta la instancia en la mesa. `ControlesSonido` comparte la vista de volumen y la señal `pisada` desacopla el movimiento del efecto |
+
+### Distribución en I3
+
+- `dominio/campana/` controla progresión e inventario. `objetos_mesa.gd` aplica los efectos de la Lente y los amuletos por encuentro. `dominio/recompensas/` genera las ofertas y `FabricaCartas` crea la instancia elegida.
+- `controlador_mesa.gd` coordina comandos, costes y transiciones. Reutiliza las mismas guardas para habilitar una acción y para ejecutarla. `vista_mano.gd` decide qué valores proyectar y conserva una copia de la mano al cierre, antes de que la Coleccionista pueda retener una carta.
+- `sala_explorable.gd` monta fondo, figuras, colisiones y puntos de interacción. `casino.gd` autoriza el acceso y coordina exploración, diálogo y encuentros.
+- `casino/interfaz/` reutiliza el libro para compras e inventario. La tienda solicita la compra a la campaña y las cartas de recompensa emiten el índice elegido. El indicador de objetivo administra su propio texto y animación.
+- `audio/` mezcla los cuatro buses y presenta el control de niveles. Los eventos de la mesa se reproducen después de que el comando o la resolución hayan sido aceptados.
+- `mesa/interfaz/` contiene la mano visual, la franja de patrones, el panel de Llaves, la secuencia de revelación y el diálogo modal. La mano conserva la identidad de cada carta y se ocupa del desplazamiento. El diálogo aísla el foco y lo devuelve al control anterior. `mesa_ui.gd` conecta estos componentes y traduce las acciones del jugador a comandos.
 
 La tabla distingue aplicación inmediata de incorporación posterior. Un patrón se acepta si se puede señalar el problema, el código que lo resuelve y la prueba que evita una regresión.
 

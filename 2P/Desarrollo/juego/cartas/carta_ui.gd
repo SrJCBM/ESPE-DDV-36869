@@ -4,10 +4,10 @@ extends Button
 signal ampliacion_solicitada(carta: Dictionary)
 
 const ARTE := {
-	Palos.VELAS: preload("res://recursos/arte/carta-velas-grabado.png"),
-	Palos.LLAVES: preload("res://recursos/arte/carta-llaves-grabado.png"),
-	Palos.RELOJES: preload("res://recursos/arte/carta-relojes-grabado.png"),
-	Palos.MASCARAS: preload("res://recursos/arte/carta-mascaras-grabado.png"),
+	Palos.VELAS: preload("res://cartas/arte/carta-velas-grabado.png"),
+	Palos.LLAVES: preload("res://cartas/arte/carta-llaves-grabado.png"),
+	Palos.RELOJES: preload("res://cartas/arte/carta-relojes-grabado.png"),
+	Palos.MASCARAS: preload("res://cartas/arte/carta-mascaras-grabado.png"),
 }
 const DURACION_SACUDIDA := 0.42
 const NOMBRES := {Palos.VELAS: "VELAS", Palos.LLAVES: "LLAVES", Palos.RELOJES: "RELOJES", Palos.MASCARAS: "MÁSCARAS"}

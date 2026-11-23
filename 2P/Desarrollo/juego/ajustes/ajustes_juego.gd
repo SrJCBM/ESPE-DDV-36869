@@ -18,3 +18,14 @@ static func guardar_movimiento_reducido(reducido: bool) -> void:
 	archivo.load(ruta) # Conserva las demás preferencias si el archivo ya existe.
 	archivo.set_value("accesibilidad", "movimiento_reducido", reducido)
 	archivo.save(ruta)
+
+static func volumen(canal: StringName, predeterminado: int) -> int:
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	return clampi(int(archivo.get_value("audio", str(canal), predeterminado)), 0, 100)
+
+static func guardar_volumen(canal: StringName, nivel: int) -> void:
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	archivo.set_value("audio", str(canal), clampi(nivel, 0, 100))
+	archivo.save(ruta)

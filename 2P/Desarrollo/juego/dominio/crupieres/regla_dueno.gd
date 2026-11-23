@@ -8,16 +8,18 @@ var _anterior := -1
 func umbral_para(manos_validas: int) -> int:
 	return maxi(MINIMO, CampanaCasino.MESAS_CAMPANA.de("dueno").umbral - manos_validas)
 
-func umbral_al_iniciar(mesa: ControladorMesa) -> int:
-	_anterior = mesa.partida.umbral if mesa.manos_resueltas() > 0 else -1
-	return umbral_para(mesa.manos_validas())
+func umbral_al_iniciar(partida: EstadoPartida) -> int:
+	_anterior = partida.umbral if partida.manos_resueltas > 0 else -1
+	return umbral_para(partida.manos_validas())
 
-func umbral_entre_manos(mesa: ControladorMesa) -> int:
-	return umbral_para(mesa.manos_validas())
+func umbral_entre_manos(partida: EstadoPartida) -> int:
+	return umbral_para(partida.manos_validas())
 
-func umbrales_vecinos(mesa: ControladorMesa) -> Dictionary:
-	if mesa.estado_activo.nombre == "decision":
+func umbrales_vecinos(partida: EstadoPartida, mano_abierta: bool) -> Dictionary:
+	if mano_abierta:
 		# La siguiente supone que esta mano se cierra sin Quiebra.
-		return {"anterior": _anterior, "siguiente": umbral_para(mesa.manos_validas() + 1)}
-	return {"anterior": mesa.partida.umbral if mesa.manos_resueltas() > 0 else -1,
-		"siguiente": umbral_para(mesa.manos_validas())}
+		return {"anterior": _anterior, "siguiente": umbral_para(partida.manos_validas() + 1)}
+	return {
+		"anterior": partida.umbral if partida.manos_resueltas > 0 else -1,
+		"siguiente": umbral_para(partida.manos_validas()),
+	}

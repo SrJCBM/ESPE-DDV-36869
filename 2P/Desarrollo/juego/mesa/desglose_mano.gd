@@ -36,7 +36,7 @@ static func construir(contenido: Control, vista: Dictionary) -> void:
 			formula += " + 2"
 		texto.text += "\nMultiplicador final: %s = %s\n\n[b]%s × %s = %s PUNTOS[/b]" % [formula, resultado.get("multiplicador", 1), resultado.get("total", 0), resultado.get("multiplicador", 1), resultado.get("puntos", 0)]
 	contenido.add_child(texto)
-	Piezas.imagen(contenido, "res://recursos/figma/boleto.svg", Rect2(595, 108, 310, 460))
+	Piezas.imagen(contenido, "res://mesa/arte/boleto.svg", Rect2(595, 108, 310, 460))
 	Piezas.etiqueta(contenido, "APORTE DE ESTA MANO", Rect2(617, 135, 266, 26), 13, Piezas.TINTA)
 	var aporte := Piezas.etiqueta(contenido, str(resultado.get("puntos", 0)), Rect2(615, 175, 270, 120), 80, Piezas.TINTA, true)
 	aporte.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

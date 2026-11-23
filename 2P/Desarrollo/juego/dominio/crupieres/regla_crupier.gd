@@ -12,17 +12,17 @@ func cobra_por_pedir() -> bool:
 	return false
 
 ## Umbral de la mano que se está abriendo.
-func umbral_al_iniciar(mesa: ControladorMesa) -> int:
-	return mesa.partida.umbral
+func umbral_al_iniciar(partida: EstadoPartida) -> int:
+	return partida.umbral
 
 ## Umbral que tendrá la próxima mano, consultado entre manos (ayuda y placa).
-func umbral_entre_manos(mesa: ControladorMesa) -> int:
-	return mesa.partida.umbral
+func umbral_entre_manos(partida: EstadoPartida) -> int:
+	return partida.umbral
 
 ## Umbral de la mano anterior y de la siguiente para anunciar cambios. −1 si no aplica.
-func umbrales_vecinos(_mesa: ControladorMesa) -> Dictionary:
+func umbrales_vecinos(_partida: EstadoPartida, _mano_abierta: bool) -> Dictionary:
 	return {"anterior": -1, "siguiente": -1}
 
 ## Después de puntuar y aplicar objetos, antes de descartar la mano.
-func al_resolver(_mesa: ControladorMesa) -> void:
+func al_resolver(_partida: EstadoPartida) -> void:
 	pass
