@@ -67,11 +67,11 @@ if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas' }
 
 El runner devuelve 0 si todas pasan y distinto de 0 si alguna falla. [Resultados registrados](../Archivo/I1/REVISION_I1.md).
 
-Capturas de I4. Vistas: `vitrina`, `vitrina-detalle`, `vitrina-baraja`, `corredor`, `puerta-cerrada`, `mesa`, `mesa-mano`, `dialogo`, `inicio`, `pausa`, `opciones` y `mesa-pausa`:
+Capturas de I4 e I5. Vistas: `vitrina`, `vitrina-detalle`, `vitrina-baraja`, `corredor` (pasillo del Custodio), `pasillo` (con `--pasillo=pasillo_recaudador`), `puerta-cerrada`, `entrada`, `oferta`, `recompensa`, `baraja`, `baraja-mano`, `mesa`, `mesa-mano`, `dialogo`, `inicio`, `pausa`, `opciones` y `mesa-pausa`:
 
 ```powershell
 foreach ($t in '1024x576','1280x720') {
-  foreach ($v in 'vitrina','corredor','mesa','dialogo','inicio','pausa','opciones','mesa-pausa') {
+  foreach ($v in 'vitrina','corredor','entrada','oferta','recompensa','baraja','baraja-mano','mesa','dialogo','inicio','pausa','opciones','mesa-pausa') {
     & $GodotExe --path '2P/Desarrollo/juego' --script res://tests/qa_interfaz_i4.gd -- --vista=$v --tamano=$t
   }
 }

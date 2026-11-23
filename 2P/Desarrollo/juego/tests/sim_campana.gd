@@ -2,11 +2,17 @@ extends SceneTree
 ## Simula campañas completas con CampanaCasino, ControladorMesa y los comandos reales.
 ## La estrategia solo usa la vista pública. Informa, por mesa, cuántos intentos llegan y cuántos la superan.
 ## godot --headless --path . --script res://tests/sim_campana.gd -- --semillas=500
+## --recompensas toma la carta de menor valor efectivo; --sin-vela desactiva la Vela de Racha ×2.
 
+## I5: el objeto inicial lo regala la anfitriona y la tienda abre tras el primer sello, así que
+## las compras empiezan en el Recaudador.
 const ESTRATEGIAS := [
-	{"nombre": "Sin compras", "lente": false, "amuletos": []},
-	## La de ITERACION_02: Lente al inicio; Corona y Sello en cuanto alcanza el saldo.
-	{"nombre": "Lente, Corona y Sello", "lente": true, "amuletos": ["corona", "prudente"]},
+	{"nombre": "Sin objeto ni compras", "inicial": "", "amuletos": []},
+	{"nombre": "Inicial Lente", "inicial": "lente", "amuletos": []},
+	{"nombre": "Inicial Sello del prudente", "inicial": "prudente", "amuletos": []},
+	{"nombre": "Inicial Moneda mellada", "inicial": "moneda", "amuletos": []},
+	## La de ITERACION_02 adaptada: Lente inicial; Corona y Sello en cuanto abre la tienda y alcanza el saldo.
+	{"nombre": "Inicial Lente, luego Corona y Sello", "inicial": "lente", "amuletos": ["corona", "prudente"]},
 ]
 const MARGENES := [4, 6, 8]
 ## Variantes con --variantes: {índice de mesa: [meta, campanadas]}. La primera usa las mesas de datos/mesas/mesas_campana.tres sin cambios.
@@ -59,10 +65,12 @@ func _init() -> void:
 static func campana(semilla: int, estrategia: Dictionary, margen: int, reglas: Dictionary = {}, tomar_cartas := false) -> int:
 	var c := CampanaCasino.new()
 	c.azar_recompensas.seed = semilla
-	c.recibir_invitacion()
-	if estrategia.lente: c.comprar("lente")
+	c.variante_vela = not OS.get_cmdline_user_args().has("--sin-vela")
+	if estrategia.inicial.is_empty(): c.recibir_invitacion()
+	else: c.atender("objeto_inicial:" + estrategia.inicial)
 	for indice in range(4):
-		for id: String in estrategia.amuletos: c.comprar(id)
+		if indice > 0:
+			for id: String in estrategia.amuletos: c.comprar(id)
 		c.iniciar(CampanaCasino.MESAS[indice])
 		var m := ControladorMesa.new()
 		m.configurar_campana(c)
