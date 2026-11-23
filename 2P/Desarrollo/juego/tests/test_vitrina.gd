@@ -109,3 +109,20 @@ func test_retirar_respeta_el_minimo_de_doce_cartas() -> void:
 	retirar.pressed.emit()
 	assert_eq(juego.vitrina.detalle.aviso.text, "Deben quedar doce cartas.")
 	assert_eq(juego.campana.baraja.size(), 12)
+
+func test_abrir_y_cerrar_la_vitrina_no_deja_nodos_huerfanos() -> void:
+	await get_tree().process_frame
+	var antes := Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT)
+	var juego = load("res://casino/casino.tscn").instantiate()
+	add_child(juego)
+	juego._entregar()
+	juego._cerrar()
+	juego.entrar("tienda")
+	juego.tienda()
+	juego.vitrina.fichas[1].pressed.emit()
+	juego.vitrina.fichas[5].pressed.emit()
+	juego._cerrar()
+	juego.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_eq(Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT), antes, "Cada etiqueta se crea una sola vez")

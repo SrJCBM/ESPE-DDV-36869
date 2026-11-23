@@ -1,6 +1,6 @@
 # Iteración 04 · Interfaz y recorrido del casino
 
-**Estado general:** Las ocho tareas están implementadas en la rama `kenned/i4-interfaz-recorrido`. Quedan [dos correcciones técnicas a cargo de Kenned](#correcciones-de-la-revisión) y el piloto de I4-08. El rediseño del mapa pasa a la [iteración 05](ITERACION_05.md). **Base:** I3, commit `cd30925`.
+**Estado general:** Las ocho tareas están implementadas en la rama `kenned/i4-interfaz-recorrido`. Las [dos correcciones de la revisión](#correcciones-de-la-revisión) están hechas; queda el piloto de I4-08. El rediseño del mapa pasa a la [iteración 05](ITERACION_05.md). **Base:** I3, commit `cd30925`.
 
 **Objetivo:** que el jugador sepa adónde ir, qué puede comprar y qué acaba de pasar con una mirada. La vitrina, las puertas y las cartas llevan la información principal. Los detalles de efectos y reglas se consultan al seleccionar un elemento o abrir el libro.
 
@@ -15,7 +15,7 @@
 | I4-05 | Mesa visual y dial de campanadas | **Implementada** · `c6c6663` | Tapete más amplio, patrones en la franja inferior y acciones compactas a la derecha, con el dial animado en una mano real |
 | I4-06 | Base reutilizable de diálogos tipo novela visual | **Implementada** | Una escena y un formato de conversación compartidos, probados con las líneas actuales de la anfitriona |
 | I4-07 | Menú de inicio y pausa con Esc | **Implementada** | Entrada al casino, pausa, opciones y retorno a la misma mano o sala |
-| I4-08 | Integración y prueba de usabilidad | **Regresión y capturas hechas** · correcciones y piloto pendientes | Recorrido completo, capturas a dos resoluciones y registro de dónde se detiene o duda el jugador |
+| I4-08 | Integración y prueba de usabilidad | **Regresión, capturas y correcciones hechas** · piloto pendiente | Recorrido completo, capturas a dos resoluciones y registro de dónde se detiene o duda el jugador |
 
 **Orden propuesto.** Empezar por una compra completa y probar el corredor con formas simples antes de rehacer su fondo. Revisar qué textos necesita el jugador y aplicar esa jerarquía al HUD y a la mesa del Custodio. Probar la base de diálogos con la anfitriona, incorporar los menús y cerrar con el recorrido completo y el piloto.
 
@@ -36,14 +36,14 @@ Implementado por Kenned el 23 de noviembre de 2026. **217 pruebas y 2.067 aserci
 
 ## Correcciones de la revisión
 
-**Responsable:** Kenned. **Rama:** `kenned/i4-interfaz-recorrido`. **Estado:** pendientes de implementación y verificación.
+**Responsable:** Kenned. **Rama:** `kenned/i4-interfaz-recorrido`. **Estado:** implementadas y verificadas el 23 de noviembre de 2026.
 
-| Tarea | Corrección | Criterio de cierre |
-| --- | --- | --- |
-| I4-07 · Foco al reanudar | En [casino.gd](juego/casino/casino.gd), guardar el control enfocado antes de abrir la pausa y restaurarlo al reanudar si sigue disponible. Si ya no está disponible, enfocar una acción válida de la mesa. | Con **Plantarse** enfocado en una mano activa, pulsar **Esc** dos veces o elegir **Reanudar**. La mano se conserva, **Plantarse** recupera el foco y **Enter** ejecuta esa acción una sola vez. |
-| I4-01 · Etiquetas de la vitrina | Crear cada etiqueta una sola vez en [ficha_producto.gd](juego/casino/interfaz/vitrina/ficha_producto.gd), [detalle_producto.gd](juego/casino/interfaz/vitrina/detalle_producto.gd) y [vitrina_gabinete.gd](juego/casino/interfaz/vitrina/vitrina_gabinete.gd). Las etiquetas creadas con `Label.new()` y reemplazadas por `Libro.rotulo()` explican los 26 nodos sin liberar al cerrar una sesión. | Abrir y cerrar el casino y repetir GUT. Confirmar que desaparecen las etiquetas huérfanas de la vitrina y que siguen pasando las pruebas de compra y navegación. |
+| Tarea | Corrección | Criterio de cierre | Resultado |
+| --- | --- | --- | --- |
+| I4-07 · Foco al reanudar | En [casino.gd](juego/casino/casino.gd), guardar el control enfocado antes de abrir la pausa y restaurarlo al reanudar si sigue disponible. Si ya no está disponible, enfocar una acción válida de la mesa. | Con **Plantarse** enfocado en una mano activa, pulsar **Esc** dos veces o elegir **Reanudar**. La mano se conserva, **Plantarse** recupera el foco y **Enter** ejecuta esa acción una sola vez. | `casino.gd` guarda el foco en `pausar()` y lo devuelve en `_reanudar()`; si el control desapareció, enfoca Iniciar o Pedir, Plantarse o Cómo jugar. Tres pruebas nuevas en `test_menus.gd`: Esc dos veces, botón **Reanudar** y control eliminado |
+| I4-01 · Etiquetas de la vitrina | Crear cada etiqueta una sola vez en [ficha_producto.gd](juego/casino/interfaz/vitrina/ficha_producto.gd), [detalle_producto.gd](juego/casino/interfaz/vitrina/detalle_producto.gd) y [vitrina_gabinete.gd](juego/casino/interfaz/vitrina/vitrina_gabinete.gd). Las etiquetas creadas con `Label.new()` y reemplazadas por `Libro.rotulo()` explican los 26 nodos sin liberar al cerrar una sesión. | Abrir y cerrar el casino y repetir GUT. Confirmar que desaparecen las etiquetas huérfanas de la vitrina y que siguen pasando las pruebas de compra y navegación. | Los ocho campos se declaran como `Label` sin instancia y se crean solo con `Libro.rotulo()`. `test_vitrina.gd` cuenta los nodos huérfanos tras abrir y cerrar la vitrina: sin la corrección encuentra 26 y con ella ninguno. Cerrar el juego no informa fugas |
 
-El enlace de la vitrina se corrigió en este plan. Adjuntar el resultado de la regresión de ambas correcciones a I4-08. El piloto con tres personas sigue pendiente.
+El enlace de la vitrina se corrigió en este plan. Regresión tras ambas correcciones: **221 pruebas y 2.076 aserciones**, todas pasan. GUT aún atribuye 28 huérfanos a `test_interfaz.gd`, que solo prueba la mesa; no vienen de la vitrina y quedan para revisar aparte. El piloto con tres personas sigue pendiente.
 
 ## I4-01 · Vitrina de la tienda
 

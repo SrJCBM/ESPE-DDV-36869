@@ -6,9 +6,9 @@ const FICHA := preload("res://recursos/hud/ficha_casino.png")
 
 var id := ""
 var imagen := TextureRect.new()
-var nombre := Label.new()
-var precio := Label.new()
-var marca_bloqueo := Label.new()
+var nombre: Label
+var precio: Label
+var marca_bloqueo: Label
 
 func configurar(objeto: ObjetoTienda, arte: Texture2D, glifo := "") -> void:
 	id = objeto.id

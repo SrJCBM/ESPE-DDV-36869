@@ -20,7 +20,7 @@ var fichas: Array[FichaProducto] = []
 var detalle := DetalleProducto.new()
 var selector := SelectorCartas.new()
 var saldo := SaldoFichas.new(32, 24)
-var confirmacion := Label.new()
+var confirmacion: Label
 var _producto := ""
 var _carta: CartaEnPartida
 

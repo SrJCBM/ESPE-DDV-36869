@@ -143,3 +143,62 @@ func test_el_encabezado_no_repite_el_boton_de_sonido() -> void:
 	var juego = _casino()
 	for hijo in juego.pagina.get_children():
 		assert_false(hijo is Button and hijo.text.begins_with("Sonido"))
+
+func _tecla(juego, codigo: Key) -> void:
+	var tecla := InputEventKey.new()
+	tecla.keycode = codigo
+	tecla.physical_keycode = codigo
+	tecla.pressed = true
+	juego.get_viewport().push_input(tecla)
+	var suelta := tecla.duplicate()
+	suelta.pressed = false
+	juego.get_viewport().push_input(suelta)
+
+func _mesa_con_mano(juego) -> ControladorMesa:
+	juego._entregar()
+	juego._cerrar()
+	juego.entrar("custodio")
+	juego._jugar()
+	var m: ControladorMesa = juego.mesa.controlador
+	m.procesar_comando(IniciarMano.new())
+	return m
+
+func test_reanudar_con_esc_devuelve_el_foco_a_plantarse_y_enter_actua_una_vez() -> void:
+	var juego = _casino()
+	var m := _mesa_con_mano(juego)
+	await get_tree().process_frame
+	var plantarse: BaseButton = juego.mesa.boton_plantarse
+	plantarse.grab_focus()
+	var manos: int = m.obtener_vista().numero_mano
+	_esc(juego)
+	assert_ne(juego.get_viewport().gui_get_focus_owner(), plantarse, "La pausa toma el foco")
+	_esc(juego)
+	assert_false(juego.menu.visible)
+	assert_eq(juego.get_viewport().gui_get_focus_owner(), plantarse, "Plantarse recupera el foco")
+	assert_eq(m.obtener_vista().fase, "decision", "La mano se conserva")
+	watch_signals(plantarse)
+	_tecla(juego, KEY_ENTER)
+	assert_signal_emit_count(plantarse, "pressed", 1)
+	assert_eq(m.obtener_vista().numero_mano, manos)
+
+func test_reanudar_con_el_boton_tambien_devuelve_el_foco() -> void:
+	var juego = _casino()
+	_mesa_con_mano(juego)
+	await get_tree().process_frame
+	var plantarse: BaseButton = juego.mesa.boton_plantarse
+	plantarse.grab_focus()
+	juego.pausar()
+	juego.menu.botones[0].pressed.emit()
+	assert_eq(juego.get_viewport().gui_get_focus_owner(), plantarse)
+
+func test_si_el_control_ya_no_existe_enfoca_una_accion_de_la_mesa() -> void:
+	var juego = _casino()
+	_mesa_con_mano(juego)
+	await get_tree().process_frame
+	var efimero := Button.new()
+	juego.mesa.add_child(efimero)
+	efimero.grab_focus()
+	juego.pausar()
+	efimero.free()
+	juego.menu.botones[0].pressed.emit()
+	assert_eq(juego.get_viewport().gui_get_focus_owner(), juego.mesa.boton_iniciar_pedir)

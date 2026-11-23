@@ -6,10 +6,10 @@ const Libro := preload("res://casino/interfaz/libro.gd")
 
 signal compra_confirmada
 
-var titulo := Label.new()
-var efecto := Label.new()
-var aviso := Label.new()
-var resto := Label.new()
+var titulo: Label
+var efecto: Label
+var aviso: Label
+var resto: Label
 var boton_comprar := Button.new()
 var contenedor := VBoxContainer.new()
 

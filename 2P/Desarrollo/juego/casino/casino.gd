@@ -48,6 +48,8 @@ var indicador_objetivo := IndicadorObjetivo.new()
 var vitrina := VitrinaGabinete.new()
 var dialogo := DialogoNovela.new()
 var menu := MenuCasino.new()
+## Control enfocado antes de pausar; se devuelve al reanudar.
+var _foco_previo = null
 
 func _ready() -> void:
 	menu.visible = false # Hasta que entre en el árbol, un Control cuenta como visible.
@@ -126,6 +128,7 @@ func abrir_inicio() -> void:
 func pausar() -> void:
 	if menu.visible:
 		return
+	_foco_previo = get_viewport().gui_get_focus_owner()
 	menu.abrir("pausa")
 	_congelar(true)
 	audio.reproducir(&"interfaz")
@@ -133,6 +136,25 @@ func pausar() -> void:
 func _reanudar() -> void:
 	menu.cerrar()
 	_congelar(false)
+	_restaurar_foco()
+
+## Devuelve el foco al control que lo tenía; si ya no está, a una acción válida de la mesa.
+func _restaurar_foco() -> void:
+	var previo = _foco_previo
+	_foco_previo = null
+	if _enfocable(previo):
+		previo.grab_focus()
+	elif is_instance_valid(mesa):
+		for nombre in ["boton_iniciar_pedir", "boton_plantarse", "boton_ayuda"]:
+			var accion: Control = mesa.get(nombre)
+			if _enfocable(accion):
+				accion.grab_focus()
+				return
+
+static func _enfocable(control) -> bool:
+	if not is_instance_valid(control) or not control is Control or not control.is_visible_in_tree() or control.focus_mode == Control.FOCUS_NONE:
+		return false
+	return not (control is BaseButton and control.disabled)
 
 func _congelar(congelado: bool) -> void:
 	var modo := Node.PROCESS_MODE_DISABLED if congelado else Node.PROCESS_MODE_INHERIT
