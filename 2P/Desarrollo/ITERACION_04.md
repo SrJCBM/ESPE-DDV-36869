@@ -11,13 +11,13 @@
 | I4-01 | Vitrina del Gabinete de la anfitriona | Pendiente | Compra de la Lente de humo desde una ficha ilustrada, con confirmación, saldo actualizado y regreso al juego |
 | I4-02 | Recorrido según el plano de la exposición | Pendiente | Corredor transitable con puertas arriba y abajo, puntos de retorno y cerrojos en el orden indicado |
 | I4-03 | Reducir el texto que aparece por defecto | Pendiente | Revisar los mensajes del vestíbulo, las puertas, la mesa y el resultado con ejemplos antes y después |
-| I4-05 | Sellos y fichas ilustrados | Pendiente | Tres espacios para los sellos, saldo con icono y prueba al obtener el primer sello |
-| I4-06 | Mesa visual y dial de campanadas | Pendiente | Composición del Custodio con dial animado en una mano real |
-| I4-07 | Base reutilizable de diálogos tipo novela visual | Pendiente | Una escena y un formato de conversación compartidos, probados con las líneas actuales de la anfitriona |
-| I4-08 | Menú de inicio y pausa con Esc | Pendiente | Entrada al casino, pausa, opciones y retorno a la misma mano o sala |
-| I4-04 | Integración y prueba de usabilidad | Pendiente | Recorrido completo, capturas a dos resoluciones y registro de dónde se detiene o duda el jugador |
+| I4-04 | Sellos y fichas ilustrados | Pendiente | Tres espacios para los sellos, saldo con icono y prueba al obtener el primer sello |
+| I4-05 | Mesa visual y dial de campanadas | Pendiente | Composición del Custodio con dial animado en una mano real |
+| I4-06 | Base reutilizable de diálogos tipo novela visual | Pendiente | Una escena y un formato de conversación compartidos, probados con las líneas actuales de la anfitriona |
+| I4-07 | Menú de inicio y pausa con Esc | Pendiente | Entrada al casino, pausa, opciones y retorno a la misma mano o sala |
+| I4-08 | Integración y prueba de usabilidad | Pendiente | Recorrido completo, capturas a dos resoluciones y registro de dónde se detiene o duda el jugador |
 
-**Orden propuesto.** Probar primero una compra completa y el HUD de progreso con la primera victoria. Probar el corredor con formas simples antes de rehacer su fondo. Después, preparar la mesa del Custodio y probar la base de diálogos con la anfitriona. Integrar los menús y validar los textos dentro de las pantallas jugables.
+**Orden propuesto.** Empezar por una compra completa y probar el corredor con formas simples antes de rehacer su fondo. Revisar qué textos necesita el jugador y aplicar esa jerarquía al HUD y a la mesa del Custodio. Probar la base de diálogos con la anfitriona, incorporar los menús y cerrar con el recorrido completo y el piloto.
 
 ## I4-01 · Vitrina de la tienda
 
@@ -71,7 +71,7 @@ flowchart TB
 
 **Aceptación.** En cada pantalla se reconoce la acción principal sin leer un párrafo. La comisión, la Quiebra, el saldo insuficiente y los valores todavía ocultos siguen siendo comprensibles con audio silenciado y movimiento reducido. Los mensajes se leen completos y el detalle se puede abrir con teclado.
 
-## I4-05 · HUD de sellos y fichas
+## I4-04 · HUD de sellos y fichas
 
 - **Sellos.** Tres recuadros contiguos forman una ilustración. Cada victoria del Custodio, el Recaudador y la Coleccionista completa su parte, en ese orden. Los espacios vacíos conservan un relieve tenue. Al volver a explorar, el sello recién ganado se estampa una vez y queda visible. El nombre y el estado de cada sello se pueden consultar al enfocar su recuadro o desde el inventario.
 - **Fichas.** Un recuadro compacto combina el icono de una ficha del casino con el saldo en cifras alineadas. Usar el mismo recuadro en exploración, mesa y vitrina. En la confirmación se ve cuánto queda tras comprar. El saldo se actualiza al aplicar una compra, una comisión o una recompensa.
@@ -79,7 +79,7 @@ flowchart TB
 
 **Aceptación.** Se distinguen los estados de 0 a 3 sellos sin depender del color. Cada victoria habilita su recuadro y el HUD refleja las fichas reales. Con movimiento reducido el sello y el saldo aparecen de inmediato.
 
-## I4-06 · Mesa visual y campanadas
+## I4-05 · Mesa visual y campanadas
 
 - **Composición.** Probar en el Custodio un tapete ilustrado que enmarque la mano, con el retrato, las cartas y el boleto de meta como focos. Usar motivos visuales de los patrones y reservar el nombre, el requisito y el bono para el detalle. Los números, costes, atajos y botones se dibujan en Godot con el estilo del casino.
 - **Dial.** Al gastar una campanada, el aro ilustrado hace un giro corto mientras la cifra baja. El número permanece horizontal y se asienta en su valor real. El efecto se activa con el gasto confirmado, dura unos **0,25 s** como punto de partida y termina en el valor correcto aunque el jugador abra el menú. Una devolución de campanada actualiza la cifra con su propio aviso. Con movimiento reducido la cifra cambia de inmediato.
@@ -88,7 +88,7 @@ flowchart TB
 
 **Aceptación.** Iniciar una mano consume una campanada y dispara un giro. Pedir, cancelar una acción, reiniciar o cambiar de pantalla dejan el aro quieto. Se identifican la mano, el umbral y la acción disponible a ambas resoluciones, con animación normal o reducida.
 
-## I4-07 · Base reutilizable de diálogos tipo novela visual
+## I4-06 · Base reutilizable de diálogos tipo novela visual
 
 La entrega es un sistema que se pueda usar desde cualquier sala con el guion que tengamos en cada momento. La trama y el guion completo se escribirán después. Mientras tanto, las líneas existentes de la anfitriona permiten probar la introducción, una elección y su efecto en el juego.
 
@@ -98,7 +98,7 @@ La entrega es un sistema que se pueda usar desde cualquier sala con el guion que
 
 **Aceptación.** Cambiar una línea o conectar otra conversación a la misma escena requiere editar solo sus datos. La anfitriona responde antes y después de recibir la invitación, y esta se entrega una sola vez. El visitante queda quieto durante el diálogo y recupera el control al cerrar. Las opciones se pueden elegir con teclado y el texto se puede leer completo con movimiento reducido y sin audio.
 
-## I4-08 · Inicio y pausa
+## I4-07 · Inicio y pausa
 
 | Pantalla | Opciones |
 | --- | --- |
@@ -112,7 +112,7 @@ La entrega es un sistema que se pueda usar desde cualquier sala con el guion que
 
 **Aceptación.** El menú se navega con ratón o teclado. Una pulsación de Esc produce una sola acción. Abrir y cerrar la pausa a mitad de una mano conserva el estado y devuelve el control al jugador. Las opciones se conservan entre sesiones.
 
-## I4-04 · Cómo comprobar el incremento
+## I4-08 · Integración y prueba de usabilidad
 
 - **Regresión.** Ejecutar GUT. Cubrir compra y cancelación, progreso de sellos, regreso a la tienda, salida posterior al Dueño, giro del dial, invitación única y pausa sin cambios en la mano. [Comandos de pruebas](juego/README.md#pruebas).
 - **Revisión visual.** Ver la vitrina, el HUD, una puerta cerrada, la mesa, el diálogo y la pausa a **1024 × 576** y **1280 × 720**. Comprobar legibilidad, foco y acciones de Esc, con movimiento normal y reducido.
