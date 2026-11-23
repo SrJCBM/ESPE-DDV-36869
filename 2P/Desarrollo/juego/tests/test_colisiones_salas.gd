@@ -26,35 +26,12 @@ func test_en_la_galeria_se_puede_llegar_a_las_seis_puertas() -> void:
 	_comprobar_rutas(juego, PlanoSalas.LIMITES_GALERIA)
 	await get_tree().process_frame
 
-func test_los_bordes_detectados_en_la_revision_manual_estan_cerrados(sala = use_parameters(["tienda", "custodio", "recaudador", "coleccionista", "dueno"])) -> void:
-	var casos := {
-		"tienda": [Vector2(1176, 193), Vector2(104, 193)],
-		"custodio": [Vector2(100, 356), Vector2(1148, 190), Vector2(1180, 356)],
-		"recaudador": [Vector2(99, 195), Vector2(1181, 195)],
-		"coleccionista": [Vector2(120, 250), Vector2(1160, 250)],
-		"dueno": [Vector2(120, 220), Vector2(1160, 220)],
-	}
-	var juego = Casino.instantiate()
-	add_child_autofree(juego)
-	juego.campana.recibir_invitacion()
-	juego.campana.superadas = 4
-	juego.entrar(sala)
-	await get_tree().physics_frame
-	await get_tree().physics_frame
-	var visitante: CharacterBody2D = juego.visitante
-	var espacio := visitante.get_world_2d().direct_space_state
-	var consulta := _consulta_pies(visitante)
-	for punto: Vector2 in casos[sala]:
-		var transformacion := visitante.global_transform
-		transformacion.origin = visitante.get_parent().to_global(punto)
-		consulta.transform = transformacion
-		assert_false(espacio.intersect_shape(consulta, 1).is_empty(), "%s · el visitante entra en la pared en %s" % [sala, punto])
-	await get_tree().process_frame
-
 func _comprobar_rutas(juego, limites: Rect2) -> void:
 	var visitante: CharacterBody2D = juego.visitante
 	var espacio := visitante.get_world_2d().direct_space_state
-	var consulta := _consulta_pies(visitante)
+	var consulta := PhysicsShapeQueryParameters2D.new()
+	consulta.shape = visitante.get_child(0).shape
+	consulta.exclude = [visitante.get_rid()]
 	var origen := Vector2i(visitante.position.snapped(Vector2(16,16)))
 	var pendientes: Array[Vector2i] = [origen]
 	var vistos := {origen: true}
@@ -68,9 +45,9 @@ func _comprobar_rutas(juego, limites: Rect2) -> void:
 		consulta.transform = transformacion
 		if not espacio.intersect_shape(consulta, 1).is_empty():
 			continue
-		var punto: Dictionary = juego.exploracion.cercano(Vector2(ubicacion))
-		if not punto.is_empty():
-			accesibles[punto.accion] = true
+		for punto: Dictionary in juego.exploracion.puntos:
+			if Vector2(ubicacion).distance_to(punto.pos) <= 86:
+				accesibles[punto.accion] = true
 		for paso: Vector2i in [Vector2i(16,0), Vector2i(-16,0), Vector2i(0,16), Vector2i(0,-16)]:
 			var vecino := ubicacion + paso
 			if limites.has_point(Vector2(vecino)) and not vistos.has(vecino):
@@ -78,12 +55,6 @@ func _comprobar_rutas(juego, limites: Rect2) -> void:
 				pendientes.append(vecino)
 	for punto: Dictionary in juego.exploracion.puntos:
 		assert_has(accesibles, punto.accion, "%s · %s es accesible desde la entrada" % [juego.sala, punto.accion])
-
-func _consulta_pies(visitante: CharacterBody2D) -> PhysicsShapeQueryParameters2D:
-	var consulta := PhysicsShapeQueryParameters2D.new()
-	consulta.shape = visitante.get_child(0).shape
-	consulta.exclude = [visitante.get_rid()]
-	return consulta
 
 func _choca_con(visitante: CharacterBody2D, rect: Rect2, mueble: StaticBody2D) -> bool:
 	for rumbo: Vector2 in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:

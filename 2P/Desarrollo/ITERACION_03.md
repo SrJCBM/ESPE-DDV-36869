@@ -13,7 +13,7 @@
 | I3-05 | Deuda técnica | 6 | **Completado** | Cinco reorganizaciones en commits separados, sin cambiar reglas. 159 pruebas |
 | I3-06 | Recompensa de cartas tras cada mesa | 4 | **Implementado** | Una de tres cartas o ninguna tras las primeras tres mesas. |
 | I3-07 | Sonido | 1 | **Implementado** | Bucle musical, ambiente, efectos de juego y cuatro controles de volumen. |
-| I3-08 | Colisiones de la exploración | — | **Implementado** | Huellas por sala y ajustes de Kenned para bordes y esquinas, verificados con pruebas de acceso. |
+| I3-08 | Colisiones de la exploración | — | **Implementado** | Huellas por sala, pruebas por mueble y capturas a dos resoluciones. |
 
 ## Completado
 
@@ -101,15 +101,7 @@ Sin compras, seleccionar la carta de menor valor supera el objetivo anterior del
 
 Las huellas de mesas, sillas, vitrinas y mostradores siguen el arte de cada sala. Las mesas usan polígonos convexos con esquinas recortadas. Las pruebas lanzan al visitante contra los muebles de las seis salas, comprueban el collider que lo detiene y verifican que desde la entrada existe un camino hasta cada interacción. La revisión en 1024 × 576 y 1280 × 720 incluyó las seis salas y la galería.
 
-Los ajustes de Kenned (`ad5b82b`) quedaron en [`plano_salas.gd`](juego/casino/exploracion/plano_salas.gd). Incluyen las paredes en perspectiva del Custodio, las esquinas curvas del Dueño y huellas de muebles como la base del reloj, la balanza y los expositores. La nota de la Coleccionista quedó frente a la vitrina y la del reloj del vestíbulo frente a su base. El paso entre el reloj y la silla del Custodio permite rodear al crupier.
-
-[`test_colisiones_salas.gd`](juego/tests/test_colisiones_salas.gd) comprueba los bordes detectados por Kenned y usa la selección por proximidad del juego para verificar que cada interacción se puede activar. Al sustituir un fondo, revisar sus huellas en la escala de 1280 × 720. El script [`qa_colisiones.gd`](juego/tests/qa_colisiones.gd) muestra encima del fondo las formas físicas reales, incluidas las esquinas de las mesas. Desde la raíz del repositorio:
-
-```powershell
-& $GodotExe --audio-driver Dummy --path '2P/Desarrollo/juego' --script res://tests/qa_colisiones.gd -- --sala=custodio --bordes=1
-```
-
-Las capturas se guardan en `juego/exportaciones/qa/`. Quitar `--bordes=1` para guardar la sala completa.
+La construcción de obstáculos vive en `casino/exploracion/plano_salas.gd`. Al sustituir un fondo, revisar sus huellas en la misma escala de 1280 × 720.
 
 ## Verificación
 
@@ -119,4 +111,4 @@ Las capturas se guardan en `juego/exportaciones/qa/`. Quitar `--bordes=1` para g
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/sim_campana.gd -- --semillas=1000 --margen=6 --recompensas
 ```
 
-Tras integrar las colisiones, I3 pasó **168 pruebas y 1.789 aserciones** en Godot 4.7.2. Los casos cubren el recorrido completo, las recompensas y compras, los bordes de las salas, el orden de revelación de dos Máscaras y el foco de los diálogos.
+I3 pasó **167 pruebas y 1.764 aserciones** en Godot 4.7.2. Los casos cubren el recorrido completo, las recompensas y compras, la validez de las acciones, el orden de revelación de dos Máscaras, la vista de la Coleccionista y la restauración del foco al sustituir un diálogo.

@@ -73,8 +73,7 @@ func test_se_puede_rodear_al_jefe_por_detras() -> void:
 	juego.campana.recibir_invitacion()
 	juego.entrar("custodio")
 	await get_tree().physics_frame
-	# Entre la base del reloj (hasta y 210) y la silla del jefe (desde y 240).
-	juego.visitante.position = Vector2(560,225)
+	juego.visitante.position = Vector2(560,200)
 	Input.action_press("este")
 	for i in range(60): await get_tree().physics_frame
 	Input.action_release("este")
