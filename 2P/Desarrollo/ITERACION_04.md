@@ -10,9 +10,9 @@
 | --- | --- | --- | --- |
 | I4-01 | Vitrina del Gabinete de la anfitriona | Pendiente | Compra de la Lente de humo desde una ficha ilustrada, con confirmación, saldo actualizado y regreso al juego |
 | I4-02 | Recorrido según el plano de la exposición | Pendiente | Corredor transitable con puertas arriba y abajo, puntos de retorno y cerrojos en el orden indicado |
-| I4-03 | Reducir el texto que aparece por defecto | Pendiente | Revisar los mensajes del vestíbulo, las puertas, la mesa y el resultado con ejemplos antes y después |
-| I4-04 | Sellos y fichas ilustrados | Pendiente | Tres espacios para los sellos, saldo con icono y prueba al obtener el primer sello |
-| I4-05 | Mesa visual y dial de campanadas | Pendiente | Composición del Custodio con dial animado en una mano real |
+| I4-03 | Reducir el texto que aparece por defecto | Pendiente | Aplicar la jerarquía y los reemplazos de texto del apartado I4-03 en las pantallas jugables |
+| I4-04 | Sellos y fichas ilustrados | Arte listo · implementación pendiente | Tres espacios para los sellos, saldo con icono y prueba al obtener el primer sello |
+| I4-05 | Mesa visual y dial de campanadas | Arte listo · implementación pendiente | Composición del Custodio con dial animado en una mano real |
 | I4-06 | Base reutilizable de diálogos tipo novela visual | Pendiente | Una escena y un formato de conversación compartidos, probados con las líneas actuales de la anfitriona |
 | I4-07 | Menú de inicio y pausa con Esc | Pendiente | Entrada al casino, pausa, opciones y retorno a la misma mano o sala |
 | I4-08 | Integración y prueba de usabilidad | Pendiente | Recorrido completo, capturas a dos resoluciones y registro de dónde se detiene o duda el jugador |
@@ -62,20 +62,22 @@ flowchart TB
 
 ## I4-03 · Texto en el momento de la decisión
 
-| Situación | A primera vista | Detalle a petición |
+| Pantalla | Qué se ve durante el juego | Qué se consulta al interactuar |
 | --- | --- | --- |
-| Exploración | Un objetivo a la izquierda, sellos ilustrados y saldo con icono. Cerca de una interacción, una línea como **E · Abrir vitrina** | Placa o nota al examinarla. Los controles se consultan en el menú |
-| Antes de sentarse | Nombre del crupier, umbral, meta, campanadas y **Tomar asiento** | Regla especial y diálogo en el libro o al hablar con el personaje |
-| En la mesa | Suma o intervalo, umbral, coste de la acción y recursos disponibles. Los patrones se leen por su símbolo y estado | Nombre y efecto del patrón al enfocarlo. Ejemplos en el libro |
-| Al resolver | Puntos obtenidos o motivo breve de la Quiebra | Fórmula y bonos en **Ver desglose** |
+| Vestíbulo y galería | Nombre de sala y un objetivo a la izquierda, como **Habla con la anfitriona**. Se elimina la pista inferior que repite el objetivo y la tira fija de teclas. Al acercarse aparece una sola acción, como **E · Hablar** | **Cómo jugar** reúne WASD, E y los atajos. Una puerta cerrada conserva su candado y muestra **Falta el primer sello** al acercarse |
+| Encabezado de exploración y mesa | Los tres sellos ilustrados y la ficha con su saldo reemplazan **10 fichas · 0 / 3 sellos**. Ayuda, inventario y sonido pasan al menú | El inventario identifica cada sello y los objetos disponibles |
+| Vitrina | Imagen, nombre y precio por producto. El detalle se abre al seleccionar. **Faltan 2 fichas** identifica un bloqueo en el producto elegido | Efecto, condición de compra y saldo resultante antes de confirmar |
+| Presentación del crupier | Una intervención breve y **Tomar asiento**. Mostrar umbral, meta y campanadas en tres cifras junto a la elección, con sus etiquetas | La regla especial se consulta en el libro. Si cambia el coste de una acción, aparece junto a esa acción durante la mano |
+| Mano activa | Cartas, suma o intervalo, umbral, campanadas y puntuación de la mesa. Quitar **No lo excedas** junto al umbral y las explicaciones repetidas. **Pedir** muestra **−1 ficha** cuando hay comisión. El gasto de **Iniciar mano** sigue visible junto al botón | El nombre y el bono de cada patrón aparecen al enfocarlo o elegirlo. Los recuentos de mazo y descarte pasan a un detalle consultable |
+| Resolución | Un resultado breve, como **+64 puntos** o **Quiebra · 19 supera 17**. Si hay Máscaras, la revelación precede al resultado | **Ver desglose** muestra la fórmula y los bonos |
 
-**Aceptación.** En cada pantalla se reconoce la acción principal sin leer un párrafo. La comisión, la Quiebra, el saldo insuficiente y los valores todavía ocultos siguen siendo comprensibles con audio silenciado y movimiento reducido. Los mensajes se leen completos y el detalle se puede abrir con teclado.
+**Aceptación.** Durante la exploración solo hay un objetivo y una pista de acción cuando el jugador está cerca de algo. Durante la mano hay una acción principal visible y un coste junto a cada acción que lo tiene. El jugador puede averiguar por qué una puerta o compra está bloqueada, leer el intervalo de una Máscara y abrir el desglose con teclado. Revisar capturas comparables a 1024 × 576 y 1280 × 720, con movimiento reducido y audio silenciado.
 
 ## I4-04 · HUD de sellos y fichas
 
 - **Sellos.** Tres recuadros contiguos forman una ilustración. Cada victoria del Custodio, el Recaudador y la Coleccionista completa su parte, en ese orden. Los espacios vacíos conservan un relieve tenue. Al volver a explorar, el sello recién ganado se estampa una vez y queda visible. El nombre y el estado de cada sello se pueden consultar al enfocar su recuadro o desde el inventario.
 - **Fichas.** Un recuadro compacto combina el icono de una ficha del casino con el saldo en cifras alineadas. Usar el mismo recuadro en exploración, mesa y vitrina. En la confirmación se ve cuánto queda tras comprar. El saldo se actualiza al aplicar una compra, una comisión o una recompensa.
-- **Arte por generar.** Tres fragmentos de una misma composición y un icono original de ficha. Los motivos propuestos son el reloj del Custodio, la balanza del Recaudador y la vitrina de la Coleccionista. Preparar capas transparentes sin cifras ni letras incrustadas. Validar el conjunto antes de producir las variantes y registrar su procedencia.
+- **Arte disponible.** Reloj del Custodio, balanza del Recaudador y vitrina de la Coleccionista, recortados del mismo tríptico. El icono de ficha se entrega como capa independiente. [Archivos y procedencia](Diseno/ARTE_I4.md).
 
 **Aceptación.** Se distinguen los estados de 0 a 3 sellos sin depender del color. Cada victoria habilita su recuadro y el HUD refleja las fichas reales. Con movimiento reducido el sello y el saldo aparecen de inmediato.
 
@@ -84,7 +86,7 @@ flowchart TB
 - **Composición.** Probar en el Custodio un tapete ilustrado que enmarque la mano, con el retrato, las cartas y el boleto de meta como focos. Usar motivos visuales de los patrones y reservar el nombre, el requisito y el bono para el detalle. Los números, costes, atajos y botones se dibujan en Godot con el estilo del casino.
 - **Dial.** Al gastar una campanada, el aro ilustrado hace un giro corto mientras la cifra baja. El número permanece horizontal y se asienta en su valor real. El efecto se activa con el gasto confirmado, dura unos **0,25 s** como punto de partida y termina en el valor correcto aunque el jugador abra el menú. Una devolución de campanada actualiza la cifra con su propio aviso. Con movimiento reducido la cifra cambia de inmediato.
 - **Resultado.** Al terminar la cuenta de puntos, iluminar brevemente el borde del boleto cuando se suma el aporte. Conservar la secuencia de revelación de Máscaras y evitar que el realce compita con ella.
-- **Arte por generar.** Un tapete para el Custodio como prueba de estilo y un aro del dial separado de su base. Mantener libres las zonas de cartas, lectura, botones y cifras. Reutilizar los grabados, el retrato y el boleto existentes.
+- **Arte disponible.** Tapete del Custodio y dial en dos capas con el mismo centro de giro. Los grabados, el retrato y el boleto se reutilizan. [Archivos y montaje](Diseno/ARTE_I4.md).
 
 **Aceptación.** Iniciar una mano consume una campanada y dispara un giro. Pedir, cancelar una acción, reiniciar o cambiar de pantalla dejan el aro quieto. Se identifican la mano, el umbral y la acción disponible a ambas resoluciones, con animación normal o reducida.
 
