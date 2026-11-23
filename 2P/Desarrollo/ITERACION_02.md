@@ -30,7 +30,7 @@ Damián jugó la versión 0.2.0 completa, antes del balance de la campaña y de 
 | --- | --- | --- | --- |
 | 1 | «Sentí el juego muy fácil.» | Coincide con la simulación: la Coleccionista la superaba el 100 % de quienes llegaban y quien compra Corona y Sello superaba al Dueño el 84 % de las veces. | I3-02 endureció la Coleccionista y redujo el Sello a un uso. Quien compra sigue superando al Dueño el 96 % de las veces, así que conviene repetir la prueba con él. |
 | 2 | «No me di cuenta de que el jefe iba bajando su límite en cada ronda. Debería haber algo más llamativo visualmente, o que solo baje si no me excedí del límite.» | El cambio de umbral solo se veía en el número y en la ayuda (H). La segunda idea cambia la regla del Dueño. | I3-03 muestra la regla del crupier y el cambio de umbral en la mesa. Por decisión de Julio, el umbral ya solo baja tras una mano sin Quiebra. |
-| 3 | «Debería haber más colisiones con el entorno. Al mover al personaje por las esquinas, en algunos sitios puedo pasar por encima de mesas u objetos cuando no debería.» | Los obstáculos de algunas salas no cubren todo el mobiliario dibujado. | I3-08: revisar y completar las colisiones de cada sala. |
+| 3 | «Debería haber más colisiones con el entorno. Al mover al personaje por las esquinas, en algunos sitios puedo pasar por encima de mesas u objetos cuando no debería.» | Los obstáculos de algunas salas no cubren todo el mobiliario dibujado. | I3-08 corrigió las colisiones de las seis salas y añadió pruebas de bloqueo y de acceso. |
 
 Sus comentarios no cubren si encontró la salida sur, si distinguió fichas de campanadas ni cuándo usar la Lente: esas preguntas quedan para el próximo piloto.
 

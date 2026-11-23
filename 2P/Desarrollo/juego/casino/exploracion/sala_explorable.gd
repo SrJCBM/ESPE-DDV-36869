@@ -45,7 +45,7 @@ func _agregar_interacciones(sala: String, nombre_nota: String) -> void:
 		"vestibulo":
 			_figura("anfitriona", Vector2(990, 231), 84)
 			_punto("anfitriona", Vector2(985, 279), "Hablar con la anfitriona")
-			_punto("nota", Vector2(640, 190), "Examinar el reloj")
+			_punto("nota", Vector2(640, 230), "Examinar el reloj")
 		"tienda":
 			_figura("anfitriona", Vector2(650, 174), 84)
 			_punto("tienda", Vector2(645, 290), "Abrir el mostrador")
@@ -53,7 +53,8 @@ func _agregar_interacciones(sala: String, nombre_nota: String) -> void:
 		_:
 			_figura(sala, Vector2(640, 310), 95)
 			_punto("mesa", Vector2(640, 521), "Acercarse a la mesa")
-			_punto("nota", Vector2(235, 262), "Examinar " + nombre_nota.to_lower())
+			var nota := Vector2(318, 262) if sala == "coleccionista" else Vector2(235, 262)
+			_punto("nota", nota, "Examinar " + nombre_nota.to_lower())
 			if sala == "dueno":
 				_punto("salida", Vector2(640, 188), "Examinar el portón")
 

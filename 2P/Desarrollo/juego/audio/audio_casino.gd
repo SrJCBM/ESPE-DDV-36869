@@ -19,7 +19,7 @@ var _emisores := {}
 var _azar := RandomNumberGenerator.new()
 
 func _ready() -> void:
-	if DisplayServer.get_name() == "headless":
+	if process_mode == Node.PROCESS_MODE_DISABLED or DisplayServer.get_name() == "headless":
 		return
 	for canal: StringName in CANALES:
 		_aplicar(canal, volumen(canal))
