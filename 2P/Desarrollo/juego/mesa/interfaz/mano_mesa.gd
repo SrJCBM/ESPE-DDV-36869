@@ -13,6 +13,8 @@ var _vacio := Control.new()
 var _ultima_carta := ""
 var _revision := 0
 var _dialogo_abierto: Callable
+## Alto de las cartas; la mesa lo reduce para que la mano quepa dentro del tapete.
+var alto_carta := 286.0
 
 func configurar(dialogo_abierto: Callable) -> void:
 	_dialogo_abierto = dialogo_abierto
@@ -47,7 +49,7 @@ func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool) -> void:
 	_vacio.visible = cartas.is_empty()
 	var ancho := 184.0
 	if cartas.size() >= 4 and cartas.size() <= 5:
-		ancho = floorf((704.0 - 16.0 * (cartas.size() - 1)) / cartas.size())
+		ancho = minf(184.0, floorf((scroll.size.x - 16.0 * (cartas.size() - 1)) / cartas.size()))
 	for indice in range(cartas.size()):
 		var datos: Dictionary = cartas[indice]
 		var id := str(datos.get("id", "posicion-%s" % indice))
@@ -59,7 +61,7 @@ func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool) -> void:
 			carta.set_meta("carta_id", id)
 			fila.add_child(carta)
 			carta.ampliacion_solicitada.connect(carta_activada.emit.bind(id))
-		carta.custom_minimum_size = Vector2(ancho, 286)
+		carta.custom_minimum_size = Vector2(ancho, alto_carta)
 		fila.move_child(carta, indice)
 		carta.establecer_movimiento_reducido(movimiento_reducido)
 		carta.presentar(datos)
@@ -82,6 +84,17 @@ func _desplazar_al_final(revision: int) -> void:
 	await get_tree().process_frame
 	if revision == _revision and not _dialogo_abierto.call():
 		scroll.scroll_horizontal = ceili(scroll.get_h_scroll_bar().max_value)
+
+## Encaja la mano dentro de un rectángulo del lienzo, conservando el desplazamiento horizontal.
+func colocar(zona: Rect2, alto: float) -> void:
+	alto_carta = alto
+	scroll.position = zona.position
+	scroll.size = zona.size
+	scroll.get_child(0).custom_minimum_size = Vector2(zona.size.x, alto + 10)
+	_vacio.position = zona.position + Vector2(20, zona.size.y * 0.3)
+	_vacio.size = Vector2(zona.size.x - 40, 120)
+	for carta in fila.get_children():
+		carta.custom_minimum_size.y = alto
 
 func revelar(indice: int, datos: Dictionary) -> Dictionary:
 	fila.get_child(indice).presentar(datos)

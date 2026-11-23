@@ -83,14 +83,15 @@ func test_eleccion_permanece_dentro_de_mesa_sin_tapar_acciones() -> void:
 	assert_gte(mesa.eleccion_llave.position.x, 405.0)
 	assert_lte(mesa.eleccion_llave.position.x + mesa.eleccion_llave.size.x, 1123.0)
 	assert_lte(mesa.eleccion_llave.position.y + mesa.eleccion_llave.size.y, 599.0)
-	assert_lt(mesa.eleccion_llave.get_global_rect().end.y, mesa.boton_iniciar_pedir.get_global_rect().position.y)
+	assert_lt(mesa.eleccion_llave.get_global_rect().end.x, mesa.boton_iniciar_pedir.get_global_rect().position.x, "No tapa la columna de acciones")
 	var elegida: Control = mesa.eleccion_llave.carta_por_id(mesa.eleccion_llave.seleccionada)
 	assert_almost_eq(mesa.eleccion_llave.get_global_rect().get_center().x, elegida.get_global_rect().get_center().x, 1.0, "La confirmación sigue a la carta elegida después de ordenar los contenedores")
 
 func test_puntuacion_al_plantarse_solo_se_publica_sin_valores_ocultos() -> void:
 	var mesa = _mesa()
 	assert_eq(mesa.vista.resultado_visible.puntos, 9)
-	assert_string_contains(mesa.boton_plantarse.get_node("Coste").text, "9 puntos")
+	assert_eq(mesa.boton_plantarse.get_node("Coste").text, "", "El botón solo lleva la acción")
+	assert_string_contains(mesa._explicacion.text, "9 puntos", "Lo que daría plantarse se lee junto a la suma")
 	mesa.controlador.procesar_comando(PedirCarta.new())
 	assert_true(mesa.vista.resultado_visible.is_empty())
 	var antes: Dictionary = mesa.controlador.obtener_vista()

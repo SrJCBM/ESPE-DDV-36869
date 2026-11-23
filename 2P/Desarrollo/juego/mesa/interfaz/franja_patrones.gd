@@ -1,5 +1,8 @@
 extends HBoxContainer
 ## Presenta patrones públicos y resalta las cartas relacionadas.
+## Cada indicador muestra un símbolo y un estado breve; el nombre, el progreso y el bono
+## aparecen en un único espacio de detalle al enfocarlo (I4-05). Tras resolver, se destacan
+## los patrones aplicados.
 
 signal detalle_cambiado(texto: String)
 signal patron_solicitado(indice: int)
@@ -7,6 +10,8 @@ signal boton_creado(boton: Button)
 
 const Lectura := preload("res://mesa/lectura_mesa.gd")
 const Piezas := preload("res://mesa/piezas_mesa.gd")
+## Símbolos breves con caracteres que tiene cualquier fuente del proyecto.
+const SIMBOLOS := {"Punto exacto": "=%s", "Al filo": "=%s", "Ascenso": "< <", "Mano larga": "5+", "Racha": "3×"}
 var _mano: HBoxContainer
 var _puede_resaltar: Callable
 var _vista: Dictionary = {}
@@ -18,6 +23,7 @@ func configurar(mano: HBoxContainer, puede_resaltar: Callable) -> void:
 	_puede_resaltar = puede_resaltar
 	position = Vector2(431, 552)
 	size = Vector2(680, 43)
+	alignment = BoxContainer.ALIGNMENT_CENTER
 	add_theme_constant_override("separation", 6)
 	hide()
 
@@ -46,8 +52,8 @@ func limpiar() -> void:
 
 func _crear_boton(indice: int) -> Button:
 	var boton := Button.new()
-	boton.custom_minimum_size = Vector2(131, 43)
-	boton.add_theme_font_size_override("font_size", 14)
+	boton.custom_minimum_size = Vector2(124, 48)
+	boton.add_theme_font_size_override("font_size", 15)
 	boton.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	boton.pressed.connect(patron_solicitado.emit.bind(indice))
 	boton.mouse_entered.connect(_senalar.bind(indice, true, true))
@@ -59,12 +65,17 @@ func _crear_boton(indice: int) -> Button:
 	return boton
 
 func _estilizar(boton: Button, datos: Dictionary) -> void:
-	boton.text = "%s +%s\n%s" % [datos.nombre, datos.bono, Lectura.progreso(datos)]
-	boton.tooltip_text = "%s: %s. %s" % [datos.nombre, datos.detalle, datos.explicacion]
+	var umbral: int = int(_vista.get("umbral", 17))
+	var simbolo: String = SIMBOLOS.get(datos.nombre, "·")
+	if "%s" in simbolo:
+		simbolo = simbolo % (umbral if datos.nombre == "Punto exacto" else umbral - 1)
+	boton.text = "%s\n%s" % [simbolo, Lectura.progreso(datos)]
+	boton.tooltip_text = "%s +%s: %s. %s" % [datos.nombre, datos.bono, datos.detalle, datos.explicacion]
 	if datos.condicionado:
 		boton.tooltip_text += " Bono condicionado a no quebrar."
+	var aplicado := _aplicado(datos.nombre)
 	var color := Piezas.MUTED
-	if datos.estado == "activo" and not datos.condicionado:
+	if aplicado or (datos.estado == "activo" and not datos.condicionado and _vista.get("fase", "") == "decision"):
 		color = Piezas.ORO
 	elif datos.estado == "pendiente" or datos.condicionado:
 		color = Piezas.MARFIL
@@ -72,8 +83,10 @@ func _estilizar(boton: Button, datos: Dictionary) -> void:
 	boton.add_theme_color_override("font_focus_color", color)
 	var estilo := StyleBoxFlat.new()
 	estilo.bg_color = Color.TRANSPARENT
-	estilo.border_color = color if datos.estado == "activo" else Color("526043")
-	estilo.border_width_bottom = 2 if datos.estado == "activo" else 1
+	estilo.bg_color = Color(0.83, 0.71, 0.47, 0.16) if aplicado else Color.TRANSPARENT
+	estilo.border_color = color if datos.estado == "activo" or aplicado else Color("526043")
+	estilo.border_width_bottom = 2 if datos.estado == "activo" or aplicado else 1
+	boton.set_meta("aplicado", aplicado)
 	boton.add_theme_stylebox_override("normal", estilo)
 	var hover := estilo.duplicate() as StyleBoxFlat
 	hover.bg_color = Color("172d23")
@@ -81,6 +94,13 @@ func _estilizar(boton: Button, datos: Dictionary) -> void:
 	hover.border_width_bottom = 2
 	boton.add_theme_stylebox_override("hover", hover)
 	boton.add_theme_stylebox_override("pressed", hover)
+
+## Tras resolver una mano válida, los patrones que puntuaron quedan destacados.
+func _aplicado(nombre: String) -> bool:
+	if _vista.get("fase", "") == "decision":
+		return false
+	var mano: Dictionary = _vista.get("ultima_mano", {})
+	return not mano.get("quiebra", true) and mano.get("patrones", []).has(nombre)
 
 func _senalar(indice: int, entra: bool, raton: bool) -> void:
 	if entra and not _puede_resaltar.call():
@@ -101,4 +121,9 @@ func _refrescar() -> void:
 	for i in range(_mano.get_child_count()):
 		var resaltar: bool = detalle.indices.has(i)
 		_mano.get_child(i).resaltar_patron(resaltar, indice >= 0 and not resaltar)
-	detalle_cambiado.emit(detalle.texto)
+	var texto: String = detalle.texto
+	var filas: Array = _vista.get("patrones_visibles", [])
+	if indice >= 0 and indice < filas.size() and not texto.is_empty():
+		# Nombre y bono en el único espacio de detalle; el indicador solo lleva símbolo y estado.
+		texto = "+%s · %s · %s" % [filas[indice].bono, texto, Lectura.progreso(filas[indice])]
+	detalle_cambiado.emit(texto)

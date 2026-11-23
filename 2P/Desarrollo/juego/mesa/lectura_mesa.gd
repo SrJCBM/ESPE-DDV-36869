@@ -21,7 +21,7 @@ static func resultado(vista: Dictionary) -> Dictionary:
 ## Regla del crupier aplicada a la mano en curso, para leerla sin abrir la ayuda.
 ## texto: placa bajo el retrato (vacía si la mesa no tiene regla especial). nota: línea junto al umbral.
 static func regla(vista: Dictionary) -> Dictionary:
-	var nota := "No lo excedas."
+	var nota := ""
 	var umbral: int = int(vista.get("umbral", 17))
 	var siguiente: int = int(vista.get("umbral_siguiente", -1))
 	var anterior: int = int(vista.get("umbral_anterior", -1))

@@ -10,6 +10,8 @@ var _textos_finales: Dictionary = {}
 var _lectura: Label
 var _puntos: Label
 var _umbral: Label
+## Boleto de la mesa: su borde se ilumina al sumar el aporte (I4-05). Opcional.
+var boleto: CanvasItem
 
 func _init(lectura: Label, puntos: Label, umbral: Label) -> void:
 	_lectura = lectura
@@ -40,6 +42,9 @@ func celebrar(vista: Dictionary, cartas: Array, puntos_previos: int) -> void:
 	tween.tween_method(cuenta, 0.0, float(aporte), DURACION_CUENTA).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_lectura, "scale", Vector2.ONE * 1.12, 0.07)
 	tween.tween_property(_lectura, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if boleto != null and aporte > 0:
+		tween.tween_property(boleto, "modulate", Color(1.35, 1.25, 0.95), 0.12)
+		tween.tween_property(boleto, "modulate", Color.WHITE, 0.35)
 	tween.tween_callback(detener)
 	if mano.get("patrones", []).has("Punto exacto"):
 		for i in range(cartas.size()):
@@ -55,6 +60,8 @@ func detener() -> void:
 	_textos_finales.clear()
 	_lectura.scale = Vector2.ONE
 	_lectura.modulate = Color.WHITE
+	if boleto != null:
+		boleto.modulate = Color.WHITE
 
 ## El número del umbral late en oro al cambiar; la placa explica el cambio con texto.
 func avisar_cambio_umbral(reducido: bool) -> void:

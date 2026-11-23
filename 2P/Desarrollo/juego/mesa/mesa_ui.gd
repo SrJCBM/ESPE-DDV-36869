@@ -19,6 +19,9 @@ const RevelacionMano := preload("res://mesa/interfaz/revelacion_mano.gd")
 const ManoMesa := preload("res://mesa/interfaz/mano_mesa.gd")
 const ModalMesa := preload("res://mesa/interfaz/modal_mesa.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
+const DialCampanadas := preload("res://mesa/interfaz/dial_campanadas.gd")
+const C := preload("res://mesa/interfaz/composicion_mesa.gd")
+const TAPETE_CUSTODIO := "res://mesa/arte/tapete_custodio.webp"
 const ORO := Piezas.ORO
 const MARFIL := Piezas.MARFIL
 const MUTED := Piezas.MUTED
@@ -58,6 +61,10 @@ var hud: HudCampana
 var modal: ModalMesa
 var movimiento_reducido := false
 var _progreso: ProgressBar
+## Dial de campanadas con el aro que gira al gastar una (I4-05).
+var dial: DialCampanadas
+var boleto: TextureRect
+var tapete: TextureRect
 var _transicion_progreso: Tween
 var franja_patrones: FranjaPatrones
 var eleccion_llave: EleccionLlave
@@ -143,25 +150,31 @@ func _construir() -> void:
 		boton_lente = Piezas.boton_texto(lienzo, "boton_lente", "LENTE", Rect2(510, 66, 340, 36), _usar_lente, 15)
 	Piezas.imagen(lienzo, retrato, Rect2(22, 124, 356, 534), true)
 	_construir_regla()
-	Piezas.etiqueta(lienzo, nombre, Rect2(429, 119, 610, 75), 46, MARFIL, true)
-	_titulo_estado = Piezas.etiqueta(lienzo, "", Rect2(431, 194, 680, 30), 16, ORO)
+	Piezas.etiqueta(lienzo, nombre, C.NOMBRE, 46, MARFIL, true)
+	_titulo_estado = Piezas.etiqueta(lienzo, "", C.ESTADO, 16, ORO)
+	# El tapete ilustrado es la prueba de estilo del Custodio; las demás mesas conservan el paño liso.
+	if campana == null or campana.activa == "custodio":
+		tapete = Piezas.imagen(lienzo, TAPETE_CUSTODIO, C.TAPETE)
+		tapete.name = "Tapete"
 	_umbral = Piezas.etiqueta(lienzo, "", Rect2(32, 660, 115, 112), 88, ORO, true)
 	Piezas.etiqueta(lienzo, "UMBRAL", Rect2(155, 671, 215, 28), 18, ORO)
-	_nota_umbral = Piezas.etiqueta(lienzo, "No lo excedas.", Rect2(155, 703, 215, 29), 20, MUTED)
-	Piezas.imagen(lienzo, "res://mesa/arte/dial.svg", Rect2(1210, 124, 180, 180))
-	_contador = Piezas.etiqueta(lienzo, "", Rect2(1234, 168, 130, 78), 62, ORO, true)
-	_contador.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_presupuesto = Piezas.etiqueta(lienzo, "", Rect2(1234, 250, 130, 23), 13, MUTED)
-	_presupuesto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	Piezas.etiqueta(lienzo, "CAMPANADAS", Rect2(1190, 306, 240, 32), 17, ORO)
-	Piezas.imagen(lienzo, "res://mesa/arte/boleto.svg", Rect2(1157, 393, 238, 237))
-	Piezas.etiqueta(lienzo, "META DE LA MESA", Rect2(1180, 416, 195, 24), 14, TINTA)
-	_meta = Piezas.etiqueta(lienzo, "", Rect2(1182, 441, 190, 85), 68, TINTA, true)
-	Piezas.etiqueta(lienzo, "PUNTOS", Rect2(1294, 485, 82, 22), 12, TINTA)
-	Piezas.etiqueta(lienzo, "ACUMULADOS", Rect2(1181, 542, 195, 24), 12, TINTA)
-	_puntos = Piezas.etiqueta(lienzo, "", Rect2(1181, 562, 196, 48), 35, TINTA, true)
+	_nota_umbral = Piezas.etiqueta(lienzo, "", Rect2(155, 703, 215, 29), 20, MUTED)
+	dial = DialCampanadas.new(C.DIAL.size.x)
+	dial.position = C.DIAL.position
+	lienzo.add_child(dial)
+	_contador = dial.cifra
+	_presupuesto = dial.presupuesto
+	var rotulo_dial := Piezas.etiqueta(lienzo, "CAMPANADAS", C.ETIQUETA_DIAL, 17, ORO)
+	rotulo_dial.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Boleto compacto alrededor de «acumulado / meta» y su barra.
+	boleto = Piezas.imagen(lienzo, "res://mesa/arte/boleto.svg", C.BOLETO)
+	boleto.name = "Boleto"
+	Piezas.etiqueta(lienzo, "ACUMULADO / META", C.BOLETO_TITULO, 12, TINTA)
+	_meta = Piezas.etiqueta(lienzo, "", C.BOLETO_TITULO, 12, TINTA)
+	_meta.hide()
+	_puntos = Piezas.etiqueta(lienzo, "", C.BOLETO_PUNTOS, 38, TINTA, true)
 	_progreso = ProgressBar.new()
-	_progreso.position = Vector2(1182, 615)
+	_progreso.position = C.BOLETO_BARRA.position
 	_progreso.show_percentage = false
 	_progreso.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var pista := StyleBoxFlat.new()
@@ -171,8 +184,8 @@ func _construir() -> void:
 	avance.bg_color = TINTA
 	_progreso.add_theme_stylebox_override("fill", avance)
 	lienzo.add_child(_progreso)
-	_progreso.size = Vector2(192, 5)
-	boton_desglose = Piezas.boton_texto(lienzo, "boton_desglose", "VER DESGLOSE", Rect2(1157, 646, 238, 36), mostrar_desglose, 14)
+	_progreso.size = C.BOLETO_BARRA.size
+	boton_desglose = Piezas.boton_texto(lienzo, "boton_desglose", "VER DESGLOSE", C.DESGLOSE, mostrar_desglose, 14)
 	boton_desglose.hide()
 	modal = ModalMesa.new()
 	mano = ManoMesa.new()
@@ -180,24 +193,39 @@ func _construir() -> void:
 	mano.carta_activada.connect(_activar_carta)
 	mano.carta_creada.connect(modal.suspender_si_abierto)
 	lienzo.add_child(mano)
+	mano.colocar(C.MANO, C.ALTO_CARTA)
+	var franja_fondo := Panel.new()
+	franja_fondo.name = "FranjaPatrones"
+	franja_fondo.position = C.FRANJA.position
+	franja_fondo.size = C.FRANJA.size
+	franja_fondo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var oscuro := StyleBoxFlat.new()
+	oscuro.bg_color = Color(0.02, 0.07, 0.05, 0.72)
+	oscuro.set_corner_radius_all(4)
+	franja_fondo.add_theme_stylebox_override("panel", oscuro)
+	lienzo.add_child(franja_fondo)
 	franja_patrones = FranjaPatrones.new()
 	lienzo.add_child(franja_patrones)
 	franja_patrones.configurar(mano.fila, _puede_resaltar_patrones)
+	franja_patrones.position = C.PATRONES.position
+	franja_patrones.size = C.PATRONES.size
 	franja_patrones.detalle_cambiado.connect(_mostrar_detalle_patron)
 	franja_patrones.patron_solicitado.connect(_mostrar_patron)
 	franja_patrones.boton_creado.connect(modal.suspender_si_abierto)
-	Piezas.imagen(lienzo, "res://mesa/arte/filete.svg", Rect2(432, 599, 671, 1))
-	_lectura_titulo = Piezas.etiqueta(lienzo, "SIGUIENTE PASO", Rect2(431, 607, 175, 23), 12, MUTED)
-	_lectura = Piezas.etiqueta(lienzo, "—", Rect2(588, 606, 235, 50), 40, MARFIL, true)
-	_explicacion = Piezas.etiqueta(lienzo, "", Rect2(827, 606, 284, 47), 16, MUTED)
+	_lectura_titulo = Piezas.etiqueta(lienzo, "SIGUIENTE PASO", C.LECTURA_TITULO, 12, MUTED)
+	_lectura_titulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_lectura = Piezas.etiqueta(lienzo, "—", C.LECTURA, 36, MARFIL, true)
+	_explicacion = Piezas.etiqueta(lienzo, "", C.EXPLICACION, 16, MUTED)
 	_explicacion.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_mensaje = Piezas.etiqueta(lienzo, "", Rect2(432, 660, 684, 40), 16, MUTED)
+	_mensaje = Piezas.etiqueta(lienzo, "", C.DETALLE, 16, MUTED)
 	_mensaje.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	boton_iniciar_pedir = Piezas.boton_accion(lienzo, "boton_iniciar_pedir", Rect2(417, 706, 278, 80), true, _iniciar_o_pedir, "P")
-	boton_plantarse = Piezas.boton_accion(lienzo, "boton_plantarse", Rect2(713, 706, 278, 80), false, _plantarse, "S")
-	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "Gratis · revelar y puntuar")
+	# Acciones apiladas a la derecha, bajo el boleto: solo la acción, su atajo y un coste real.
+	boton_iniciar_pedir = Piezas.boton_accion(lienzo, "boton_iniciar_pedir", C.PEDIR, true, _iniciar_o_pedir, "P")
+	boton_plantarse = Piezas.boton_accion(lienzo, "boton_plantarse", C.PLANTARSE, false, _plantarse, "S")
+	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "")
 	_mazo = Piezas.etiqueta(lienzo, "", Rect2(40, 780, 350, 24), 12, MUTED)
 	_respuesta = Respuesta.new(_lectura, _puntos, _umbral)
+	_respuesta.boleto = boleto
 	add_child(_respuesta)
 	eleccion_llave = EleccionLlave.new()
 	lienzo.add_child(eleccion_llave)
@@ -225,7 +253,7 @@ func _iniciar_revelacion() -> void:
 	boton_iniciar_pedir.disabled = true
 	boton_iniciar_pedir.get_node("Fondo").modulate.a = 0.55
 	boton_plantarse.disabled = false
-	Piezas.texto_accion(boton_plantarse, "MOSTRAR RESULTADO", "Saltar revelación")
+	Piezas.texto_accion(boton_plantarse, "MOSTRAR RESULTADO", "")
 
 func _mostrar_carta_revelada(indice: int, datos: Dictionary) -> void:
 	var reveladas := mano.revelar(indice, datos)
@@ -262,8 +290,8 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	else:
 		_transicion_progreso = create_tween()
 		_transicion_progreso.tween_property(_progreso, "value", destino, 0.3).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_contador.text = str(vista.get("campanadas", 0))
-	_presupuesto.text = "ÚLTIMA MANO" if fase == "decision" and int(vista.get("campanadas", 0)) == 0 else "DE %s" % vista.get("presupuesto", 10)
+	var texto_presupuesto := "ÚLTIMA MANO" if fase == "decision" and int(vista.get("campanadas", 0)) == 0 else "DE %s" % vista.get("presupuesto", 10)
+	dial.presentar(int(vista.get("campanadas", 0)), int(vista.get("presupuesto", 10)), int(vista.get("numero_mano", 0)), texto_presupuesto, movimiento_reducido)
 	_meta.text = str(vista.get("meta", 200))
 	_puntos.text = "%s / %s" % [vista.get("puntos", 0), vista.get("meta", 200)]
 	_umbral.text = str(vista.get("umbral", 17))
@@ -278,7 +306,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 		boton_lente.visible = campana.lentes > 0
 		boton_lente.disabled = fase != "decision" or int(vista.intervalo.ocultas) == 0
 	boton_reiniciar.disabled = not bool(acciones.get("reiniciar", true))
-	Piezas.texto_accion(boton_iniciar_pedir, "PEDIR" if fase == "decision" else "INICIAR MANO", ("−1 ficha" if vista.get("comision", false) else "Gratis") if fase == "decision" else "−1 campanada")
+	Piezas.texto_accion(boton_iniciar_pedir, "PEDIR" if fase == "decision" else "INICIAR MANO", ("−1 ficha" if vista.get("comision", false) else "") if fase == "decision" else "−1 campanada")
 	boton_plantarse.visible = fase == "decision"
 	for boton in [boton_iniciar_pedir, boton_plantarse]:
 		boton.get_node("Fondo").modulate.a = 0.55 if boton.disabled else 1.0
@@ -299,27 +327,29 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 func _presentar_lectura(cartas: Array) -> void:
 	var intervalo: Dictionary = vista.get("intervalo", {})
 	boton_desglose.visible = _hay_resultado_revelado()
-	_lectura.position = Vector2(588, 606)
-	_lectura.size = Vector2(235, 50)
+	_lectura.position = C.LECTURA.position
+	_lectura.size = C.LECTURA.size
 	_lectura_titulo.visible = not cartas.is_empty() and not boton_desglose.visible
 	_lectura.visible = not cartas.is_empty()
-	_explicacion.position = Vector2(827, 606)
-	_explicacion.size = Vector2(284, 47)
+	_explicacion.position = C.EXPLICACION.position
+	_explicacion.size = C.EXPLICACION.size
 	_explicacion.tooltip_text = ""
 	if boton_desglose.visible:
 		var lectura: Dictionary = Lectura.resultado(vista)
-		_lectura.position = Vector2(431, 600)
-		_lectura.size = Vector2(680, 43)
+		_lectura.position = C.RESULTADO.position
+		_lectura.size = C.RESULTADO.size
 		_lectura.text = lectura.formula
 		_lectura.add_theme_font_size_override("font_size", 34)
-		_explicacion.position = Vector2(432, 642)
-		_explicacion.size = Vector2(680, 22)
+		_explicacion.position = C.RESULTADO_DETALLE.position
+		_explicacion.size = C.RESULTADO_DETALLE.size
 		_explicacion.text = lectura.detalle
 		_explicacion.tooltip_text = lectura.completo
 	else:
 		_lectura_titulo.text = "TOTAL POSIBLE" if intervalo.get("ocultas", 0) > 0 else ("SUMA EFECTIVA" if not cartas.is_empty() else "SIGUIENTE PASO")
+		# Intervalo y umbral juntos: se comparan sin buscar el umbral en otra esquina.
+		if not cartas.is_empty(): _lectura_titulo.text += "\nUMBRAL %s" % vista.get("umbral", 17)
 		_lectura.text = "%s–%s" % [intervalo.get("minimo", 0), intervalo.get("maximo", 0)] if intervalo.get("ocultas", 0) > 0 else (str(intervalo.get("conocido", 0)) if not cartas.is_empty() else "—")
-		_lectura.add_theme_font_size_override("font_size", 40)
+		_lectura.add_theme_font_size_override("font_size", 36)
 		_explicacion.text = ""
 		if intervalo.get("ocultas", 0) > 0:
 			var conocidas := "%s + ?" % intervalo.get("conocido", 0)
@@ -444,6 +474,7 @@ func _demostracion() -> void:
 func _abrir_modal(titulo: String, caja: Rect2 = ModalMesa.MARCO_NORMAL) -> void:
 	revelacion.terminar()
 	_respuesta.detener()
+	dial.detener()
 	eleccion_llave.cancelar()
 	franja_patrones.limpiar()
 	_actualizar_orientacion()
@@ -479,6 +510,7 @@ func establecer_movimiento_reducido(reducido: bool) -> void:
 		revelacion.terminar()
 		_respuesta.detener()
 		_respuesta.detener_aviso()
+		dial.detener()
 	mano.establecer_movimiento_reducido(reducido)
 	if reducido:
 		if _transicion_progreso != null and _transicion_progreso.is_valid():
@@ -534,22 +566,22 @@ func _cambio_eleccion_llave(activa: bool) -> void:
 		_actualizar_orientacion()
 
 func _actualizar_orientacion() -> void:
-	_mensaje.position = Vector2(1015, 714) if vista.get("terminado", false) else Vector2(432, 660)
-	_mensaje.size = Vector2(380, 58) if vista.get("terminado", false) else Vector2(684, 40)
+	_mensaje.position = C.DETALLE.position
+	_mensaje.size = C.DETALLE.size
 	_mensaje.text = Lectura.pista(vista)
 	_mensaje.visible = not _mensaje.text.is_empty()
-	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "Revelar y puntuar")
-	boton_plantarse.tooltip_text += ". Sin coste en campanadas."
+	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "")
+	boton_plantarse.tooltip_text += ". Revela y puntúa; no gasta campanadas."
 	if vista.get("fase", "preparado") == "decision":
 		var resultado: Dictionary = vista.get("resultado_visible", {})
 		if not resultado.is_empty():
-			Piezas.texto_accion(boton_plantarse, "PLANTARSE", "%s puntos" % resultado.puntos)
+			# Lo que daría plantarse ahora se lee junto a la suma, no dentro del botón.
+			_explicacion.text = "Plantarse: %s puntos" % resultado.puntos
+			_explicacion.show()
 	elif vista.get("terminado", false):
 		boton_iniciar_pedir.disabled = false
 		boton_iniciar_pedir.get_node("Fondo").modulate.a = 1.0
-		if campana != null:
-			Piezas.texto_accion(boton_iniciar_pedir, "LEVANTARSE", "Volver a la sala" if vista.victoria else "Fin del intento")
-		else: Piezas.texto_accion(boton_iniciar_pedir, "VOLVER A JUGAR", "Nuevo intento")
+		Piezas.texto_accion(boton_iniciar_pedir, "LEVANTARSE" if campana != null else "VOLVER A JUGAR", "")
 
 func _puede_resaltar_patrones() -> bool:
 	return not modal.visible and not revelacion.activa and eleccion_llave.seleccionada.is_empty()
@@ -559,8 +591,8 @@ func _mostrar_detalle_patron(texto: String) -> void:
 		return
 	_actualizar_orientacion()
 	if not texto.is_empty():
-		_mensaje.position = Vector2(432, 660)
-		_mensaje.size = Vector2(684, 40)
+		_mensaje.position = C.DETALLE.position
+		_mensaje.size = C.DETALLE.size
 		_mensaje.text = texto
 		_mensaje.show()
 
