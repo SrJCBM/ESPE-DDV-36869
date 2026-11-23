@@ -1,8 +1,8 @@
 # Plan de desarrollo de La Última Mesa
 
-Base de trabajo: diseño v2.4. Estado actualizado el **13 de noviembre de 2026**: mesa local I1 implementada y revisada técnicamente, versión 0.1.0. I1-02 e I1-04 de Ariel Completado; las demás entregas implementadas Por revisar. I1-07 lo realizará Julio y la prueba en otro equipo sigue pendiente.
+El diseño v2.4 y el entorno aprobado por el docente guían la campaña. Ariel completó I1-00 e I1-08 y entregó el ejecutable. I1-07 espera los comentarios. El balance, la respuesta visual y las refactorizaciones están registrados en la [iteración 03](ITERACION_03.md).
 
-Figma permanece como referencia de diseño; la implementación activa está en `2P/Desarrollo/juego/`. La base de Kenned (`5d73d50`) forma parte del historial y el incremento se integra en `main` local. [Tablero actualizado](README.md) y [revisión técnica](REVISION_I1.md).
+Figma permanece como referencia de diseño; la implementación activa está en `2P/Desarrollo/juego/`. La base de Kenned (`5d73d50`) forma parte del historial y los cambios aprobados se integran en `main`. [Tablero actualizado](README.md) y [revisión técnica](REVISION_I1.md).
 
 ## Guía para comenzar
 
@@ -71,17 +71,17 @@ El cierre incluirá una demostración, el registro de problemas y una revisión 
 | --- | --- | --- |
 | Preparación | Base documental y entorno acordados. | Versión de Godot registrada, tareas priorizadas y reglas del primer incremento confirmadas. |
 | 1 | Mesa local del Custodio con el núcleo actual. | Iniciar, pedir, Llaves, Máscaras, cuatro palos y cinco patrones funcionan; hay cierre de mesa y reinicio. |
-| 2 | Primera ronda competitiva por LAN. | Dos computadoras completan una ronda; coinciden puntos y turno, y se conserva la información privada. |
-| 3 | Primer recorrido con progresión. | El visitante conversa, entra al Custodio, gana un sello, abre una puerta y realiza una compra válida. |
-| 4 | Campaña completa. | Las cuatro mesas, tienda, objetos y cambios de baraja permiten llegar a escape o derrota y reiniciar. |
+| 2 | Exploración, economía, objetos y mesas locales. | Se puede recibir la baraja, comprar y usar objetos, obtener los tres sellos y abrir el portón. |
+| 3 | Ajustes del recorrido y de las reglas según las pruebas con jugadores. | Revisar orientación, comisiones, dificultad y legibilidad con observaciones del equipo. |
+| 4 | Primera ronda competitiva por LAN. | Dos equipos completan una ronda con puntos y turno coherentes y cartas privadas. |
 | 5 | Duelo LAN completo. | Tres rondas con umbrales 17, 21 y 25; sala de espera, recursos, desempates, revancha y salida por desconexión. |
 | 6 | Versión revisada para Windows. | Campaña y duelo completos con ayuda, controles, ajustes, audio y exportación comprobados en otro equipo. |
 
-Cada fila requiere una versión demostrable; la preparación es un paso previo y todavía no constituye un incremento jugable. El ciclo 2 valida la red antes de ampliar el escenario y realizar el acabado visual. Los ciclos podrán subdividirse según la capacidad del equipo, manteniendo la secuencia de dependencias.
+El balance de campaña se ajustó a partir de la simulación y de la sesión con Damián. La [iteración 03](ITERACION_03.md) distingue las tareas completadas de las que siguen pendientes.
 
 ### Inicio del desarrollo y validación
 
-La mesa local ya dispone de base, núcleo, UI y comprobaciones técnicas. Falta registrar la comprobación de Ariel, la aceptación del equipo, el piloto I1-07 y la prueba de la exportación actual en otro equipo. Julio realizará el piloto; no se consideran realizadas sesiones por disponer de capturas o pruebas automáticas.
+Ariel compartió el ejecutable de I1. Los comentarios pendientes se registrarán en el protocolo de I1-07.
 
 #### Primer incremento
 
@@ -90,7 +90,7 @@ El primer objetivo será jugar una mesa local del Custodio con recursos provisio
 | Tarea del incremento jugable (implementado; aceptación pendiente) | Responsable | Resultado verificable |
 | --- | --- | --- |
 | Definir datos y estado de la mano | Ariel | Catálogo y datos por intento; mano, mazo y descarte conservan las 24 cartas sin duplicados. |
-| Implementar acciones, costes y fases | Kenned; Ariel revisa | Iniciar cuesta una campanada; pedir, plantarse y devolver una Llave no consumen campanadas; las acciones inválidas no cambian el estado. |
+| Implementar acciones, costes y fases | Kenned; Ariel revisa | Solo iniciar cuesta una campanada; pedir es gratis; plantarse y devolver una Llave no consumen otra; las acciones inválidas no cambian el estado. |
 | Construir la mesa y sus controles | Julio | Orden de cartas, umbral, meta, puntos y campanadas visibles; acciones inválidas deshabilitadas. |
 | Verificar visibilidad y puntuación | Kenned y Julio; Ariel revisa cálculos | El controlador oculta las Máscaras, la UI representa la vista permitida y el evaluador produce un desglose correcto al resolver. |
 | Integrar el encuentro y reinicio | Kenned | Se comprueba meta antes de declarar derrota con cero campanadas; reiniciar restaura el estado. |

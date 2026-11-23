@@ -1,6 +1,6 @@
 # Balance del Recaudador · ¿la comisión cambia cómo conviene jugar?
 
-**19 de noviembre de 2026 · Kenned.** Precios y reglas actuales, sin cambios. Los resultados alimentan la decisión del equipo junto con los comentarios que recoja Ariel.
+**19 de noviembre de 2026 · Kenned.** Medición histórica con dos usos del Sello del prudente. El [balance de campaña](BALANCE_CAMPANA.md) documenta el cambio posterior a un uso por mesa.
 
 ## Resultado
 
@@ -30,7 +30,7 @@ Los dos controles no son recorridos alcanzables con los precios actuales: hay qu
 
 ## Conclusión
 
-- **La comisión no cambia el estilo que conviene.** Plantarse pronto gana más en los cuatro escenarios. Pedir una carta más cuesta entre 32 y 101 victorias.
+- **Con la comisión de una ficha, plantarse pronto gana más en los cuatro escenarios.** Pedir una carta más cuesta entre 32 y 101 victorias.
 - **Quedarse sin saldo perjudica.** Con el mismo equipamiento, sentarse con 18 fichas en vez de 45 nunca mejora el resultado. Sin amuletos cuesta 40 victorias jugando con prudencia y 52 arriesgando. La causa principal: sin fichas no se puede pedir ni siquiera cuando la mano está baja y la regla base lo pide, así que se cierran manos de pocos puntos y se necesitan más manos para llegar a 400. A veces la falta de saldo evita una carta que habría causado Quiebra, pero en el conjunto pesa más lo que impide sumar.
 - **El informe anterior se equivocaba en este punto.** Decía que quedarse sin fichas frenaba al jugador arriesgado y le ayudaba. Las victorias de más que tenía «Compra» frente a «Ahorra» venían de la Corona y el Sello, no del saldo. Con 45 fichas, los amuletos suman 22 victorias plantándose pronto y 79 arriesgando.
 - **Comprar compensa la comisión en este escenario.** Quien compra se sienta con 18 fichas y gana 198 de 200, casi igual que el control de 45 fichas con los mismos amuletos (200). Plantándose pronto apenas le falta saldo (0,28 manos por intento). El que arriesga sí lo nota: 135 frente a 168.
@@ -60,7 +60,7 @@ El caso contrario también aparece en la misma semilla (sexta mano, estilo «una
 
 ## Repetir la prueba
 
-La simulación usa `CampanaCasino`, `ControladorMesa` y los comandos reales del juego.
+Para reproducir la tabla, ejecutar el comando en el commit histórico `ec9f73e`, donde el Sello tenía dos usos. La simulación usa `CampanaCasino`, `ControladorMesa` y los comandos reales del juego.
 
 1. Abrir el proyecto con Godot 4.7.2 y ejecutar **GUT → Run All**, o solo `tests/test_balance_recaudador.gd`. Por consola:
 

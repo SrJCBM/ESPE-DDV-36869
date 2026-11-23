@@ -57,7 +57,7 @@ Se eligió 750 · 17: vuelve al centro del objetivo quitando una sola campanada.
 
 - **Quien compra Corona y Sello supera la Coleccionista siempre y el Dueño el 96 % de las veces.** Ningún ajuste de meta o campanadas cambia lo primero (con meta 800 seguía en 99 %). Reducir el Sello a un uso solo resta dos puntos al Dueño: la mayor parte de la ventaja viene de la Corona, que se mantiene hasta observar a jugadores.
 - Las tablas de [BALANCE_RECAUDADOR.md](BALANCE_RECAUDADOR.md) se midieron con el Sello de dos usos; sus filas con amuletos ya no son exactas.
-- La comisión del Recaudador no cambia qué estilo conviene. Con saldo de sobra, permitir una o dos peticiones gratis por mano dio exactamente las mismas victorias (178 y 89 de 200). Solo influye cuando faltan fichas, como ya mostraba [BALANCE_RECAUDADOR.md](BALANCE_RECAUDADOR.md).
+- En las estrategias comparadas, plantarse pronto obtuvo más victorias con la comisión de una ficha. Con saldo holgado, el ensayo con una o dos peticiones gratuitas por mano mantuvo las victorias (178 y 89 de 200), aunque cambió el gasto. [Balance del Recaudador](BALANCE_RECAUDADOR.md).
 - Son bots con una regla fija: detectan desequilibrios grandes, no miden diversión ni cómo aprende una persona. El piloto debe confirmar si la Coleccionista se siente más tensa y si el Dueño es alcanzable sin comprar.
 - El Word del diseño (v2.4) se actualizó en su mismo archivo con estas reglas, la regla nueva del Dueño, el coste por mano y la Quiebra segura.
 
