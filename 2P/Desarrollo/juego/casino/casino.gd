@@ -4,7 +4,7 @@ const Visitante := preload("res://casino/exploracion/visitante.gd")
 const SalaExplorable := preload("res://casino/exploracion/sala_explorable.gd")
 const Libro := preload("res://casino/interfaz/libro.gd")
 const Mesa := preload("res://mesa/mesa.tscn")
-const TiendaCasino := preload("res://casino/interfaz/tienda_casino.gd")
+const VitrinaGabinete := preload("res://casino/interfaz/vitrina/vitrina_gabinete.gd")
 const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
 const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
@@ -42,7 +42,7 @@ var mesa: Control
 var audio := AudioCasino.new()
 var boton_sonido := Button.new()
 var indicador_objetivo := IndicadorObjetivo.new()
-var _tienda := TiendaCasino.new(libro, _cerrar)
+var vitrina := VitrinaGabinete.new()
 
 func _ready() -> void:
 	get_window().min_size = Vector2i(1024,576)
@@ -89,11 +89,15 @@ func _ready() -> void:
 	pagina.add_child(controles)
 	indicador_objetivo.name = "IndicadorObjetivo"
 	pagina.add_child(indicador_objetivo)
-	_tienda.compra_realizada.connect(_refrescar)
 	velo.size = BASE
 	velo.color = Color(0.015,0.035,0.026,0.66)
 	pagina.add_child(velo)
 	pagina.add_child(libro)
+	pagina.add_child(vitrina)
+	vitrina.cerrada.connect(_cerrar)
+	vitrina.compra_realizada.connect(func(_id: String) -> void:
+		audio.reproducir(&"interfaz")
+		_refrescar())
 	velo.hide()
 	libro.hide()
 	resized.connect(_adaptar)
@@ -101,7 +105,7 @@ func _ready() -> void:
 	entrar("vestibulo")
 
 func _actualizar_objetivo() -> void:
-	var mostrar := not libro.visible and not velo.visible and not is_instance_valid(mesa)
+	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not is_instance_valid(mesa)
 	indicador_objetivo.presentar(campana.objetivo(), mostrar)
 
 func _adaptar() -> void:
@@ -122,7 +126,7 @@ func cercano() -> Dictionary:
 
 func _process(_delta: float) -> void:
 	_actualizar_objetivo()
-	if libro.visible or is_instance_valid(mesa): return
+	if libro.visible or vitrina.visible or is_instance_valid(mesa): return
 	var elegido := cercano()
 	exploracion.marcar(elegido)
 	if not elegido.is_empty(): pista.text = "E   /   " + str(elegido.accion)
@@ -131,7 +135,7 @@ func _process(_delta: float) -> void:
 	else: pista.text = "El umbral del sur conduce a la galería."
 
 func _unhandled_key_input(evento: InputEvent) -> void:
-	if is_instance_valid(mesa) or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	if is_instance_valid(mesa) or vitrina.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
 	if libro.visible:
 		if evento.keycode == KEY_ESCAPE or (evento.keycode == KEY_I and libro.cierre == _cerrar):
 			if libro.cierre.is_valid(): libro.cierre.call()
@@ -265,6 +269,7 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 	libro.opcion("Continuar",_cerrar)
 
 func _cerrar() -> void:
+	vitrina.hide()
 	libro.hide()
 	velo.hide()
 	boton_sonido.focus_mode = Control.FOCUS_ALL
@@ -289,4 +294,4 @@ func tienda() -> void:
 		_aviso("Mostrador cerrado", "Presenta primero tu invitación en el vestíbulo.")
 		return
 	_preparar_libro()
-	_tienda.abrir(campana)
+	vitrina.abrir(campana)
