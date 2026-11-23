@@ -1,29 +1,27 @@
 class_name PlanoGaleria
 extends RefCounted
-## Plano del corredor común según la diapositiva «Plano del casino» (I4-02).
-## Las cuatro mesas quedan al norte, en orden de izquierda a derecha; el vestíbulo y
-## la tienda conectan desde el sur. Coordenadas del mundo de 1280 × 720.
+## Puertas del corredor común, alineadas con el arte de `casino/arte/corredor.webp` (I4-02).
+## Las seis puertas están en la pared del norte: el vestíbulo y el Gabinete a la izquierda y
+## las cuatro mesas a continuación, en orden de progresión. Coordenadas del mundo de 1280 × 720.
 
-const NORTE := 300.0 ## Punto de interacción de las puertas del norte.
-const SUR := 588.0 ## Punto de interacción de las puertas del sur.
+const PUERTA_Y := 302.0 ## Punto de interacción, al pie de cada puerta.
+const REGRESO_Y := 375.0 ## Al volver de una sala, el visitante queda frente a su puerta.
 const PUERTAS := {
-	"custodio": {"lado": "norte", "x": 250.0, "placa": "I · Custodio"},
-	"recaudador": {"lado": "norte", "x": 510.0, "placa": "II · Recaudador"},
-	"coleccionista": {"lado": "norte", "x": 770.0, "placa": "III · Coleccionista"},
-	"dueno": {"lado": "norte", "x": 1030.0, "placa": "IV · Dueño"},
-	"vestibulo": {"lado": "sur", "x": 380.0, "placa": "Vestíbulo"},
-	"tienda": {"lado": "sur", "x": 900.0, "placa": "Gabinete"},
+	"vestibulo": {"x": 136.0, "placa": "Vestíbulo"},
+	"tienda": {"x": 337.0, "placa": "Gabinete"},
+	"custodio": {"x": 538.0, "placa": "I · Custodio"},
+	"recaudador": {"x": 739.0, "placa": "II · Recaudador"},
+	"coleccionista": {"x": 940.0, "placa": "III · Coleccionista"},
+	"dueno": {"x": 1141.0, "placa": "IV · Dueño"},
 }
 const REQUISITOS := ["Habla con la anfitriona", "Falta el primer sello", "Falta el segundo sello", "Falta el tercer sello"]
 
 static func punto(destino: String) -> Vector2:
-	var puerta: Dictionary = PUERTAS[destino]
-	return Vector2(puerta.x, NORTE if puerta.lado == "norte" else SUR)
+	return Vector2(PUERTAS[destino].x, PUERTA_Y)
 
 ## Al volver de una sala, el visitante queda frente a su puerta y con espacio para caminar.
 static func entrada(origen: String) -> Vector2:
-	var puerta: Dictionary = PUERTAS.get(origen, PUERTAS["vestibulo"])
-	return Vector2(puerta.x, 372.0 if puerta.lado == "norte" else 512.0)
+	return Vector2(PUERTAS.get(origen, PUERTAS["vestibulo"]).x, REGRESO_Y)
 
 ## Requisito breve de una mesa cerrada, para la placa y el aviso.
 static func requisito(destino: String) -> String:
@@ -36,7 +34,7 @@ static func siguiente(campana: CampanaCasino) -> String:
 		return "vestibulo"
 	return CampanaCasino.MESAS[mini(campana.superadas, CampanaCasino.MESAS.size() - 1)]
 
-## Estado de una puerta para la placa: el texto acompaña al icono y al color.
+## Estado de una puerta para la placa: el texto acompaña al icono y a la luz.
 static func estado(destino: String, campana: CampanaCasino) -> String:
 	var nivel := CampanaCasino.MESAS.find(destino)
 	if not campana.puerta_abierta(destino): return "Cerrada"

@@ -74,7 +74,7 @@ Cada pantalla nueva de I4 es un componente con una sola responsabilidad. Los coo
 | --- | --- | --- |
 | `casino/interfaz/vitrina/` | `VitrinaGabinete` coordina `FichaProducto`, `DetalleProducto` y `SelectorCartas`. La campaña valida y aplica la compra; la vitrina emite `compra_realizada` y `cerrada` | Observer y composición |
 | `casino/interfaz/hud/` | `HudCampana` reúne `SellosCampana` y `SaldoFichas`; solo lee la campaña. El mismo recuadro sirve en exploración, mesa y vitrina | Composición |
-| `casino/exploracion/plano_galeria.gd` | Plano del corredor como datos: puertas, lado, posiciones de regreso, requisito, puerta siguiente y estado. La galería lo dibuja y `SalaExplorable` crea las interacciones | Datos separados de la presentación |
+| `casino/exploracion/plano_galeria.gd` | Puertas del corredor como datos alineados con su arte: posición, regreso, requisito, puerta siguiente y estado. La galería dibuja el estado sobre el fondo y `SalaExplorable` crea las interacciones | Datos separados de la presentación |
 | `casino/interfaz/cifras_mesa.gd` | Umbral, meta y campanadas de una `ReglaMesa` junto a Tomar asiento | Composición |
 | `mesa/interfaz/dial_campanadas.gd` | Cifra real, giro del aro solo ante un gasto de la misma partida y aviso propio de las devoluciones | Componente con estado visual propio |
 | `mesa/interfaz/composicion_mesa.gd` | Medidas de la mesa en un solo lugar | Datos de distribución |

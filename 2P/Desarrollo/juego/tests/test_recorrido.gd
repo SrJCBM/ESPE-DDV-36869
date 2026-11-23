@@ -16,15 +16,15 @@ func _punto(juego, destino: String) -> Dictionary:
 		if punto.get("destino", "") == destino: return punto
 	return {}
 
-func test_las_mesas_quedan_al_norte_en_orden_y_vestibulo_y_tienda_al_sur() -> void:
+func test_las_puertas_siguen_el_arte_del_corredor_y_las_mesas_su_orden() -> void:
+	# corredor.webp: vestíbulo y Gabinete a la izquierda y las cuatro mesas a continuación.
+	var orden := ["vestibulo", "tienda", "custodio", "recaudador", "coleccionista", "dueno"]
 	var x_previa := -1.0
-	for mesa: String in CampanaCasino.MESAS:
-		var puerta: Dictionary = PlanoGaleria.PUERTAS[mesa]
-		assert_eq(puerta.lado, "norte", mesa)
-		assert_gt(puerta.x, x_previa, "%s queda a la derecha de la anterior" % mesa)
-		x_previa = puerta.x
-	for sala in ["vestibulo", "tienda"]:
-		assert_eq(PlanoGaleria.PUERTAS[sala].lado, "sur", sala)
+	for destino in orden:
+		var x: float = PlanoGaleria.PUERTAS[destino].x
+		assert_gt(x, x_previa, "%s queda a la derecha de la anterior" % destino)
+		x_previa = x
+		assert_eq(PlanoGaleria.punto(destino).y, PlanoGaleria.PUERTA_Y, "Todas en la pared del norte")
 
 func test_volver_de_una_sala_deja_al_visitante_frente_a_su_puerta() -> void:
 	var juego = _casino()
