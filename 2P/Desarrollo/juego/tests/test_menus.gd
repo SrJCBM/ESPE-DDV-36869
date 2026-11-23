@@ -109,7 +109,7 @@ func test_volver_al_inicio_pide_confirmacion_con_un_intento_activo() -> void:
 	juego.menu.botones[1].pressed.emit()
 	assert_eq(juego.menu.pantalla, "inicio")
 	assert_false(juego.campana.recibida, "Intento nuevo")
-	assert_eq(juego.sala, "vestibulo")
+	assert_eq(juego.sala, "entrada")
 
 func test_sin_intento_vuelve_al_inicio_directamente() -> void:
 	var juego = _casino()

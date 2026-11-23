@@ -27,11 +27,13 @@ func test_sin_interaccion_cerca_no_hay_pista_ni_tira_de_teclas() -> void:
 
 func test_cerca_de_algo_aparece_una_sola_accion_breve() -> void:
 	var juego = _casino()
+	juego.entrar("vestibulo")
 	juego.visitante.position = Vector2(985, 300)
 	juego._process(0.0)
 	assert_eq(juego.pista.text, "E · Hablar")
 	juego._entregar()
 	juego._cerrar()
+	juego.campana.superadas = 1
 	juego.entrar("tienda")
 	juego.visitante.position = Vector2(645, 310)
 	juego._process(0.0)
@@ -41,11 +43,11 @@ func test_una_puerta_cerrada_muestra_su_requisito_al_acercarse() -> void:
 	var juego = _casino()
 	juego._entregar()
 	juego._cerrar()
-	juego.entrar("corredor", "vestibulo")
-	juego.visitante.position = PlanoGaleria.punto("recaudador") + Vector2(0, 20)
+	juego.entrar("pasillo_custodio", "vestibulo")
+	juego.visitante.position = PlanoGaleria.punto("pasillo_custodio", "pasillo_recaudador") + Vector2(-20, 0)
 	juego._process(0.0)
 	assert_eq(juego.pista.text, "Falta el primer sello")
-	juego.visitante.position = PlanoGaleria.punto("custodio") + Vector2(0, 20)
+	juego.visitante.position = PlanoGaleria.punto("pasillo_custodio", "custodio") + Vector2(0, 20)
 	juego._process(0.0)
 	assert_eq(juego.pista.text, "E · Entrar · El Custodio")
 

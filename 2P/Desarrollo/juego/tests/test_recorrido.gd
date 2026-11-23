@@ -1,5 +1,6 @@
 extends GutTest
-## I4-02: corredor según el plano, regresos frente a cada puerta y cerrojos en orden.
+## I5, primer tramo del mapa: entrada → vestíbulo → pasillo del Custodio → mesa. El primer
+## sello abre el pasillo del Recaudador y su tienda; los regresos dejan frente a cada puerta.
 
 func after_each() -> void:
 	await get_tree().process_frame
@@ -16,84 +17,118 @@ func _punto(juego, destino: String) -> Dictionary:
 		if punto.get("destino", "") == destino: return punto
 	return {}
 
-func test_las_mesas_quedan_al_norte_en_orden_y_vestibulo_y_tienda_al_sur() -> void:
-	# Diapositiva «Plano del casino»: mesas al norte; vestíbulo y tienda al sur, bajo las dos primeras.
-	var x_previa := -1.0
-	for mesa: String in CampanaCasino.MESAS:
-		assert_true(PlanoGaleria.norte(mesa), mesa)
-		assert_gt(PlanoGaleria.PUERTAS[mesa].x, x_previa, "%s queda a la derecha de la anterior" % mesa)
-		x_previa = PlanoGaleria.PUERTAS[mesa].x
-	assert_false(PlanoGaleria.norte("vestibulo"))
-	assert_false(PlanoGaleria.norte("tienda"))
-	assert_eq(PlanoGaleria.PUERTAS["vestibulo"].x, PlanoGaleria.PUERTAS["custodio"].x)
-	assert_eq(PlanoGaleria.PUERTAS["tienda"].x, PlanoGaleria.PUERTAS["recaudador"].x)
-	assert_gt(PlanoGaleria.punto("vestibulo").y, PlanoGaleria.punto("custodio").y)
+func _con_invitacion():
+	var juego = _casino()
+	juego._entregar()
+	juego._cerrar()
+	return juego
+
+func test_cada_pasillo_tiene_su_mesa_al_norte_y_las_salas_al_sur() -> void:
+	assert_true(PlanoGaleria.norte("pasillo_custodio", "custodio"))
+	assert_eq(PlanoGaleria.lado("pasillo_custodio", "vestibulo"), "sur")
+	assert_eq(PlanoGaleria.lado("pasillo_custodio", "pasillo_recaudador"), "este")
+	assert_true(PlanoGaleria.norte("pasillo_recaudador", "recaudador"))
+	assert_eq(PlanoGaleria.lado("pasillo_recaudador", "tienda"), "sur")
+	assert_eq(PlanoGaleria.lado("pasillo_recaudador", "pasillo_custodio"), "oeste")
+	assert_true(PlanoGaleria.norte("pasillo_coleccionista", "coleccionista"))
+	for sala: String in PlanoGaleria.PADRE:
+		assert_true(PlanoGaleria.puertas(PlanoGaleria.PADRE[sala]).has(sala), "%s sale a su pasillo" % sala)
+	assert_false(PlanoGaleria.puertas("pasillo_custodio").has("tienda"), "Sin tienda antes del Custodio")
+
+func test_el_intento_empieza_en_la_entrada_y_se_recorre_con_e() -> void:
+	var juego = _casino()
+	assert_eq(juego.sala, "entrada")
+	juego.interactuar(_punto(juego, "vestibulo"))
+	assert_eq(juego.sala, "vestibulo")
+	juego.interactuar(_punto(juego, "pasillo_custodio"))
+	assert_eq(juego.sala, "vestibulo", "Sin invitación el pasillo sigue cerrado")
+	assert_string_contains(juego.libro.cuerpo.text, "Habla con la anfitriona")
+	juego._cerrar()
+	juego._entregar()
+	juego.interactuar(_punto(juego, "pasillo_custodio"))
+	assert_eq(juego.sala, "pasillo_custodio")
+	assert_eq(juego.visitante.position, PlanoGaleria.entrada("pasillo_custodio", "vestibulo"))
+	assert_eq(juego.cercano().get("destino", ""), "vestibulo", "La primera E vuelve por donde entró")
+	juego.interactuar(_punto(juego, "custodio"))
+	assert_eq(juego.sala, "custodio")
+	juego.interactuar(_punto(juego, "pasillo_custodio"))
+	assert_eq(juego.sala, "pasillo_custodio")
+	assert_eq(juego.cercano().get("destino", ""), "custodio")
 
 func test_volver_de_una_sala_deja_al_visitante_frente_a_su_puerta() -> void:
-	var juego = _casino()
-	juego._entregar()
-	juego._cerrar()
-	for origen in ["vestibulo", "tienda", "custodio"]:
-		juego.entrar("corredor", origen)
-		var puerta := PlanoGaleria.punto(origen)
-		assert_eq(juego.visitante.position.x, puerta.x, "Frente a la puerta de %s" % origen)
-		var distancia: float = absf(juego.visitante.position.y - puerta.y)
-		assert_between(distancia, 40.0, 90.0, "Cerca de la puerta y con espacio para caminar")
-		assert_eq(juego.cercano().get("destino", ""), origen, "La primera E vuelve a entrar por donde salió")
+	var juego = _con_invitacion()
+	juego.campana.superadas = 2
+	for pareja in [["pasillo_custodio", "vestibulo"], ["pasillo_custodio", "custodio"], ["pasillo_recaudador", "tienda"], ["pasillo_recaudador", "pasillo_custodio"], ["pasillo_custodio", "pasillo_recaudador"], ["pasillo_coleccionista", "pasillo_recaudador"]]:
+		juego.entrar(pareja[0], pareja[1])
+		var puerta := PlanoGaleria.punto(pareja[0], pareja[1])
+		var distancia: float = juego.visitante.position.distance_to(puerta)
+		assert_between(distancia, 40.0, 90.0, "Cerca de la puerta de %s y con espacio para caminar" % pareja[1])
+		assert_eq(juego.cercano().get("destino", ""), pareja[1], "La primera E vuelve a %s" % pareja[1])
 
-func test_las_puertas_cerradas_muestran_su_requisito_y_se_abren_en_orden() -> void:
-	var juego = _casino()
-	juego._entregar()
+func test_el_primer_sello_abre_el_pasillo_del_recaudador_y_su_tienda() -> void:
+	var juego = _con_invitacion()
+	juego.entrar("pasillo_custodio", "vestibulo")
+	assert_eq(_punto(juego, "pasillo_recaudador").accion, "Falta el primer sello")
+	assert_eq(PlanoGaleria.estado("pasillo_recaudador", juego.campana, "pasillo_custodio"), "Cerrada")
+	assert_eq(PlanoGaleria.estado("custodio", juego.campana, "pasillo_custodio"), "Siguiente")
+	juego.interactuar(_punto(juego, "pasillo_recaudador"))
+	assert_eq(juego.sala, "pasillo_custodio", "Una puerta cerrada no deja pasar")
+	assert_string_contains(juego.libro.cuerpo.text, "Falta el primer sello")
 	juego._cerrar()
-	juego.entrar("corredor", "vestibulo")
-	assert_eq(_punto(juego, "recaudador").accion, "Falta el primer sello")
-	assert_eq(PlanoGaleria.estado("recaudador", juego.campana), "Cerrada")
-	assert_eq(PlanoGaleria.estado("custodio", juego.campana), "Siguiente")
-	juego.interactuar(_punto(juego, "dueno"))
-	assert_eq(juego.sala, "corredor", "Una puerta cerrada no deja pasar")
-	assert_string_contains(juego.libro.cuerpo.text, "Falta el tercer sello")
-	juego._cerrar()
+	juego.entrar("tienda")
+	assert_eq(juego.sala, "pasillo_custodio", "La tienda no se abre antes del Custodio")
 	juego.campana.superadas = 1
-	juego.entrar("corredor", "custodio")
-	assert_eq(PlanoGaleria.estado("custodio", juego.campana), "Superada")
-	assert_eq(PlanoGaleria.estado("recaudador", juego.campana), "Siguiente")
-	assert_eq(_punto(juego, "recaudador").accion, "Entrar · El Recaudador")
+	juego.entrar("pasillo_custodio", "custodio")
+	assert_eq(PlanoGaleria.estado("custodio", juego.campana, "pasillo_custodio"), "Superada")
+	assert_eq(PlanoGaleria.estado("pasillo_recaudador", juego.campana, "pasillo_custodio"), "Siguiente")
+	juego.interactuar(_punto(juego, "pasillo_recaudador"))
+	assert_eq(juego.sala, "pasillo_recaudador")
+	assert_eq(PlanoGaleria.estado("recaudador", juego.campana, "pasillo_recaudador"), "Siguiente")
+	assert_eq(_punto(juego, "pasillo_coleccionista").accion, "Falta el segundo sello")
+	juego.interactuar(_punto(juego, "tienda"))
+	assert_eq(juego.sala, "tienda")
+	juego.interactuar(_punto(juego, "pasillo_recaudador"))
+	assert_eq(juego.sala, "pasillo_recaudador")
 	juego.interactuar(_punto(juego, "recaudador"))
 	assert_eq(juego.sala, "recaudador")
 
 func test_la_placa_cercana_muestra_el_requisito_solo_al_acercarse() -> void:
-	var juego = _casino()
-	juego._entregar()
-	juego._cerrar()
-	juego.entrar("corredor", "vestibulo")
+	var juego = _con_invitacion()
+	juego.entrar("pasillo_custodio", "vestibulo")
 	var galeria = juego.exploracion.galeria
 	assert_not_null(galeria)
-	juego.visitante.position = PlanoGaleria.punto("coleccionista") + Vector2(0, 20)
+	juego.visitante.position = PlanoGaleria.punto("pasillo_custodio", "pasillo_recaudador") + Vector2(-20, 0)
 	juego.exploracion.marcar(juego.cercano())
-	assert_eq(galeria._cercana, "coleccionista")
+	assert_eq(galeria._cercana, "pasillo_recaudador")
 	juego.visitante.position = Vector2(640, 450)
 	juego.exploracion.marcar(juego.cercano())
 	assert_eq(galeria._cercana, "")
 
-func test_la_puerta_siguiente_acompana_el_progreso() -> void:
+func test_la_puerta_que_se_ilumina_acerca_al_siguiente_paso() -> void:
 	var campana := CampanaCasino.new()
-	assert_eq(PlanoGaleria.siguiente(campana), "vestibulo")
+	assert_eq(PlanoGaleria.siguiente(campana, "pasillo_custodio"), "vestibulo")
 	campana.recibir_invitacion()
-	var esperadas := ["custodio", "recaudador", "coleccionista", "dueno", "dueno"]
+	var esperadas := [
+		["custodio", "pasillo_custodio", "pasillo_recaudador"],
+		["pasillo_recaudador", "recaudador", "pasillo_recaudador"],
+		["pasillo_recaudador", "pasillo_coleccionista", "coleccionista"],
+		["pasillo_recaudador", "pasillo_coleccionista", "dueno"],
+		["pasillo_recaudador", "pasillo_coleccionista", "dueno"],
+	]
 	for superadas in range(5):
 		campana.superadas = superadas
-		assert_eq(PlanoGaleria.siguiente(campana), esperadas[superadas], "Tras vencer al Dueño, su sala lleva a la salida")
+		for indice in PlanoGaleria.ORDEN.size():
+			assert_eq(PlanoGaleria.siguiente(campana, PlanoGaleria.ORDEN[indice]), esperadas[superadas][indice], "%s sellos · %s" % [superadas, PlanoGaleria.ORDEN[indice]])
 
-func test_ruta_del_plano_vestibulo_tienda_y_mesa_con_e() -> void:
-	var juego = _casino()
-	juego._entregar()
-	juego._cerrar()
-	juego.interactuar(_punto(juego, "corredor"))
-	assert_eq(juego.sala, "corredor")
-	juego.interactuar(_punto(juego, "tienda"))
-	assert_eq(juego.sala, "tienda")
-	juego.interactuar(_punto(juego, "corredor"))
-	assert_eq(juego.sala, "corredor")
-	assert_eq(juego.visitante.position, PlanoGaleria.entrada("tienda"))
-	juego.interactuar(_punto(juego, "custodio"))
-	assert_eq(juego.sala, "custodio")
+func test_el_dueno_se_alcanza_desde_el_ultimo_pasillo_con_tres_sellos() -> void:
+	var juego = _con_invitacion()
+	juego.campana.superadas = 2
+	juego.entrar("pasillo_coleccionista", "pasillo_recaudador")
+	assert_eq(_punto(juego, "dueno").accion, "Falta el tercer sello")
+	juego.campana.superadas = 3
+	juego.entrar("pasillo_coleccionista", "coleccionista")
+	juego.interactuar(_punto(juego, "dueno"))
+	assert_eq(juego.sala, "dueno")
+	juego.interactuar(_punto(juego, "pasillo_coleccionista"))
+	assert_eq(juego.sala, "pasillo_coleccionista")
+	assert_eq(juego.cercano().get("destino", ""), "dueno")

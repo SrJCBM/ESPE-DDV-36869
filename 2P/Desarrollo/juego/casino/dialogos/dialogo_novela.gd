@@ -3,7 +3,8 @@ extends Control
 ## cuadro inferior con nombre e intervención y respuestas encima del cuadro.
 ## Clic, Enter o E avanzan; si la línea se está escribiendo, la primera pulsación la completa.
 ## Esc cierra sin aplicar nada. Con movimiento reducido el texto aparece completo.
-## No conoce el juego: las condiciones las evalúa `evaluar` y las solicitudes se emiten.
+## No conoce el juego: las condiciones las evalúa `evaluar`, las solicitudes se emiten y
+## `describir` (opcional) completa una opción con {"icono", "detalle"}.
 
 signal solicitud(id: String)
 signal cerrado
@@ -17,6 +18,7 @@ const MUTED := Color("b9ad91")
 
 var conversacion: Conversacion
 var evaluar: Callable
+var describir: Callable
 var reducido := false
 var actual := ""
 var retrato: TextureRect
@@ -84,9 +86,10 @@ func _ready() -> void:
 	hide()
 
 ## Abre la conversación en la entrada que corresponda al progreso. false si no hay ninguna.
-func abrir(datos: Conversacion, condicion: Callable, movimiento_reducido := false) -> bool:
+func abrir(datos: Conversacion, condicion: Callable, movimiento_reducido := false, descripcion := Callable()) -> bool:
 	conversacion = datos
 	evaluar = condicion
+	describir = descripcion
 	reducido = movimiento_reducido
 	var inicio := conversacion.inicio(evaluar)
 	if inicio.is_empty():
@@ -141,6 +144,17 @@ func completar() -> void:
 		boton.text = str(_opciones[indice].get("texto", ""))
 		boton.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		boton.custom_minimum_size = Vector2(520, 44)
+		var extra: Dictionary = describir.call(_opciones[indice]) if describir.is_valid() else {}
+		if not str(extra.get("detalle", "")).is_empty():
+			# Nombre y efecto en una línea cada uno, con el icono del objeto a la izquierda.
+			boton.text += "\n" + str(extra.detalle)
+			boton.custom_minimum_size.y = 66
+			boton.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		if ResourceLoader.exists(str(extra.get("icono", ""))):
+			boton.icon = load(str(extra.icono))
+			boton.expand_icon = true
+			boton.add_theme_constant_override("icon_max_width", 50)
+			boton.add_theme_constant_override("h_separation", 12)
 		boton.add_theme_font_override("font", Libro.SANS)
 		boton.add_theme_font_size_override("font_size", 18)
 		boton.add_theme_color_override("font_color", Libro.PAPEL)

@@ -17,6 +17,7 @@ func _figuras(juego) -> Array:
 func test_visitante_y_personajes_tienen_altura_legible() -> void:
 	assert_gte(Visitante.ALTO, 100.0)
 	var juego = _casino()
+	juego.entrar("vestibulo")
 	var anfitriona: Sprite2D = _figuras(juego)[0]
 	assert_almost_eq(anfitriona.texture.get_height() * anfitriona.scale.y, 84.0, 0.5)
 	juego.campana.recibir_invitacion()
@@ -30,10 +31,13 @@ func test_las_figuras_se_ordenan_por_los_pies() -> void:
 	var juego = _casino()
 	assert_true(juego.mundo.y_sort_enabled)
 	assert_true(juego.decorado.y_sort_enabled)
+	juego.entrar("vestibulo")
 	var anfitriona: Sprite2D = _figuras(juego)[0]
 	assert_eq(anfitriona.position, Vector2(990, 231), "El origen de la figura está en sus pies.")
 	assert_almost_eq(anfitriona.offset.y, -anfitriona.texture.get_height() * 0.5, 0.01)
 	for punto in juego.exploracion.puntos: assert_eq(punto.marca.get_parent(), juego.capa_superior)
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 func test_rombos_y_placas_quedan_sobre_el_mundo_y_bajo_los_dialogos() -> void:
 	var juego = _casino()
@@ -45,7 +49,8 @@ func test_rombos_y_placas_quedan_sobre_el_mundo_y_bajo_los_dialogos() -> void:
 
 func test_las_placas_de_la_galeria_quedan_sobre_el_visitante() -> void:
 	var juego = _casino()
-	juego.entrar("corredor", "vestibulo")
+	juego.campana.recibir_invitacion()
+	juego.entrar("pasillo_custodio", "vestibulo")
 	var placas: Node2D = juego.capa_superior.get_node("Placas")
 	assert_eq(placas.z_index, 0, "Sin z_index: un valor alto las pondría sobre los diálogos.")
 	juego.entrar("vestibulo")

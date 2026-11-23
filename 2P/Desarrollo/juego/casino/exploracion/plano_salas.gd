@@ -6,6 +6,9 @@ extends RefCounted
 const LIMITES := Rect2(87, 178, 1106, 475)
 const LIMITES_GALERIA := Rect2(48, 288, 1184, 310)
 const MUEBLES := {
+	"entrada": {
+		"fachada": Rect2(87, 178, 1106, 140),
+	},
 	"vestibulo": {
 		"mostrador": Rect2(861, 170, 247, 98),
 		"banco_oeste": Rect2(87, 485, 40, 139),
@@ -52,7 +55,7 @@ const MUEBLES := {
 }
 
 static func construir(sala: String, padre: Node2D) -> void:
-	var area := LIMITES_GALERIA if sala == "corredor" else LIMITES
+	var area := LIMITES_GALERIA if PlanoGaleria.es_pasillo(sala) else LIMITES
 	var a := area.position
 	var b := area.end
 	_agregar(padre, "Norte", Rect2(a - Vector2(30,30), Vector2(area.size.x+60,30)))

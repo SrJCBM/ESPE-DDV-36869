@@ -8,13 +8,14 @@ signal reanudar
 signal volver_al_inicio
 signal salir
 signal movimiento_cambiado(reducido: bool)
+signal ver_baraja
 
 const Libro := preload("res://casino/interfaz/libro.gd")
 const PanelOpciones := preload("res://casino/interfaz/menus/panel_opciones.gd")
 const FONDO_INICIO := preload("res://casino/arte/vestibulo.webp")
 const BASE := Vector2(1440, 810)
 const MUTED := Color("b9ad91")
-const COMO_JUGAR := "Recorre el casino con WASD o las flechas y pulsa E para hablar, entrar o examinar. La anfitriona te entrega la baraja y diez fichas.\n\nVence al Custodio, al Recaudador y a la Coleccionista para reunir tres sellos; con ellos se abre la mesa del Dueño. Entre encuentros puedes volver a la tienda.\n\nEn la mesa, pide cartas sin pasarte del umbral y plántate para sumar puntos. Cada mano nueva gasta una campanada.\n\nAtajos: I pertenencias · H reglas de la mesa · V sonido · Esc pausa."
+const COMO_JUGAR := "Recorre el casino con WASD o las flechas y pulsa E para hablar, entrar o examinar. La anfitriona te entrega la baraja, diez fichas y un objeto a elegir.\n\nVence al Custodio, al Recaudador y a la Coleccionista para reunir tres sellos; cada sello abre la puerta del pasillo siguiente y el tercero, la del Dueño. La tienda está junto al Recaudador.\n\nEn la mesa, pide cartas sin pasarte del umbral y plántate para sumar puntos. Cada mano nueva gasta una campanada.\n\nAtajos: I pertenencias · H reglas de la mesa · V sonido · Esc pausa."
 
 var audio: AudioCasino
 ## Devuelve [título, texto] de las pertenencias del intento.
@@ -117,9 +118,11 @@ func abrir(nombre: String) -> void:
 			_boton("Volver", abrir.bind(_raiz))
 		"inventario":
 			var datos: Array = texto_inventario.call() if texto_inventario.is_valid() else ["Tus pertenencias", ""]
-			_marco(Rect2(370, 200, 700, 400))
+			_marco(Rect2(370, 180, 700, 450))
 			_titulo(str(datos[0]), 40)
 			_texto(str(datos[1]))
+			if intento_activo.is_valid() and intento_activo.call():
+				_boton("Ver baraja", ver_baraja.emit)
 			_boton("Volver", abrir.bind(_raiz))
 		"confirmar":
 			_marco(Rect2(420, 240, 600, 330))

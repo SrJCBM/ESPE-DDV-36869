@@ -2,7 +2,7 @@ extends GutTest
 
 const Casino := preload("res://casino/casino.tscn")
 
-func test_muebles_bloquean_el_movimiento(sala = use_parameters(["vestibulo", "tienda", "custodio", "recaudador", "coleccionista", "dueno"])) -> void:
+func test_muebles_bloquean_el_movimiento(sala = use_parameters(["entrada", "vestibulo", "tienda", "custodio", "recaudador", "coleccionista", "dueno"])) -> void:
 	var juego = Casino.instantiate()
 	add_child_autofree(juego)
 	juego.campana.recibir_invitacion()
@@ -17,10 +17,13 @@ func test_muebles_bloquean_el_movimiento(sala = use_parameters(["vestibulo", "ti
 	_comprobar_rutas(juego, PlanoSalas.LIMITES)
 	await get_tree().process_frame
 
-func test_en_la_galeria_se_puede_llegar_a_las_seis_puertas() -> void:
+func test_en_cada_pasillo_se_puede_llegar_a_todas_sus_puertas(pasillo = use_parameters(PlanoGaleria.ORDEN)) -> void:
 	var juego = Casino.instantiate()
 	add_child_autofree(juego)
-	juego.entrar("corredor", "vestibulo")
+	juego.campana.recibir_invitacion()
+	juego.campana.superadas = 3
+	juego.entrar(pasillo)
+	assert_eq(juego.sala, pasillo)
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	_comprobar_rutas(juego, PlanoSalas.LIMITES_GALERIA)

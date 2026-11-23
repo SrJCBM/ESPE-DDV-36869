@@ -11,6 +11,7 @@ const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
 const CifrasMesa := preload("res://casino/interfaz/cifras_mesa.gd")
 const DialogoNovela := preload("res://casino/dialogos/dialogo_novela.gd")
 const MenuCasino := preload("res://casino/interfaz/menus/menu_casino.gd")
+const VistaBaraja := preload("res://casino/interfaz/baraja/vista_baraja.gd")
 const ANFITRIONA: Conversacion = preload("res://datos/dialogos/anfitriona.tres")
 const BASE := Vector2(1440,810)
 const DIALOGOS := {
@@ -20,6 +21,7 @@ const DIALOGOS := {
 	"dueno": "¿Ya distingues el alba tras la verja? Empiezas en veinticinco. Cada mano que cierres sin pasarte me devuelve un paso, hasta diecisiete."
 }
 const NOTAS := {
+	"entrada": ["La farola", "Bajo la luz hay una invitación pisoteada con tu nombre. La tuya sigue lacrada en el bolsillo."],
 	"vestibulo": ["El reloj detenido", "Todas las agujas señalan la hora a la que llegaste. Bajo el cristal alguien grabó tres ranuras del tamaño de un sello."],
 	"tienda": ["La vitrina de humo", "La lámpara atraviesa la lente y dibuja dos rostros en el terciopelo. Uno desaparece cuando la luz toca el cristal."],
 	"custodio": ["El péndulo", "Hay diez muescas en la caja. El péndulo solo avanza cuando alguien empieza una mano."],
@@ -48,11 +50,16 @@ var indicador_objetivo := IndicadorObjetivo.new()
 var vitrina := VitrinaGabinete.new()
 var dialogo := DialogoNovela.new()
 var menu := MenuCasino.new()
+var vista_baraja := VistaBaraja.new()
+## Control enfocado antes de abrir «Ver baraja»; se devuelve al cerrarla.
+var _foco_baraja = null
 ## Control enfocado antes de pausar; se devuelve al reanudar.
 var _foco_previo = null
 
 func _ready() -> void:
-	menu.visible = false # Hasta que entre en el árbol, un Control cuenta como visible.
+	# Hasta que entren en el árbol, un Control cuenta como visible.
+	menu.visible = false
+	vista_baraja.visible = false
 	get_window().min_size = Vector2i(1024,576)
 	add_child(audio)
 	visitante.pisada.connect(audio.reproducir.bind(&"paso"))
@@ -103,7 +110,7 @@ func _ready() -> void:
 	libro.hide()
 	resized.connect(_adaptar)
 	_adaptar()
-	entrar("vestibulo")
+	entrar("entrada")
 	add_child(menu)
 	menu.audio = audio
 	menu.texto_inventario = _texto_inventario
@@ -113,6 +120,9 @@ func _ready() -> void:
 	menu.volver_al_inicio.connect(volver_al_inicio)
 	menu.salir.connect(func() -> void: get_tree().quit())
 	menu.movimiento_cambiado.connect(_cambiar_movimiento)
+	menu.ver_baraja.connect(ver_baraja)
+	add_child(vista_baraja)
+	vista_baraja.cerrada.connect(_baraja_cerrada)
 	_inicio_si_principal.call_deferred()
 
 ## El menú de inicio solo aparece al arrancar el juego, no cuando las pruebas montan el casino.
@@ -180,7 +190,7 @@ func _cambiar_movimiento(reducido: bool) -> void:
 	_refrescar()
 
 func _actualizar_objetivo() -> void:
-	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not dialogo.visible and not menu.visible and not is_instance_valid(mesa)
+	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not dialogo.visible and not menu.visible and not vista_baraja.visible and not is_instance_valid(mesa)
 	indicador_objetivo.presentar(campana.objetivo(), mostrar)
 
 func _adaptar() -> void:
@@ -215,7 +225,7 @@ func _pista(elegido: Dictionary) -> String:
 	return "E · " + str(elegido.accion)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
-	if menu.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	if menu.visible or vista_baraja.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
 	# La mesa, la vitrina y el diálogo resuelven antes su propio Esc; si llega aquí, pausa.
 	if evento.keycode == KEY_ESCAPE and not libro.visible:
 		pausar()
@@ -258,9 +268,19 @@ func interactuar(p: Dictionary) -> void:
 ## Conversación con la anfitriona en la escena de diálogos (I4-06); sus líneas son datos.
 func _recepcion() -> void:
 	visitante.bloqueado = true
-	if not dialogo.abrir(ANFITRIONA, campana.cumple, AjustesJuego.movimiento_reducido()):
+	if not dialogo.abrir(ANFITRIONA, campana.cumple, AjustesJuego.movimiento_reducido(), _describir_opcion):
 		visitante.bloqueado = false
 	_actualizar_objetivo()
+
+## Las opciones de la oferta inicial muestran el icono y el efecto del catálogo de la tienda.
+func _describir_opcion(opcion: Dictionary) -> Dictionary:
+	var solicitud := str(opcion.get("solicitud", ""))
+	if not solicitud.begins_with("objeto_inicial:"):
+		return {}
+	var producto := CampanaCasino.TIENDA.buscar(solicitud.trim_prefix("objeto_inicial:"))
+	if producto == null:
+		return {}
+	return {"icono": "res://casino/arte/objeto_%s.webp" % producto.id, "detalle": producto.descripcion}
 
 ## Una elección del diálogo pide un cambio; la campaña comprueba si corresponde.
 func _solicitud(id: String) -> void:
@@ -339,7 +359,7 @@ func _sonido() -> void:
 func _nuevo_intento() -> void:
 	campana = CampanaCasino.new()
 	_cerrar()
-	entrar("vestibulo")
+	entrar("entrada")
 
 func _abrir(t: String, mensaje: String, foto: String, volver: Callable) -> void:
 	_preparar_libro()
@@ -369,7 +389,50 @@ func _refrescar() -> void:
 
 func inventario() -> void:
 	var datos := _texto_inventario()
-	_aviso(datos[0], datos[1])
+	_abrir(datos[0], datos[1], "", _cerrar)
+	if campana.recibida:
+		libro.opcion("Ver baraja", ver_baraja)
+	libro.opcion("Continuar", _cerrar)
+
+## «Ver baraja» desde el inventario, en exploración o en la pausa durante una mano.
+## Al cerrarla, el foco vuelve al botón desde el que se abrió.
+func ver_baraja() -> void:
+	if not campana.recibida or vista_baraja.visible:
+		return
+	_foco_baraja = get_viewport().gui_get_focus_owner()
+	move_child(vista_baraja, -1)
+	vista_baraja.abrir(datos_baraja())
+	audio.reproducir(&"naipe")
+	_actualizar_objetivo()
+
+func _baraja_cerrada() -> void:
+	var previo = _foco_baraja
+	_foco_baraja = null
+	if _enfocable(previo):
+		previo.grab_focus()
+	_actualizar_objetivo()
+
+## Proyección pública de la baraja: ordenada por palo y valor, nunca por el mazo. Durante una
+## mano las Máscaras van boca abajo, sin valor ni ajuste, para no delatar las de la mano.
+func datos_baraja() -> Dictionary:
+	var en_mano := is_instance_valid(mesa)
+	var cartas := []
+	for carta in campana.baraja:
+		var id := carta.id_instancia
+		var oculta := en_mano and carta.definicion.palo == Palos.MASCARAS
+		var ajuste := 0 if oculta else int(campana.ajustadas.get(id, 0))
+		var notas := PackedStringArray()
+		if not oculta and carta.definicion.rasgo == CartaEnPartida.RASGO_RACHA_DOBLE: notas.append("RACHA ×2")
+		if campana.ganadas.has(id): notas.append("GANADA")
+		if ajuste != 0: notas.append("AJUSTE %+d" % ajuste)
+		cartas.append({
+			"palo": carta.definicion.palo, "oculta": oculta,
+			"valor": null if oculta else carta.definicion.valor_impreso,
+			"valor_efectivo": null if oculta else carta.valor_efectivo(),
+			"rasgo": "" if oculta else carta.definicion.rasgo, "nota": " · ".join(notas),
+			"ganada": campana.ganadas.has(id), "ajuste": ajuste,
+		})
+	return {"cartas": cartas, "retiradas": campana.retiradas.duplicate(true), "en_mano": en_mano}
 
 func _texto_inventario() -> Array:
 	var objetos := PackedStringArray()

@@ -31,15 +31,35 @@ entradas = [{
 intervenciones = {
 "entrega": {
 "personaje": "anfitriona",
-"texto": "«Veinticuatro cartas y diez fichas. Son tuyas. La tienda abre al otro lado de la galería. Cuando estés listo, toma asiento ante el Custodio.»"
+"texto": "«Buena elección. La tienda queda más allá del Custodio: gánate su sello y la encontrarás junto al Recaudador. Toma asiento cuando estés listo.»"
+},
+"oferta": {
+"opciones": [{
+"ir": "entrega",
+"solicitud": "objeto_inicial:lente",
+"texto": "Lente de humo"
+}, {
+"ir": "entrega",
+"solicitud": "objeto_inicial:prudente",
+"texto": "Sello del prudente"
+}, {
+"ir": "entrega",
+"solicitud": "objeto_inicial:moneda",
+"texto": "Moneda mellada"
+}, {
+"ir": "",
+"texto": "Pensarlo un momento"
+}],
+"personaje": "anfitriona",
+"texto": "«Veinticuatro cartas y diez fichas serán tuyas. Además, la casa regala una de estas piezas, una sola vez. Elige con calma.»"
 },
 "pista_0": {
 "personaje": "anfitriona",
-"texto": "«El reloj verde pertenece al Custodio. Sal a la galería y busca la primera puerta iluminada.»"
+"texto": "«El reloj verde pertenece al Custodio. Sal al pasillo y busca la puerta iluminada del norte.»"
 },
 "pista_1": {
 "personaje": "anfitriona",
-"texto": "«El Recaudador adelanta quince fichas. Te cobrará una por cada carta que pidas tras el reparto.»"
+"texto": "«Su sello abre la puerta del este. Allí esperan el Recaudador y mi tienda. Él adelanta quince fichas y cobra una por cada carta que pidas tras el reparto.»"
 },
 "pista_2": {
 "personaje": "anfitriona",
@@ -47,7 +67,7 @@ intervenciones = {
 },
 "pista_3": {
 "personaje": "anfitriona",
-"texto": "«Tres sellos. El Dueño ya sabe que has llegado. Mira la luz tras su mesa.»"
+"texto": "«Tres sellos. El Dueño ya sabe que has llegado. Su puerta está al final del último pasillo.»"
 },
 "pista_4": {
 "personaje": "anfitriona",
@@ -55,8 +75,7 @@ intervenciones = {
 },
 "saludo": {
 "opciones": [{
-"ir": "entrega",
-"solicitud": "entregar_invitacion",
+"ir": "oferta",
 "texto": "Entregar la invitación"
 }, {
 "ir": "",

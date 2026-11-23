@@ -59,8 +59,14 @@ func test_entregar_la_invitacion_desde_el_dialogo_solo_una_vez() -> void:
 	assert_eq(juego.dialogo.botones.size(), 2)
 	assert_false(juego.campana.recibida, "Avanzar tampoco")
 	juego.dialogo.elegir(0)
+	assert_eq(juego.dialogo.actual, "oferta")
+	assert_false(juego.campana.recibida, "Entregar la invitación abre la oferta; aún no entrega nada")
+	juego.dialogo.completar()
+	assert_eq(juego.dialogo.botones.size(), 4)
+	juego.dialogo.elegir(2)
 	assert_true(juego.campana.recibida)
 	assert_eq(juego.campana.saldo, 10)
+	assert_eq(juego.campana.amuletos, ["moneda"] as Array[String])
 	assert_eq(juego.dialogo.actual, "entrega")
 	assert_eq(juego.hud.saldo.cifra.text, "10")
 	juego.dialogo.completar()
@@ -96,7 +102,7 @@ func test_la_primera_pulsacion_completa_la_linea_que_se_escribe() -> void:
 	assert_eq(juego.dialogo.botones.size(), 2)
 	assert_eq(juego.get_viewport().gui_get_focus_owner(), juego.dialogo.botones[0])
 	_tecla(juego, KEY_E)
-	assert_true(juego.campana.recibida, "E elige la respuesta enfocada")
+	assert_eq(juego.dialogo.actual, "oferta", "E elige la respuesta enfocada")
 
 func test_con_movimiento_reducido_el_texto_aparece_completo() -> void:
 	var juego = _casino()
