@@ -1,6 +1,6 @@
 # Iteración 03 · Pulido, balance y deuda técnica
 
-**En curso desde el 22 de noviembre de 2026.** Parte de una revisión del juego hecha con el paquete de skills de desarrollo de videojuegos (`gamedev-skills/awesome-gamedev-agent-skills`) y de los comentarios de Damián en la [revisión de la iteración 2](ITERACION_02.md#revisión-con-damián). La revisión propuso siete puntos de mejora; aquí se ordenan de completado a por implementar. Rama de trabajo: `kenned/i2-feedback-revelacion`.
+**En curso desde el 22 de noviembre de 2026.** Parte de una revisión del juego hecha con el paquete de skills de desarrollo de videojuegos (`gamedev-skills/awesome-gamedev-agent-skills`) y de los comentarios de Damián en la [revisión de la iteración 2](ITERACION_02.md#revisión-con-damián). La revisión propuso siete puntos de mejora; aquí se ordenan de completado a por implementar. Las entregas I3-01 a I3-05 se integraron en `main`.
 
 ## Estado
 
@@ -35,7 +35,7 @@ Al plantarse, cada Máscara se voltea con un leve rebote al revelarse. La fórmu
 | El Dueño de la Casa (meta · campanadas) | 800 · 16 | **750 · 18**; con I3-03, **750 · 17** |
 | Sello del prudente | Dos usos por mesa | **Un uso por mesa** (propuesta de Julio) |
 
-En 1.000 campañas simuladas sin compras, la Coleccionista pasa de superarse el 100 % al 94 % de las veces y el Dueño del 13 % al 35 %, dentro del objetivo del 30–40 % (34 % tras la regla nueva del Dueño de I3-03). Precios y amuletos no cambian: las fichas siguen siendo escasas para que comprar sea una decisión. El mismo commit:
+En 1.000 campañas simuladas sin compras, la Coleccionista pasa de superarse el 100 % al 94 % de las veces y el Dueño del 13 % al 35 %, dentro del objetivo del 30–40 % (34 % tras la regla nueva del Dueño de I3-03). Los precios se mantienen. El Sello del prudente pasa a una activación por mesa. El mismo commit:
 
 - añade `tests/sim_campana.gd`, que simula campañas completas con los comandos reales;
 - edita el documento de diseño v2.4 en su mismo archivo con el coste por mano, la Quiebra segura y las reglas nuevas;
