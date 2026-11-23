@@ -44,8 +44,8 @@ static func calcular(cartas: Array, intervalo: Dictionary, umbral: int) -> Array
 		var palo: String = str(cartas.back().get("palo", ""))
 		for indice in range(cartas.size() - 1, -1, -1):
 			if cartas[indice].get("palo", "") != palo: break
-			racha += 1
-	filas.append(_fila("Racha", "activo" if racha >= 3 else "progreso", "%s/3 del palo" % mini(racha, 3), "Las 3 últimas cartas conservadas son del mismo palo. Las anteriores pueden ser distintas. No se puede cambiar el orden.", ocultas > 0))
+			racha += 2 if cartas[indice].get("rasgo", "") == CartaEnPartida.RASGO_RACHA_DOBLE else 1
+	filas.append(_fila("Racha", "activo" if racha >= 3 else "progreso", "%s/3 del palo" % mini(racha, 3), "Las 3 últimas cartas conservadas son del mismo palo. Una Vela de Racha ×2 cuenta como dos. Las anteriores pueden ser distintas. No se puede cambiar el orden.", ocultas > 0))
 	if minimo > umbral:
 		for fila in filas:
 			fila.estado = "anulado"

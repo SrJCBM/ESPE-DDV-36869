@@ -534,7 +534,10 @@ func mostrar_carta(carta: Dictionary) -> void:
 		Palos.RELOJES: "Su valor efectivo es el impreso menos uno, con mínimo uno. Pedirlo es gratis en campanadas, igual que las demás cartas.",
 		Palos.MASCARAS: "Su valor permanece oculto hasta plantarte. El intervalo usa de 1 a 10 por Máscara y no predice el valor real.",
 	}
-	var detalle := Piezas.etiqueta(modal.contenido, efectos.get(palo, ""), Rect2(350, 230, 362, 220), 21, MARFIL)
+	var efecto: String = efectos.get(palo, "")
+	if carta.get("rasgo", "") == CartaEnPartida.RASGO_RACHA_DOBLE:
+		efecto += " Esta Vela cuenta como dos cartas para Racha; para el umbral vale lo impreso."
+	var detalle := Piezas.etiqueta(modal.contenido, efecto, Rect2(350, 230, 362, 220), 21, MARFIL)
 	detalle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var lectura := "VALOR OCULTO · 1–10" if carta.get("oculta", false) else "VALOR EFECTIVO: %s" % carta.get("valor_efectivo", carta.get("valor", "—"))
 	Piezas.etiqueta(modal.contenido, lectura, Rect2(350, 489, 362, 65), 18, ORO)

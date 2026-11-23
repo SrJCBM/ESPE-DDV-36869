@@ -69,7 +69,8 @@ func presentar(carta: Dictionary) -> void:
 	var revelar: bool = bool(_vista.get("oculta", false)) and not oculta
 	_vista = {"palo": str(carta.get("palo", Palos.MASCARAS)), "oculta": oculta,
 		"valor": null if oculta else carta.get("valor"),
-		"valor_efectivo": null if oculta else carta.get("valor_efectivo")}
+		"valor_efectivo": null if oculta else carta.get("valor_efectivo"),
+		"rasgo": "" if oculta else str(carta.get("rasgo", "")), "nota": str(carta.get("nota", ""))}
 	if is_node_ready():
 		_actualizar()
 		if revelar and not _movimiento_reducido:
@@ -128,6 +129,10 @@ func _actualizar() -> void:
 	else:
 		var efectivo: Variant = _vista.get("valor_efectivo")
 		_efecto.text = "Cuenta como %s" % str(efectivo) if efectivo != null and efectivo != _vista.get("valor") else ""
+		if _vista.get("rasgo", "") == CartaEnPartida.RASGO_RACHA_DOBLE:
+			_efecto.text = "RACHA ×2"
+	if not str(_vista.get("nota", "")).is_empty():
+		_efecto.text = str(_vista.nota)
 	if _devolucion_disponible:
 		_efecto.text = "LLAVE ELEGIDA" if _seleccionada else "Cambiar · L"
 	tooltip_text = "%s. %s. %s. Activar para ampliar." % [NOMBRES.get(palo, palo), "Valor oculto" if oculta else "Valor %s" % _valor.text, _efecto.text]

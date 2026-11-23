@@ -17,5 +17,7 @@ func presentar(opciones: Array[Dictionary]) -> void:
 		datos.valor_efectivo = maxi(1, datos.valor - 1) if datos.palo == Palos.RELOJES else datos.valor
 		carta.presentar(datos)
 		carta.tooltip_text = "Añadir %s de %s a la baraja" % [datos.valor, Palos.NOMBRES[datos.palo]]
+		if datos.get("rasgo", "") == CartaEnPartida.RASGO_RACHA_DOBLE:
+			carta.tooltip_text += ". Cuenta como dos cartas para Racha; para el umbral vale %s" % datos.valor
 		carta.accessibility_name = carta.tooltip_text
 		carta.pressed.connect(elegida.emit.bind(i))

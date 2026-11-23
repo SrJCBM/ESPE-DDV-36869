@@ -32,10 +32,8 @@ static func evaluar(mano: Array, umbral: int = 17) -> Dictionary:
 		bonos["Ascenso"] = BONOS["Ascenso"]
 	if mano.size() >= 5:
 		bonos["Mano larga"] = BONOS["Mano larga"]
-	if mano.size() >= 3:
-		var ultimo_palo: String = mano[-1].definicion.palo
-		if mano[-2].definicion.palo == ultimo_palo and mano[-3].definicion.palo == ultimo_palo:
-			bonos["Racha"] = BONOS["Racha"]
+	if racha(mano) >= 3:
+		bonos["Racha"] = BONOS["Racha"]
 	var multiplicador: int = 1
 	for nombre: String in bonos:
 		patrones.append(nombre)
@@ -47,6 +45,20 @@ static func evaluar(mano: Array, umbral: int = 17) -> Dictionary:
 	resultado.multiplicador = multiplicador
 	resultado.puntos = total * multiplicador
 	return resultado
+
+
+## Cartas del mismo palo al final de la mano. Una Vela de racha doble cuenta como dos.
+static func racha(mano: Array) -> int:
+	if mano.is_empty():
+		return 0
+	var palo: String = mano[-1].definicion.palo
+	var cuenta := 0
+	for indice in range(mano.size() - 1, -1, -1):
+		var carta: CartaEnPartida = mano[indice]
+		if carta.definicion.palo != palo:
+			break
+		cuenta += carta.peso_racha()
+	return cuenta
 
 
 static func intervalo(mano: Array, reveladas: bool = false, vistas: Dictionary = {}) -> Dictionary:
