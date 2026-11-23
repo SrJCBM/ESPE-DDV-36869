@@ -1,6 +1,5 @@
 extends GutTest
 
-const Galeria := preload("res://casino/exploracion/galeria.gd")
 
 
 func nueva() -> CampanaCasino:
@@ -262,7 +261,7 @@ func test_campana_completa_con_baraja_normal_y_recompensas_unicas() -> void:
 			if not c.amuletos.has("prudente"): c.comprar("prudente")
 			if c.lentes == 0: c.comprar("lente")
 		juego.entrar("corredor",juego.sala)
-		juego.visitante.position = Vector2(Galeria.eje(nivel+2),310)
+		juego.visitante.position = PlanoGaleria.punto(CampanaCasino.MESAS[nivel]) + Vector2(0,12)
 		juego.interactuar(juego.cercano())
 		assert_eq(juego.sala,CampanaCasino.MESAS[nivel])
 		juego.visitante.position = Vector2(640,536)

@@ -167,9 +167,7 @@ func interactuar(p: Dictionary) -> void:
 				audio.reproducir(&"puerta")
 				entrar(p.destino,sala)
 			else:
-				var nivel := CampanaCasino.MESAS.find(p.destino)
-				var requisito := "Habla con la anfitriona del vestíbulo." if nivel == 0 else "Necesitas %s de los tres sellos." % nivel
-				_aviso(p.accion,requisito)
+				_aviso(CampanaCasino.NOMBRES[p.destino], PlanoGaleria.requisito(p.destino) + ".")
 
 func _recepcion() -> void:
 	var retrato := "res://casino/arte/personaje_anfitriona.webp"

@@ -5,6 +5,8 @@ const Galeria := preload("res://casino/exploracion/galeria.gd")
 const Libro := preload("res://casino/interfaz/libro.gd")
 
 var puntos: Array[Dictionary] = []
+## Galería montada, para que resalte la puerta cercana; null fuera del corredor.
+var galeria: Galeria
 var _decorado: Node2D
 var _marcas: Node2D
 
@@ -18,16 +20,17 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 			capa.remove_child(hijo)
 			hijo.queue_free()
 	puntos.clear()
+	galeria = null
 	var entrada: Vector2
 	if sala == "corredor":
-		var galeria := Galeria.new()
+		galeria = Galeria.new()
 		galeria.campana = campana
 		galeria.capa_placas = _marcas
 		_decorado.add_child(galeria)
-		for i in range(Galeria.DESTINOS.size()):
-			var puerta: String = Galeria.DESTINOS[i]
-			_punto("puerta", Vector2(Galeria.eje(i), 302), CampanaCasino.NOMBRES[puerta], puerta)
-		entrada = Vector2(Galeria.eje(maxi(0, Galeria.DESTINOS.find(origen))), 375)
+		for destino: String in PlanoGaleria.PUERTAS:
+			var accion: String = CampanaCasino.NOMBRES[destino] if campana.puerta_abierta(destino) else PlanoGaleria.requisito(destino)
+			_punto("puerta", PlanoGaleria.punto(destino), accion, destino)
+		entrada = PlanoGaleria.entrada(origen)
 	else:
 		var arte := Sprite2D.new()
 		arte.texture = load("res://casino/arte/%s.webp" % sala)
@@ -86,3 +89,5 @@ func cercano(posicion: Vector2) -> Dictionary:
 func marcar(elegido: Dictionary) -> void:
 	for punto in puntos:
 		punto.marca.text = "◆" if punto == elegido else "◇"
+	if galeria != null:
+		galeria.resaltar(str(elegido.get("destino", "")) if elegido.get("tipo", "") == "puerta" else "")
