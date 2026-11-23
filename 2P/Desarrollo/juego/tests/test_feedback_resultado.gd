@@ -37,9 +37,9 @@ func test_punto_exacto_cuenta_los_puntos_y_termina_en_el_resultado() -> void:
 	var mesa = _mesa(["velas_08", "llaves_09"])
 	mesa.controlador.procesar_comando(Plantarse.new())
 	assert_true(mesa._feedback != null and mesa._feedback.is_valid(), "la cuenta está en marcha")
-	assert_ne(mesa._lectura.text, "17 × 5 = 85", "empieza desde cero")
+	assert_ne(mesa._lectura.text, "+85 puntos", "empieza desde cero")
 	await _esperar(1.1)
-	assert_eq(mesa._lectura.text, "17 × 5 = 85")
+	assert_eq(mesa._lectura.text, "+85 puntos")
 	assert_eq(mesa._puntos.text, "85 / 200")
 	assert_eq(mesa._lectura.scale, Vector2.ONE)
 	_assert_cartas_en_reposo(mesa)
@@ -54,7 +54,7 @@ func test_quiebra_sacude_las_cartas_y_vuelve_al_reposo() -> void:
 	for carta in mesa.mano.fila.get_children():
 		if carta._visual.position != Vector2.ZERO or carta._visual.modulate != Color.WHITE: movidas += 1
 	assert_gt(movidas, 0, "la Quiebra se nota en las cartas")
-	assert_string_contains(mesa._lectura.text, "0 puntos")
+	assert_string_contains(mesa._lectura.text, "Quiebra · ")
 	await _esperar(0.8)
 	_assert_cartas_en_reposo(mesa)
 	assert_eq(mesa._lectura.modulate, Color.WHITE)
@@ -72,7 +72,7 @@ func test_revelacion_de_mascara_termina_con_resultado_y_cartas_en_reposo() -> vo
 func test_movimiento_reducido_muestra_el_resultado_al_instante() -> void:
 	var mesa = _mesa(["velas_08", "llaves_09"], true)
 	mesa.controlador.procesar_comando(Plantarse.new())
-	assert_eq(mesa._lectura.text, "17 × 5 = 85")
+	assert_eq(mesa._lectura.text, "+85 puntos")
 	assert_eq(mesa._puntos.text, "85 / 200")
 	assert_null(mesa._feedback)
 	_assert_cartas_en_reposo(mesa)
@@ -82,7 +82,7 @@ func test_activar_movimiento_reducido_a_mitad_de_cuenta_fija_el_resultado() -> v
 	mesa.controlador.procesar_comando(Plantarse.new())
 	await get_tree().process_frame
 	mesa.establecer_movimiento_reducido(true)
-	assert_eq(mesa._lectura.text, "17 × 5 = 85")
+	assert_eq(mesa._lectura.text, "+85 puntos")
 	assert_eq(mesa._puntos.text, "85 / 200")
 	_assert_cartas_en_reposo(mesa)
 

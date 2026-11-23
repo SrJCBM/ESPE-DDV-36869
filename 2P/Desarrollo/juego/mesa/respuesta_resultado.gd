@@ -34,7 +34,7 @@ func celebrar(vista: Dictionary, cartas: Array, puntos_previos: int) -> void:
 	var aporte: int = int(mano.get("puntos", 0))
 	var meta: int = int(vista.get("meta", 200))
 	var cuenta := func(valor: float) -> void:
-		_lectura.text = "%s × %s = %s" % [total, multiplicador, roundi(valor)]
+		_lectura.text = "+%s puntos" % roundi(valor)
 		_puntos.text = "%s / %s" % [puntos_previos + roundi(valor), meta]
 	cuenta.call(0.0)
 	tween.tween_method(cuenta, 0.0, float(aporte), DURACION_CUENTA).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)

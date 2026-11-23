@@ -8,6 +8,7 @@ const VitrinaGabinete := preload("res://casino/interfaz/vitrina/vitrina_gabinete
 const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
 const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
+const CifrasMesa := preload("res://casino/interfaz/cifras_mesa.gd")
 const BASE := Vector2(1440,810)
 const DIALOGOS := {
 	"custodio": "He guardado la primera silla para ti. Escucha lo que calla la Máscara antes de pedir otra carta.",
@@ -84,9 +85,6 @@ func _ready() -> void:
 	pista = Libro.rotulo("",17,Libro.PAPEL)
 	pista.position = Vector2(80,777)
 	pagina.add_child(pista)
-	var controles := Libro.rotulo("WASD / flechas · caminar     E · interactuar     I · inventario",16,Libro.ORO)
-	controles.position = Vector2(918,779)
-	pagina.add_child(controles)
 	indicador_objetivo.name = "IndicadorObjetivo"
 	pagina.add_child(indicador_objetivo)
 	velo.size = BASE
@@ -129,10 +127,15 @@ func _process(_delta: float) -> void:
 	if libro.visible or vitrina.visible or is_instance_valid(mesa): return
 	var elegido := cercano()
 	exploracion.marcar(elegido)
-	if not elegido.is_empty(): pista.text = "E   /   " + str(elegido.accion)
-	elif not campana.recibida: pista.text = "La anfitriona te espera en el mostrador iluminado."
-	elif sala == "corredor": pista.text = "Acércate a una puerta para leer su placa."
-	else: pista.text = "El umbral del sur conduce a la galería."
+	pista.text = _pista(elegido)
+
+## Una sola línea cerca de una interacción; una puerta cerrada muestra su requisito.
+func _pista(elegido: Dictionary) -> String:
+	if elegido.is_empty():
+		return ""
+	if elegido.tipo == "puerta" and not campana.puerta_abierta(elegido.destino):
+		return str(elegido.accion)
+	return "E · " + str(elegido.accion)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
 	if is_instance_valid(mesa) or vitrina.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
@@ -189,8 +192,8 @@ func _presentar_jefe() -> void:
 	if nivel < campana.superadas:
 		_aviso(CampanaCasino.NOMBRES[sala],"La mesa se ha cerrado. La casa recuerda tu victoria.",foto)
 		return
-	var regla := CampanaCasino.MESAS_CAMPANA.de(sala)
-	_abrir(CampanaCasino.NOMBRES[sala],"«%s»\nUmbral %s   ·   Meta %s   ·   %s campanadas" % [DIALOGOS[sala],regla.umbral,regla.meta,regla.campanadas],foto,_cerrar)
+	_abrir(CampanaCasino.NOMBRES[sala],"«%s»" % DIALOGOS[sala],foto,_cerrar)
+	libro.lista.add_child(CifrasMesa.new(CampanaCasino.MESAS_CAMPANA.de(sala)))
 	libro.opcion("Tomar asiento",_jugar)
 	libro.opcion("Volver a la sala",_cerrar)
 

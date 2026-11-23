@@ -54,7 +54,7 @@ func test_las_puertas_cerradas_muestran_su_requisito_y_se_abren_en_orden() -> vo
 	juego.entrar("corredor", "custodio")
 	assert_eq(PlanoGaleria.estado("custodio", juego.campana), "Superada")
 	assert_eq(PlanoGaleria.estado("recaudador", juego.campana), "Siguiente")
-	assert_eq(_punto(juego, "recaudador").accion, CampanaCasino.NOMBRES["recaudador"])
+	assert_eq(_punto(juego, "recaudador").accion, "Entrar · El Recaudador")
 	juego.interactuar(_punto(juego, "recaudador"))
 	assert_eq(juego.sala, "recaudador")
 

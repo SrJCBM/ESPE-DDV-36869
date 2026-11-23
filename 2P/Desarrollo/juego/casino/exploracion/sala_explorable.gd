@@ -28,7 +28,7 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 		galeria.capa_placas = _marcas
 		_decorado.add_child(galeria)
 		for destino: String in PlanoGaleria.PUERTAS:
-			var accion: String = CampanaCasino.NOMBRES[destino] if campana.puerta_abierta(destino) else PlanoGaleria.requisito(destino)
+			var accion: String = "Entrar · %s" % CampanaCasino.NOMBRES[destino] if campana.puerta_abierta(destino) else PlanoGaleria.requisito(destino)
 			_punto("puerta", PlanoGaleria.punto(destino), accion, destino)
 		entrada = PlanoGaleria.entrada(origen)
 	else:
@@ -43,22 +43,22 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 	return entrada
 
 func _agregar_interacciones(sala: String, nombre_nota: String) -> void:
-	_punto("puerta", Vector2(640, 651), "Volver a la galería", "corredor")
+	_punto("puerta", Vector2(640, 651), "Salir a la galería", "corredor")
 	match sala:
 		"vestibulo":
 			_figura("anfitriona", Vector2(990, 231), 84)
-			_punto("anfitriona", Vector2(985, 279), "Hablar con la anfitriona")
+			_punto("anfitriona", Vector2(985, 279), "Hablar")
 			_punto("nota", Vector2(640, 190), "Examinar el reloj")
 		"tienda":
 			_figura("anfitriona", Vector2(650, 174), 84)
-			_punto("tienda", Vector2(645, 290), "Abrir el mostrador")
+			_punto("tienda", Vector2(645, 290), "Abrir vitrina")
 			_punto("nota", Vector2(168, 385), "Examinar la vitrina")
 		_:
 			_figura(sala, Vector2(640, 310), 95)
-			_punto("mesa", Vector2(640, 521), "Acercarse a la mesa")
+			_punto("mesa", Vector2(640, 521), "Hablar")
 			_punto("nota", Vector2(235, 262), "Examinar " + nombre_nota.to_lower())
 			if sala == "dueno":
-				_punto("salida", Vector2(640, 188), "Examinar el portón")
+				_punto("salida", Vector2(640, 188), "Abrir el portón")
 
 func _figura(id: String, pies: Vector2, alto: float) -> void:
 	var personaje := Sprite2D.new()
