@@ -17,6 +17,17 @@ Las piezas se generaron con la herramienta integrada ImageGen para La Última Me
 - El tapete conserva el centro oscuro para la mano. La prueba de composición lo encuadra entre el título y la franja de patrones, en `Rect2(390, 203, 740, 342)` sobre el lienzo de 1440 × 810. Las cartas quedan delante y el borde termina antes de la franja. El saldo, las cifras y los nombres se componen en Godot.
 - La ficha y las capas del dial se recortaron y centraron. El tapete se redujo a WebP con alfa. Los originales son arte generado para este repositorio.
 
+## Pedido · corredor según el plano
+
+**Para Julio.** El fondo actual de `juego/casino/arte/corredor.webp` (1672 × 941) tiene seis puertas al norte y solo una barandilla al sur. La diapositiva «Plano del casino» pide cuatro mesas al norte y el vestíbulo y la tienda al sur. Mientras tanto el juego apaga las dos puertas de la izquierda y dibuja dos vanos provisionales sobre la barandilla.
+
+- **Norte.** Cuatro puertas de mesa en las posiciones actuales de las puertas 3 a 6 (ejes a 538, 739, 940 y 1141 px sobre 1280 de ancho): verde acolchada, roja, violeta y la del amanecer. Donde hoy están las dos primeras puertas, pared con apliques o una vitrina, sin puertas.
+- **Sur.** Dos aberturas en la barandilla, bajo las puertas I y II (ejes a 538 y 739 px): el vestíbulo, con un arco de recepción y luz cálida, y el Gabinete de la anfitriona, con una vitrina visible al fondo. Deben leerse como salidas hacia el espectador, sin texto.
+- **Se conserva.** Encuadre, perspectiva, alfombra roja, suelo de mármol, paleta y tamaño de 1672 × 941. Sin letreros ni números: placas, luz y candados se componen en Godot.
+- **Entrega.** PNG original en `Diseno/recursos/i4/` y WebP en el mismo `corredor.webp`. Si los ejes cambian, basta con ajustar `PUERTAS` en `casino/exploracion/plano_galeria.gd`.
+
+> Original reusable game background for La Última Mesa, a supernatural late-Victorian casino. Dark forest emerald, aged brass, subdued amber, restrained fine copperplate hatching. No text, letters, numerals, signatures or logos. Same camera, perspective, red carpet runner and green marble floor as the existing gallery corridor. The far (north) wall holds exactly four ornate arched doors evenly spaced on the right two thirds: green tufted leather, deep red lacquer, violet stained glass, and a dark sunrise-ray door; the left third is wall with brass sconces and a glazed cabinet, no doors. The near (south) brass balustrade is interrupted by two open archways on the left half, aligned under the first two north doors: a warmly lit reception arch and a doorway revealing a curiosity cabinet. Wide landscape 16:9, flat even composition for a walkable 2D top-down room.
+
 ## Prompts de generación
 
 ### Tríptico de sellos

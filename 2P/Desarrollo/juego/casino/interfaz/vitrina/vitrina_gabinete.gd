@@ -66,8 +66,9 @@ func _ready() -> void:
 	detalle.custom_minimum_size = Vector2(392, 0)
 	detalle.compra_confirmada.connect(_confirmar)
 	add_child(detalle)
+	# Cinco columnas y la barra de desplazamiento caben dentro del marco (borde derecho en 1320).
 	selector.position = Vector2(892, 458)
-	selector.size = Vector2(400, 210)
+	selector.size = Vector2(392, 206)
 	selector.carta_elegida.connect(_elegir_carta)
 	selector.motivo_consultado.connect(func(texto: String) -> void: detalle.aviso.text = texto)
 	add_child(selector)

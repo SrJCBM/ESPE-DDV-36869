@@ -84,6 +84,9 @@ func test_servicio_de_baraja_elige_carta_con_cambio_previsto_y_motivos() -> void
 		if carta.definicion.valor_impreso == 10: diez = carta
 	_ficha(juego, "subir").pressed.emit()
 	assert_true(juego.vitrina.selector.visible)
+	var marco_derecho := 1320.0
+	assert_lte(juego.vitrina.selector.get_rect().end.x, marco_derecho, "El selector no se sale del marco de la vitrina")
+	assert_lte(juego.vitrina.selector.rejilla.get_combined_minimum_size().x, juego.vitrina.selector.size.x)
 	assert_eq(juego.vitrina.selector.botones.size(), juego.campana.baraja.size())
 	var indice: int = juego.campana.baraja.find(diez)
 	var boton: Button = juego.vitrina.selector.botones[indice]
