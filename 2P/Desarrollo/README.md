@@ -52,6 +52,7 @@ Los comandos de pruebas y exportación están en [juego/README.md](juego/README.
 - [Iteración 01 y criterios R01–R20](ITERACION_01.md).
 - [Iteración 02: campaña y revisión con Damián](ITERACION_02.md).
 - [Iteración 03: pulido, balance y deuda técnica](ITERACION_03.md), con el estado de cada mejora.
+- [Iteración 04 · Interfaz y recorrido del casino](ITERACION_04.md), plan de vitrina, mapa, HUD, diálogos y menús.
 - [Balance de la campaña y del Recaudador](BALANCE_CAMPANA.md).
 - [Revisión técnica y pendientes de cierre](Archivo/I1/REVISION_I1.md).
 - [Plan general](PLAN_DE_TRABAJO.md), [arquitectura](ARQUITECTURA_Y_PATRONES.md) y [entorno](ENTORNO_Y_HERRAMIENTAS.md).
