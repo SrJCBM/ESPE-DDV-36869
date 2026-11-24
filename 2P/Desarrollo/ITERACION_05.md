@@ -1,6 +1,6 @@
 # Iteración 05 · Pasillos de los jefes
 
-**Estado general:** en curso. Kenned redactó el borrador el 23 de noviembre de 2026 a partir de lo que acordó con Julio, y ese mismo día implementó el primer tramo en la rama `kenned/i5-arranque-campana`, que parte de I4 con sus correcciones. Julio define los identificadores, el orden y el reparto de las tareas. La integración a `main` queda pendiente hasta que Kenned vuelva. **Base:** I4, rama `kenned/i4-interfaz-recorrido` (PR #4).
+**Estado general:** en curso. Kenned redactó el borrador el 23 de noviembre de 2026 a partir de lo que acordó con Julio, y ese mismo día implementó el primer tramo en la rama `kenned/i5-arranque-campana`, que parte de I4 con sus correcciones. Julio define los identificadores, el orden y el reparto de las tareas. **Integrada en `main` el 24 de noviembre de 2026** junto con I4 (PR #4), con 257 pruebas en verde sobre el resultado, la simulación de campaña y una exportación para Windows comprobada.
 
 **Objetivo:** que el avance por la campaña se recorra. Cada sello abre una puerta física hacia el pasillo del jefe siguiente, y cada pasillo anuncia con su arte y su sonido a quién se va a enfrentar el jugador.
 
@@ -126,7 +126,7 @@ Lecturas para Julio:
 - **Pasillo del Dueño** con su propia pantalla y la puerta desde el pasillo de la Coleccionista.
 - **LAN.** Queda para una iteración futura, por decisión de Julio. No se ha empezado.
 - **Diseño nuevo del protagonista.** Hasta tener las ilustraciones (la herramienta de generación de Julio vuelve a estar disponible el jueves al mediodía), el juego usa el sprite antiguo del visitante.
-- **Integración a `main`.** Queda para cuando Kenned vuelva; antes debe fusionarse el PR #4 de I4.
+- **Integración a `main`.** Hecha el 24 de noviembre de 2026 (commit de integración `07d4fe6`); el PR #4 de I4 quedó fusionado con ella. El trabajo siguiente de I5 parte de `main`.
 - **Nodos huérfanos de `test_interfaz.gd`.** GUT sigue atribuyéndole 28; es un pendiente aparte de I4, no viene de los cambios de I5.
 
 ## Pendiente de I4
