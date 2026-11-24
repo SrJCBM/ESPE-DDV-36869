@@ -4,9 +4,15 @@ const Visitante := preload("res://casino/exploracion/visitante.gd")
 const SalaExplorable := preload("res://casino/exploracion/sala_explorable.gd")
 const Libro := preload("res://casino/interfaz/libro.gd")
 const Mesa := preload("res://mesa/mesa.tscn")
-const TiendaCasino := preload("res://casino/interfaz/tienda_casino.gd")
+const VitrinaGabinete := preload("res://casino/interfaz/vitrina/vitrina_gabinete.gd")
 const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
 const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
+const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
+const CifrasMesa := preload("res://casino/interfaz/cifras_mesa.gd")
+const DialogoNovela := preload("res://casino/dialogos/dialogo_novela.gd")
+const MenuCasino := preload("res://casino/interfaz/menus/menu_casino.gd")
+const VistaBaraja := preload("res://casino/interfaz/baraja/vista_baraja.gd")
+const ANFITRIONA: Conversacion = preload("res://datos/dialogos/anfitriona.tres")
 const BASE := Vector2(1440,810)
 const DIALOGOS := {
 	"custodio": "He guardado la primera silla para ti. Escucha lo que calla la Máscara antes de pedir otra carta.",
@@ -15,6 +21,7 @@ const DIALOGOS := {
 	"dueno": "¿Ya distingues el alba tras la verja? Empiezas en veinticinco. Cada mano que cierres sin pasarte me devuelve un paso, hasta diecisiete."
 }
 const NOTAS := {
+	"entrada": ["La farola", "Bajo la luz hay una invitación pisoteada con tu nombre. La tuya sigue lacrada en el bolsillo."],
 	"vestibulo": ["El reloj detenido", "Todas las agujas señalan la hora a la que llegaste. Bajo el cristal alguien grabó tres ranuras del tamaño de un sello."],
 	"tienda": ["La vitrina de humo", "La lámpara atraviesa la lente y dibuja dos rostros en el terciopelo. Uno desaparece cuando la luz toca el cristal."],
 	"custodio": ["El péndulo", "Hay diez muescas en la caja. El péndulo solo avanza cuando alguien empieza una mano."],
@@ -34,16 +41,28 @@ var visitante := Visitante.new()
 var libro := Libro.new()
 var velo := ColorRect.new()
 var titulo: Label
-var cuenta: Label
+var hud := HudCampana.new()
 var pista: Label
 var exploracion := SalaExplorable.new(decorado, capa_superior)
 var mesa: Control
 var audio := AudioCasino.new()
-var boton_sonido := Button.new()
 var indicador_objetivo := IndicadorObjetivo.new()
-var _tienda := TiendaCasino.new(libro, _cerrar)
+var vitrina := VitrinaGabinete.new()
+var dialogo := DialogoNovela.new()
+var menu := MenuCasino.new()
+var vista_baraja := VistaBaraja.new()
+## Control enfocado antes de abrir «Ver baraja»; se devuelve al cerrarla.
+var _foco_baraja = null
+## Control enfocado antes de pausar; se devuelve al reanudar.
+var _foco_previo = null
+## Guardado automático de la campaña (I5). Solo se activa cuando el casino es la escena
+## principal, para que las pruebas que montan el casino no toquen la partida de quien juega.
+var guardado_activo := false
 
 func _ready() -> void:
+	# Hasta que entren en el árbol, un Control cuenta como visible.
+	menu.visible = false
+	vista_baraja.visible = false
 	get_window().min_size = Vector2i(1024,576)
 	add_child(audio)
 	visitante.pisada.connect(audio.reproducir.bind(&"paso"))
@@ -65,44 +84,178 @@ func _ready() -> void:
 	var marca := Libro.rotulo("LA ÚLTIMA MESA",24,Libro.ORO,true)
 	marca.position = Vector2(80,6)
 	pagina.add_child(marca)
-	boton_sonido.text = "Sonido · V"
-	boton_sonido.position = Vector2(290, 9)
-	boton_sonido.size = Vector2(104, 33)
-	boton_sonido.add_theme_stylebox_override("normal", Libro.caja(Color("10251f"), Color("645c44")))
-	boton_sonido.add_theme_color_override("font_color", Libro.PAPEL)
-	boton_sonido.pressed.connect(_sonido)
-	pagina.add_child(boton_sonido)
 	titulo = Libro.rotulo("",26,Libro.PAPEL,true)
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	titulo.position = Vector2(435,5)
 	titulo.size.x = 570
 	pagina.add_child(titulo)
-	cuenta = Libro.rotulo("",16,Libro.ORO)
-	cuenta.position = Vector2(982,15)
-	cuenta.size.x = 376
-	cuenta.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	pagina.add_child(cuenta)
+	hud.position = Vector2(982,6)
+	hud.size = Vector2(376,40)
+	pagina.add_child(hud)
 	pista = Libro.rotulo("",17,Libro.PAPEL)
 	pista.position = Vector2(80,777)
 	pagina.add_child(pista)
-	var controles := Libro.rotulo("WASD / flechas · caminar     E · interactuar     I · inventario",16,Libro.ORO)
-	controles.position = Vector2(918,779)
-	pagina.add_child(controles)
 	indicador_objetivo.name = "IndicadorObjetivo"
 	pagina.add_child(indicador_objetivo)
-	_tienda.compra_realizada.connect(_refrescar)
+	pagina.add_child(dialogo)
+	dialogo.solicitud.connect(_solicitud)
+	dialogo.cerrado.connect(_cerrar)
 	velo.size = BASE
 	velo.color = Color(0.015,0.035,0.026,0.66)
 	pagina.add_child(velo)
 	pagina.add_child(libro)
+	pagina.add_child(vitrina)
+	vitrina.cerrada.connect(_cerrar)
+	vitrina.compra_realizada.connect(func(_id: String) -> void:
+		audio.reproducir(&"interfaz")
+		_refrescar())
 	velo.hide()
 	libro.hide()
 	resized.connect(_adaptar)
 	_adaptar()
-	entrar("vestibulo")
+	entrar("entrada")
+	add_child(menu)
+	menu.audio = audio
+	menu.texto_inventario = _texto_inventario
+	menu.intento_activo = _algo_se_pierde
+	menu.texto_confirmar = _aviso_volver_al_inicio
+	menu.hay_partida = func() -> bool: return guardado_activo and PartidaGuardada.existe()
+	menu.entrar.connect(_entrar_desde_menu)
+	menu.continuar.connect(_continuar_desde_menu)
+	menu.reanudar.connect(_reanudar)
+	menu.volver_al_inicio.connect(volver_al_inicio)
+	menu.salir.connect(func() -> void: get_tree().quit())
+	menu.movimiento_cambiado.connect(_cambiar_movimiento)
+	menu.ver_baraja.connect(ver_baraja)
+	add_child(vista_baraja)
+	vista_baraja.cerrada.connect(_baraja_cerrada)
+	_inicio_si_principal.call_deferred()
+
+## El menú de inicio solo aparece al arrancar el juego, no cuando las pruebas montan el casino.
+func _inicio_si_principal() -> void:
+	if is_inside_tree() and get_tree().current_scene == self:
+		guardado_activo = true
+		abrir_inicio()
+
+func abrir_inicio() -> void:
+	menu.abrir("inicio")
+	_congelar(true)
+
+## Esc en el juego libre o en una mano sin nada abierto. Congela sala, mesa y animaciones.
+func pausar() -> void:
+	if menu.visible:
+		return
+	guardar() # Conserva también la posición exacta del visitante.
+	_foco_previo = get_viewport().gui_get_focus_owner()
+	menu.abrir("pausa")
+	_congelar(true)
+	audio.reproducir(&"interfaz")
+
+func _reanudar() -> void:
+	menu.cerrar()
+	_congelar(false)
+	_restaurar_foco()
+
+## Devuelve el foco al control que lo tenía; si ya no está, a una acción válida de la mesa.
+func _restaurar_foco() -> void:
+	var previo = _foco_previo
+	_foco_previo = null
+	if _enfocable(previo):
+		previo.grab_focus()
+	elif is_instance_valid(mesa):
+		for nombre in ["boton_iniciar_pedir", "boton_plantarse", "boton_ayuda"]:
+			var accion: Control = mesa.get(nombre)
+			if _enfocable(accion):
+				accion.grab_focus()
+				return
+
+static func _enfocable(control) -> bool:
+	if not is_instance_valid(control) or not control is Control or not control.is_visible_in_tree() or control.focus_mode == Control.FOCUS_NONE:
+		return false
+	return not (control is BaseButton and control.disabled)
+
+func _congelar(congelado: bool) -> void:
+	var modo := Node.PROCESS_MODE_DISABLED if congelado else Node.PROCESS_MODE_INHERIT
+	pagina.process_mode = modo
+	if is_instance_valid(mesa):
+		mesa.process_mode = modo
+	move_child(menu, -1)
+	_actualizar_objetivo()
+
+## Vuelve a la pantalla de inicio. Con guardado, la partida queda guardada (una mesa en
+## curso vuelve a como estaba al sentarse); sin él, se abandona el intento.
+func volver_al_inicio() -> void:
+	guardar()
+	if is_instance_valid(mesa):
+		remove_child(mesa)
+		mesa.queue_free()
+		mesa = null
+		pagina.show()
+	_intento_en_blanco()
+	abrir_inicio()
+
+func _algo_se_pierde() -> bool:
+	if guardado_activo:
+		return is_instance_valid(mesa)
+	return campana.recibida or is_instance_valid(mesa)
+
+func _aviso_volver_al_inicio() -> String:
+	if guardado_activo:
+		return "Se perderá la mano en curso. Al continuar, volverás frente al crupier con lo que tenías al sentarte."
+	return "Se perderá el intento actual: la baraja, las fichas y los sellos."
+
+## «Entrar al casino» o «Nueva partida» (ya confirmada): empieza de cero si había partida.
+func _entrar_desde_menu() -> void:
+	if guardado_activo and PartidaGuardada.existe():
+		PartidaGuardada.borrar()
+		_intento_en_blanco()
+	_reanudar()
+
+func _continuar_desde_menu() -> void:
+	continuar()
+	_reanudar()
+
+## Guarda el intento si se puede: con invitación, sin derrota y fuera de una mesa.
+func guardar() -> void:
+	if not guardado_activo or not campana.recibida or campana.derrota or is_instance_valid(mesa) or not campana.activa.is_empty():
+		return
+	PartidaGuardada.guardar({
+		"campana": campana.a_datos(), "sala": sala,
+		"posicion": [visitante.position.x, visitante.position.y],
+	})
+
+## Carga la partida guardada. false si no hay ninguna válida.
+func continuar() -> bool:
+	var datos := PartidaGuardada.cargar()
+	if datos.is_empty():
+		return false
+	campana = CampanaCasino.desde_datos(datos.campana)
+	_cerrar()
+	var destino := str(datos.get("sala", "vestibulo"))
+	if not CampanaCasino.NOMBRES.has(destino) or not campana.puerta_abierta(destino):
+		destino = "vestibulo"
+	entrar(destino)
+	var posicion = datos.get("posicion", [])
+	if destino == str(datos.get("sala", "")) and posicion is Array and posicion.size() == 2:
+		var punto := Vector2(float(posicion[0]), float(posicion[1]))
+		var limites := PlanoSalas.LIMITES_GALERIA if PlanoGaleria.es_pasillo(destino) else PlanoSalas.LIMITES
+		if limites.has_point(punto):
+			visitante.position = punto
+	if campana.hay_recompensa():
+		_mostrar_recompensa("Tienes una carta de la casa pendiente. Puedes añadirla a tu baraja.")
+	return true
+
+func _notification(que: int) -> void:
+	if que == NOTIFICATION_WM_CLOSE_REQUEST:
+		guardar()
+
+func _cambiar_movimiento(reducido: bool) -> void:
+	if is_instance_valid(mesa):
+		mesa.establecer_movimiento_reducido(reducido)
+	_refrescar()
 
 func _actualizar_objetivo() -> void:
-	var mostrar := not libro.visible and not velo.visible and not is_instance_valid(mesa)
+	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not dialogo.visible and not menu.visible and not vista_baraja.visible and not is_instance_valid(mesa)
 	indicador_objetivo.presentar(campana.objetivo(), mostrar)
 
 func _adaptar() -> void:
@@ -123,16 +276,27 @@ func cercano() -> Dictionary:
 
 func _process(_delta: float) -> void:
 	_actualizar_objetivo()
-	if libro.visible or is_instance_valid(mesa): return
+	if libro.visible or vitrina.visible or dialogo.visible or menu.visible or is_instance_valid(mesa): return
 	var elegido := cercano()
 	exploracion.marcar(elegido)
-	if not elegido.is_empty(): pista.text = "E   /   " + str(elegido.accion)
-	elif not campana.recibida: pista.text = "La anfitriona te espera en el mostrador iluminado."
-	elif sala == "corredor": pista.text = "Acércate a una puerta para leer su placa."
-	else: pista.text = "El umbral del sur conduce a la galería."
+	pista.text = _pista(elegido)
+
+## Una sola línea cerca de una interacción; una puerta cerrada muestra su requisito.
+func _pista(elegido: Dictionary) -> String:
+	if elegido.is_empty():
+		return ""
+	if elegido.tipo == "puerta" and not campana.puerta_abierta(elegido.destino):
+		return str(elegido.accion)
+	return "E · " + str(elegido.accion)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
-	if is_instance_valid(mesa) or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	if menu.visible or vista_baraja.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	# La mesa, la vitrina y el diálogo resuelven antes su propio Esc; si llega aquí, pausa.
+	if evento.keycode == KEY_ESCAPE and not libro.visible:
+		pausar()
+		get_viewport().set_input_as_handled()
+		return
+	if is_instance_valid(mesa) or vitrina.visible or dialogo.visible: return
 	if libro.visible:
 		if evento.keycode == KEY_ESCAPE or (evento.keycode == KEY_I and libro.cierre == _cerrar):
 			if libro.cierre.is_valid(): libro.cierre.call()
@@ -164,23 +328,34 @@ func interactuar(p: Dictionary) -> void:
 				audio.reproducir(&"puerta")
 				entrar(p.destino,sala)
 			else:
-				var nivel := CampanaCasino.MESAS.find(p.destino)
-				var requisito := "Habla con la anfitriona del vestíbulo." if nivel == 0 else "Necesitas %s de los tres sellos." % nivel
-				_aviso(p.accion,requisito)
+				_aviso(CampanaCasino.NOMBRES[p.destino], PlanoGaleria.requisito(p.destino) + ".")
 
+## Conversación con la anfitriona en la escena de diálogos (I4-06); sus líneas son datos.
 func _recepcion() -> void:
-	var retrato := "res://casino/arte/personaje_anfitriona.webp"
-	if not campana.recibida:
-		_abrir("La anfitriona","«Llegas a la hora exacta. Aquí todos los relojes se detuvieron esperando a alguien. ¿Me dejas ver tu invitación?»",retrato,_cerrar)
-		libro.opcion("Entregar la invitación",_entregar)
-	else:
-		var frases := ["«El reloj verde pertenece al Custodio. Cruza la puerta del sur y busca el primer sello en la galería.»","«El Recaudador adelanta quince fichas. Te cobrará una por cada carta que pidas tras el reparto.»","«Ella colecciona lo que más vale. Vigila qué carta se queda después de cada mano.»","«Tres sellos. El Dueño ya sabe que has llegado. Mira la luz tras su mesa.»","«Oigo el pestillo. Vuelve al portón detrás de la última mesa.»"]
-		_aviso("La anfitriona",frases[campana.superadas],retrato)
+	visitante.bloqueado = true
+	if not dialogo.abrir(ANFITRIONA, campana.cumple, AjustesJuego.movimiento_reducido(), _describir_opcion):
+		visitante.bloqueado = false
+	_actualizar_objetivo()
 
+## Las opciones de la oferta inicial muestran el icono y el efecto del catálogo de la tienda.
+func _describir_opcion(opcion: Dictionary) -> Dictionary:
+	var solicitud := str(opcion.get("solicitud", ""))
+	if not solicitud.begins_with("objeto_inicial:"):
+		return {}
+	var producto := CampanaCasino.TIENDA.buscar(solicitud.trim_prefix("objeto_inicial:"))
+	if producto == null:
+		return {}
+	return {"icono": "res://casino/arte/objeto_%s.webp" % producto.id, "detalle": producto.descripcion}
+
+## Una elección del diálogo pide un cambio; la campaña comprueba si corresponde.
+func _solicitud(id: String) -> void:
+	if campana.atender(id):
+		audio.reproducir(&"sello")
+		_refrescar()
+
+## Atajo de las pruebas y capturas: la misma solicitud que «Entregar la invitación».
 func _entregar() -> void:
-	campana.recibir_invitacion()
-	_refrescar()
-	_aviso("La anfitriona","«Veinticuatro cartas y diez fichas. Son tuyas. La tienda abre al otro lado de la galería. Cuando estés listo, toma asiento ante el Custodio.»","res://casino/arte/personaje_anfitriona.webp")
+	_solicitud("entregar_invitacion")
 
 func _presentar_jefe() -> void:
 	var nivel := CampanaCasino.MESAS.find(sala)
@@ -188,12 +363,13 @@ func _presentar_jefe() -> void:
 	if nivel < campana.superadas:
 		_aviso(CampanaCasino.NOMBRES[sala],"La mesa se ha cerrado. La casa recuerda tu victoria.",foto)
 		return
-	var regla := CampanaCasino.MESAS_CAMPANA.de(sala)
-	_abrir(CampanaCasino.NOMBRES[sala],"«%s»\nUmbral %s   ·   Meta %s   ·   %s campanadas" % [DIALOGOS[sala],regla.umbral,regla.meta,regla.campanadas],foto,_cerrar)
+	_abrir(CampanaCasino.NOMBRES[sala],"«%s»" % DIALOGOS[sala],foto,_cerrar)
+	libro.lista.add_child(CifrasMesa.new(CampanaCasino.MESAS_CAMPANA.de(sala)))
 	libro.opcion("Tomar asiento",_jugar)
 	libro.opcion("Volver a la sala",_cerrar)
 
 func _jugar() -> void:
+	guardar() # Si el juego se cierra en la mesa, se continúa frente al crupier.
 	if not campana.iniciar(sala): return
 	_cerrar()
 	visitante.bloqueado = true
@@ -220,11 +396,16 @@ func _levantarse(victoria: bool, exactos: int) -> void:
 		else:
 			_aviso("Mesa superada","La casa entrega %s fichas. %s" % [premio,ruta])
 	else:
+		if guardado_activo:
+			PartidaGuardada.borrar()
 		_abrir("La casa gana","La última campanada se apaga. Tu siguiente invitación abrirá un intento nuevo.","",Callable())
 		libro.opcion("Volver al vestíbulo",_nuevo_intento)
 
 func _ofrecer_recompensa(premio: int, ruta: String) -> void:
-	_abrir("Una carta de la casa", "Recibes %s fichas. Puedes añadir una carta a tu baraja.\n%s" % [premio, ruta], "", Callable())
+	_mostrar_recompensa("Recibes %s fichas. Puedes añadir una carta a tu baraja.\n%s" % [premio, ruta])
+
+func _mostrar_recompensa(mensaje: String) -> void:
+	_abrir("Una carta de la casa", mensaje, "", Callable())
 	var fila := CartasRecompensa.new()
 	libro.lista.add_child(fila)
 	fila.presentar(campana.opciones_recompensa())
@@ -247,9 +428,15 @@ func _sonido() -> void:
 	libro.opcion("Volver al casino",_cerrar)
 
 func _nuevo_intento() -> void:
+	if guardado_activo:
+		PartidaGuardada.borrar()
+	_intento_en_blanco()
+
+## Intento nuevo en memoria, sin tocar la partida guardada.
+func _intento_en_blanco() -> void:
 	campana = CampanaCasino.new()
 	_cerrar()
-	entrar("vestibulo")
+	entrar("entrada")
 
 func _abrir(t: String, mensaje: String, foto: String, volver: Callable) -> void:
 	_preparar_libro()
@@ -257,7 +444,6 @@ func _abrir(t: String, mensaje: String, foto: String, volver: Callable) -> void:
 
 func _preparar_libro() -> void:
 	visitante.bloqueado = true
-	boton_sonido.focus_mode = Control.FOCUS_NONE
 	velo.show()
 	_actualizar_objetivo()
 
@@ -266,26 +452,77 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 	libro.opcion("Continuar",_cerrar)
 
 func _cerrar() -> void:
+	vitrina.hide()
+	dialogo.hide()
 	libro.hide()
 	velo.hide()
-	boton_sonido.focus_mode = Control.FOCUS_ALL
 	visitante.bloqueado = false
 	_refrescar()
 
 func _refrescar() -> void:
 	titulo.text = CampanaCasino.NOMBRES.get(sala,"")
-	cuenta.text = "%s fichas     ·     %s / 3 sellos" % [campana.saldo,mini(3,campana.superadas)] if campana.recibida else "La invitación"
+	hud.presentar(campana, AjustesJuego.movimiento_reducido())
 	_actualizar_objetivo()
+	guardar()
 
 func inventario() -> void:
+	var datos := _texto_inventario()
+	_abrir(datos[0], datos[1], "", _cerrar)
+	if campana.recibida:
+		libro.opcion("Ver baraja", ver_baraja)
+	libro.opcion("Continuar", _cerrar)
+
+## «Ver baraja» desde el inventario, en exploración o en la pausa durante una mano.
+## Al cerrarla, el foco vuelve al botón desde el que se abrió.
+func ver_baraja() -> void:
+	if not campana.recibida or vista_baraja.visible:
+		return
+	_foco_baraja = get_viewport().gui_get_focus_owner()
+	move_child(vista_baraja, -1)
+	vista_baraja.abrir(datos_baraja())
+	audio.reproducir(&"naipe")
+	_actualizar_objetivo()
+
+func _baraja_cerrada() -> void:
+	var previo = _foco_baraja
+	_foco_baraja = null
+	if _enfocable(previo):
+		previo.grab_focus()
+	_actualizar_objetivo()
+
+## Proyección pública de la baraja: ordenada por palo y valor, nunca por el mazo. Durante una
+## mano las Máscaras van boca abajo, sin valor ni ajuste, para no delatar las de la mano.
+func datos_baraja() -> Dictionary:
+	var en_mano := is_instance_valid(mesa)
+	var cartas := []
+	for carta in campana.baraja:
+		var id := carta.id_instancia
+		var oculta := en_mano and carta.definicion.palo == Palos.MASCARAS
+		var ajuste := 0 if oculta else int(campana.ajustadas.get(id, 0))
+		var notas := PackedStringArray()
+		if not oculta and carta.definicion.rasgo == CartaEnPartida.RASGO_RACHA_DOBLE: notas.append("RACHA ×2")
+		if campana.ganadas.has(id): notas.append("GANADA")
+		if ajuste != 0: notas.append("AJUSTE %+d" % ajuste)
+		cartas.append({
+			"palo": carta.definicion.palo, "oculta": oculta,
+			"valor": null if oculta else carta.definicion.valor_impreso,
+			"valor_efectivo": null if oculta else carta.valor_efectivo(),
+			"rasgo": "" if oculta else carta.definicion.rasgo, "nota": " · ".join(notas),
+			"ganada": campana.ganadas.has(id), "ajuste": ajuste,
+		})
+	return {"cartas": cartas, "retiradas": campana.retiradas.duplicate(true), "en_mano": en_mano}
+
+func _texto_inventario() -> Array:
 	var objetos := PackedStringArray()
 	for id in campana.amuletos: objetos.append(CampanaCasino.TIENDA.buscar(id).nombre)
-	var mensaje := "%s cartas   ·   %s fichas   ·   %s / 3 sellos\n%s / 2 lentes de humo. Amuletos: %s." % [campana.baraja.size(),campana.saldo,mini(3,campana.superadas),campana.lentes,", ".join(objetos) if objetos.size() else "ninguno"]
-	_aviso("Tus pertenencias",mensaje if campana.recibida else "Una invitación lacrada y una ficha antigua. Enséñale la invitación a la anfitriona.")
+	var sellos := PackedStringArray()
+	for recuadro in hud.sellos.recuadros: sellos.append(recuadro.tooltip_text)
+	var mensaje := "%s cartas   ·   %s fichas\n%s.\n%s / 2 lentes de humo. Amuletos: %s." % [campana.baraja.size(),campana.saldo,", ".join(sellos),campana.lentes,", ".join(objetos) if objetos.size() else "ninguno"]
+	return ["Tus pertenencias", mensaje if campana.recibida else "Una invitación lacrada y una ficha antigua. Enséñale la invitación a la anfitriona."]
 
 func tienda() -> void:
 	if not campana.recibida:
 		_aviso("Mostrador cerrado", "Presenta primero tu invitación en el vestíbulo.")
 		return
 	_preparar_libro()
-	_tienda.abrir(campana)
+	vitrina.abrir(campana)

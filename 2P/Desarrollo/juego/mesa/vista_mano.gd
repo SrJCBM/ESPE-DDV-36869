@@ -38,7 +38,7 @@ func _cartas(mano: Array[CartaEnPartida], llaves: Array[String], vistas: Diction
 	for carta in mano:
 		var oculta := not revelar and carta.es_mascara_oculta(vistas)
 		cartas.append({
-			"id": carta.id_instancia, "palo": carta.definicion.palo,
+			"id": carta.id_instancia, "palo": carta.definicion.palo, "rasgo": carta.definicion.rasgo,
 			"valor": null if oculta else carta.definicion.valor_impreso,
 			"valor_efectivo": null if oculta else carta.valor_efectivo(),
 			"oculta": oculta, "puede_devolver": llaves.has(carta.id_instancia),

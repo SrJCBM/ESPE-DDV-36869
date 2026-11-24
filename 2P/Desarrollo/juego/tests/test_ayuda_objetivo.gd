@@ -120,7 +120,10 @@ func test_indicador_cambia_una_vez_y_se_oculta_con_ventanas() -> void:
 	assert_true(juego.indicador_objetivo.visible)
 	juego._recepcion()
 	assert_false(juego.indicador_objetivo.visible, "Diálogo abierto")
-	juego.libro.primero.pressed.emit()
+	juego.dialogo.completar()
+	juego.dialogo.elegir(0)
+	juego.dialogo.completar()
+	juego.dialogo.elegir(1)
 	assert_eq(juego.indicador_objetivo.texto.text, "Encuentra la mesa del Custodio")
 	assert_eq(juego.indicador_objetivo.cambios, 1)
 	assert_false(juego.indicador_objetivo.visible)
@@ -129,8 +132,7 @@ func test_indicador_cambia_una_vez_y_se_oculta_con_ventanas() -> void:
 	juego.inventario()
 	assert_false(juego.indicador_objetivo.visible, "Inventario abierto")
 	juego._cerrar()
-	juego.entrar("corredor", "vestibulo")
-	juego.entrar("tienda")
+	juego.entrar("pasillo_custodio", "vestibulo")
 	juego.tienda()
 	assert_false(juego.indicador_objetivo.visible, "Tienda abierta")
 	juego._cerrar()
@@ -171,7 +173,7 @@ func test_indicador_deja_pasar_clics_y_no_tapa_el_juego() -> void:
 	assert_lte(caja.size.y, 60.0, "Como máximo dos líneas")
 	assert_lte(caja.end.x, 560.0, "Ocupa solo la esquina izquierda")
 	assert_lt(caja.end.y, juego.mundo.position.y + 178, "Por encima del área caminable de las salas")
-	for sala in ["vestibulo", "corredor", "tienda", "custodio", "dueno"]:
+	for sala in ["entrada", "vestibulo", "pasillo_custodio", "pasillo_recaudador", "pasillo_coleccionista", "tienda", "custodio", "dueno"]:
 		juego.campana.superadas = 4
 		juego.entrar(sala)
 		for punto in juego.exploracion.puntos:

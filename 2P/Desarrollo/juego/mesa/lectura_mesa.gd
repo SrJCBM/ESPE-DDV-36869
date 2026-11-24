@@ -6,29 +6,22 @@ static func resultado(vista: Dictionary) -> Dictionary:
 	var total: int = int(mano.get("total", 0))
 	var umbral: int = int(vista.get("umbral", 17))
 	if mano.get("quiebra", false):
-		return {"formula": "%s > %s · 0 puntos" % [total, umbral],
-			"detalle": "Superaste el umbral por %s." % (total - umbral), "completo": ""}
-	var partes := PackedStringArray(["Base 1"])
-	var velas: int = int(mano.get("velas", 0))
-	if velas > 0: partes.append("%s %s" % [velas, "Vela" if velas == 1 else "Velas"])
-	var suma_bonos := 0
+		return {"formula": "Quiebra · %s supera %s" % [total, umbral],
+			"detalle": "Esta mano no suma puntos.", "completo": "Superaste el umbral por %s." % (total - umbral)}
+	# A primera vista, el aporte y los patrones obtenidos; la fórmula queda en «Ver desglose».
+	var partes := PackedStringArray()
 	var bonos: Dictionary = mano.get("bonos", {})
 	for nombre in mano.get("patrones", []):
-		var bono: int = int(bonos.get(nombre, 0))
-		suma_bonos += bono
-		partes.append("%s +%s" % ["Exacto" if nombre == "Punto exacto" else nombre, bono])
+		partes.append("%s +%s" % ["Exacto" if nombre == "Punto exacto" else nombre, int(bonos.get(nombre, 0))])
 	if mano.get("corona", 0) > 0: partes.append("Corona +2")
-	var detalle := " · ".join(partes)
-	var completo := detalle
-	if detalle.length() > 78:
-		detalle = "Base 1 · %s Velas · Bonos +%s" % [velas, suma_bonos]
-	return {"formula": "%s × %s = %s" % [total, mano.get("multiplicador", 1), mano.get("puntos", 0)],
-		"detalle": detalle, "completo": completo}
+	var completo := "%s × %s = %s" % [total, mano.get("multiplicador", 1), mano.get("puntos", 0)]
+	return {"formula": "+%s puntos" % mano.get("puntos", 0),
+		"detalle": " · ".join(partes), "completo": completo}
 
 ## Regla del crupier aplicada a la mano en curso, para leerla sin abrir la ayuda.
 ## texto: placa bajo el retrato (vacía si la mesa no tiene regla especial). nota: línea junto al umbral.
 static func regla(vista: Dictionary) -> Dictionary:
-	var nota := "No lo excedas."
+	var nota := ""
 	var umbral: int = int(vista.get("umbral", 17))
 	var siguiente: int = int(vista.get("umbral_siguiente", -1))
 	var anterior: int = int(vista.get("umbral_anterior", -1))

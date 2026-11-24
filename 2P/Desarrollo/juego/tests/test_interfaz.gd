@@ -88,15 +88,12 @@ func test_cambiar_el_dialogo_abierto_conserva_el_foco_original() -> void:
 	var audio := AudioCasino.new()
 	add_child_autofree(audio)
 	mesa.activar_audio(audio)
-	var sonido: Button = mesa.lienzo.get_node("boton_sonido")
-	assert_lt(sonido.get_index(), mesa.modal.get_index())
+	assert_false(mesa.lienzo.has_node("boton_sonido"), "El volumen está en el menú de pausa")
 	mesa.mostrar_carta(vista.cartas[1])
 	assert_false(mesa.modal.contenido.has_node("Reglamento"))
 	assert_eq(mesa.boton_ayuda.focus_mode, Control.FOCUS_NONE)
-	assert_eq(sonido.focus_mode, Control.FOCUS_NONE)
 	mesa.cerrar_modal()
 	assert_eq(mesa.boton_ayuda.focus_mode, Control.FOCUS_ALL)
-	assert_eq(sonido.focus_mode, Control.FOCUS_ALL)
 	assert_eq(mesa.get_viewport().gui_get_focus_owner(), mesa.boton_ayuda)
 
 func test_mano_larga_permanece_en_contenedor_desplazable() -> void:
@@ -290,7 +287,8 @@ func test_mensajes_y_devolucion_conservan_anchos_del_diseno() -> void:
 	assert_lte(mesa._mensaje.size.x, 684.0)
 	assert_lte(mesa._mensaje.get_line_count(), 2)
 	assert_eq(mesa._mensaje.get_visible_line_count(), mesa._mensaje.get_line_count())
-	assert_lte(mesa._mensaje.get_global_rect().end.y, mesa.boton_iniciar_pedir.get_global_rect().position.y)
+	# Las acciones están en la columna derecha: el mensaje no debe invadirla.
+	assert_lte(mesa._mensaje.get_global_rect().end.x, mesa.boton_iniciar_pedir.get_global_rect().position.x)
 	mesa.eleccion_llave.cancelar()
 
 func test_resumen_de_varios_patrones_no_desborda_su_rectangulo() -> void:
@@ -344,7 +342,7 @@ func test_doce_cartas_conservan_tamano_y_muestran_la_ultima_al_robar() -> void:
 	await get_tree().process_frame
 	var primera: Control = mesa.mano.fila.get_child(0)
 	var ultima: Control = mesa.mano.fila.get_child(11)
-	assert_eq(ultima.size, Vector2(184, 286))
+	assert_eq(ultima.size, Vector2(184, preload("res://mesa/interfaz/composicion_mesa.gd").ALTO_CARTA))
 	assert_gt(mesa.mano.scroll.scroll_horizontal, 0)
 	assert_lte(ultima.get_global_rect().end.x, mesa.mano.scroll.get_global_rect().end.x)
 	assert_lt(primera.get_global_rect().position.x, mesa.mano.scroll.get_global_rect().position.x)

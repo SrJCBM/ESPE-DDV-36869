@@ -12,6 +12,6 @@ static func crear_baraja() -> Array[CartaEnPartida]:
 	return cartas
 
 
-static func crear_carta(palo: String, valor: int, identidad: String = "") -> CartaEnPartida:
+static func crear_carta(palo: String, valor: int, identidad: String = "", rasgo: String = "") -> CartaEnPartida:
 	assert(Palos.es_valido(palo), "Palo desconocido: %s" % palo)
-	return CartaEnPartida.new(CartaDef.new("%s_%02d" % [palo, valor], palo, valor), identidad)
+	return CartaEnPartida.new(CartaDef.new("%s_%02d" % [palo, valor], palo, valor, rasgo), identidad)

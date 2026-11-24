@@ -17,6 +17,10 @@ Las piezas se generaron con la herramienta integrada ImageGen para La Última Me
 - El tapete conserva el centro oscuro para la mano. La prueba de composición lo encuadra entre el título y la franja de patrones, en `Rect2(390, 203, 740, 342)` sobre el lienzo de 1440 × 810. Las cartas quedan delante y el borde termina antes de la franja. El saldo, las cifras y los nombres se componen en Godot.
 - La ficha y las capas del dial se recortaron y centraron. El tapete se redujo a WebP con alfa. Los originales son arte generado para este repositorio.
 
+## Corredor común · pedido retirado
+
+El pedido de un corredor con cuatro puertas al norte y dos al sur queda **retirado**. La [iteración 05](../ITERACION_05.md#arte-y-sonido) sustituye el corredor común por una entrada y un pasillo propio para cada jefe; el arte se pide allí. Mientras tanto I4 usa el `corredor.webp` actual con dos vanos provisionales al sur.
+
 ## Prompts de generación
 
 ### Tríptico de sellos

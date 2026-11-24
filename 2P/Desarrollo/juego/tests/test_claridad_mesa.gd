@@ -84,7 +84,8 @@ func test_resultado_102_explica_sus_bonos_junto_a_la_mano() -> void:
 	var mesa = _mesa()
 	mesa.controlador.procesar_comando(PedirCarta.new())
 	mesa.controlador.procesar_comando(Plantarse.new())
-	assert_eq(mesa._lectura.text, "17 × 6 = 102")
+	assert_eq(mesa._lectura.text, "+102 puntos")
+	assert_eq(mesa._explicacion.tooltip_text, "17 × 6 = 102", "La fórmula sigue disponible")
 	assert_string_contains(mesa._explicacion.text, "Exacto +3")
 	assert_string_contains(mesa._explicacion.text, "Ascenso +2")
 	assert_true(mesa.boton_desglose.visible)
@@ -93,8 +94,8 @@ func test_quiebra_explica_exceso_real_y_cero_aporte() -> void:
 	var mesa = _mesa(["velas_10", "velas_06", "mascaras_03"])
 	mesa.controlador.procesar_comando(PedirCarta.new())
 	mesa.controlador.procesar_comando(Plantarse.new())
-	assert_string_contains(mesa._lectura.text, "0 puntos")
-	assert_string_contains(mesa._explicacion.text, "por 2")
+	assert_eq(mesa._lectura.text, "Quiebra · 19 supera 17")
+	assert_string_contains(mesa._explicacion.tooltip_text, "por 2")
 	assert_eq(mesa.vista.puntos, 0)
 
 func test_final_resume_manos_y_quiebras_una_sola_vez_y_reintentar_limpia() -> void:

@@ -1,6 +1,5 @@
 extends GutTest
 
-const Galeria := preload("res://casino/exploracion/galeria.gd")
 
 
 func nueva() -> CampanaCasino:
@@ -176,32 +175,33 @@ func test_retencion_desempata_por_ultima_y_dueno_puntua_con_umbral_vigente() -> 
 func test_recorrido_f5_interaccion_compra_mesa_y_regreso() -> void:
 	var juego = load(ProjectSettings.get_setting("application/run/main_scene")).instantiate()
 	add_child_autofree(juego)
-	assert_eq(juego.sala,"vestibulo")
+	assert_eq(juego.sala,"entrada")
 	var pos: Vector2 = juego.visitante.position
 	Input.action_press("norte")
 	for i in range(8): await get_tree().physics_frame
 	Input.action_release("norte")
 	assert_lt(juego.visitante.position.y,pos.y)
+	juego.entrar("vestibulo","entrada")
 	juego.visitante.position = Vector2(985,288)
 	var e := InputEventKey.new()
 	e.keycode = KEY_E
 	e.physical_keycode = KEY_E
 	e.pressed = true
 	juego._unhandled_key_input(e)
-	assert_true(juego.libro.visible)
-	assert_lte(juego.libro.cuerpo.get_rect().end.x,juego.libro.size.x-30)
+	assert_true(juego.dialogo.visible, "La anfitriona habla en la escena de diálogos")
 	assert_true(juego.visitante.bloqueado)
-	juego.libro.primero.pressed.emit()
+	juego.dialogo.completar()
+	juego.dialogo.elegir(0)
+	juego.dialogo.completar()
+	juego.dialogo.elegir(0)
 	assert_eq(juego.campana.saldo,10)
-	juego.libro.primero.pressed.emit()
-	juego.entrar("corredor","vestibulo")
+	assert_eq(juego.campana.lentes,1, "La Lente de humo es el objeto inicial elegido")
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	assert_false(juego.visitante.bloqueado)
+	juego.entrar("pasillo_custodio","vestibulo")
 	juego.entrar("tienda")
-	juego.tienda()
-	juego.libro.primero.pressed.emit()
-	assert_eq(juego.campana.saldo,10)
-	juego.libro.primero.pressed.emit()
-	assert_eq(juego.campana.lentes,1)
-	juego._cerrar()
+	assert_eq(juego.sala,"pasillo_custodio", "La tienda abre tras el primer sello")
 	juego.entrar("custodio")
 	juego._presentar_jefe()
 	juego.libro.primero.pressed.emit()
@@ -214,7 +214,8 @@ func test_recorrido_f5_interaccion_compra_mesa_y_regreso() -> void:
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
 	assert_null(juego.mesa)
 	assert_true(juego.campana.puerta_abierta("recaudador"))
-	assert_eq(juego.campana.saldo,14)
+	assert_true(juego.campana.puerta_abierta("tienda"))
+	assert_eq(juego.campana.saldo,20)
 	assert_lte(juego.libro.cuerpo.get_rect().end.x,juego.libro.size.x)
 	assert_true(juego.visitante.bloqueado)
 	await get_tree().process_frame
@@ -223,6 +224,7 @@ func test_recorrido_f5_interaccion_compra_mesa_y_regreso() -> void:
 func test_colision_del_mostrador_y_derrota_sin_premio() -> void:
 	var juego = load("res://casino/casino.tscn").instantiate()
 	add_child_autofree(juego)
+	juego.entrar("vestibulo")
 	juego.visitante.position = Vector2(980,289)
 	Input.action_press("norte")
 	for i in range(18): await get_tree().physics_frame
@@ -245,7 +247,7 @@ func test_colision_del_mostrador_y_derrota_sin_premio() -> void:
 	assert_eq(juego.campana.saldo,10)
 	juego.libro.primero.pressed.emit()
 	assert_eq(juego.campana.saldo,0)
-	assert_eq(juego.sala,"vestibulo")
+	assert_eq(juego.sala,"entrada")
 	await get_tree().process_frame
 	await get_tree().process_frame
 
@@ -261,8 +263,11 @@ func test_campana_completa_con_baraja_normal_y_recompensas_unicas() -> void:
 			if not c.amuletos.has("corona"): c.comprar("corona")
 			if not c.amuletos.has("prudente"): c.comprar("prudente")
 			if c.lentes == 0: c.comprar("lente")
-		juego.entrar("corredor",juego.sala)
-		juego.visitante.position = Vector2(Galeria.eje(nivel+2),310)
+		var mesa_actual: String = CampanaCasino.MESAS[nivel]
+		var pasillo: String = PlanoGaleria.PADRE[mesa_actual]
+		juego.entrar(pasillo,juego.sala)
+		assert_eq(juego.sala,pasillo)
+		juego.visitante.position = PlanoGaleria.punto(pasillo, mesa_actual) + (Vector2(0,12) if PlanoGaleria.norte(pasillo, mesa_actual) else Vector2(-12,0))
 		juego.interactuar(juego.cercano())
 		assert_eq(juego.sala,CampanaCasino.MESAS[nivel])
 		juego.visitante.position = Vector2(640,536)
@@ -288,7 +293,7 @@ func test_campana_completa_con_baraja_normal_y_recompensas_unicas() -> void:
 	juego.interactuar(juego.cercano())
 	assert_eq(juego.libro.primero.text,"Comenzar otro viaje")
 	juego.libro.primero.pressed.emit()
-	assert_eq(juego.sala,"vestibulo")
+	assert_eq(juego.sala,"entrada")
 	assert_eq(juego.campana.superadas,0)
 	assert_false(juego.campana.recibida)
 	await get_tree().process_frame

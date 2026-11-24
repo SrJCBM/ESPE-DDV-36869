@@ -2,9 +2,12 @@ extends RefCounted
 ## Monta la sala y sus puntos de interacción. Devuelve la posición de entrada.
 
 const Galeria := preload("res://casino/exploracion/galeria.gd")
+const EntradaCasino := preload("res://casino/exploracion/entrada_casino.gd")
 const Libro := preload("res://casino/interfaz/libro.gd")
 
 var puntos: Array[Dictionary] = []
+## Pasillo montado, para que resalte la puerta cercana; null fuera de los pasillos.
+var galeria: Galeria
 var _decorado: Node2D
 var _marcas: Node2D
 
@@ -18,16 +21,23 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 			capa.remove_child(hijo)
 			hijo.queue_free()
 	puntos.clear()
+	galeria = null
 	var entrada: Vector2
-	if sala == "corredor":
-		var galeria := Galeria.new()
+	if PlanoGaleria.es_pasillo(sala):
+		galeria = Galeria.new()
 		galeria.campana = campana
+		galeria.pasillo = sala
 		galeria.capa_placas = _marcas
 		_decorado.add_child(galeria)
-		for i in range(Galeria.DESTINOS.size()):
-			var puerta: String = Galeria.DESTINOS[i]
-			_punto("puerta", Vector2(Galeria.eje(i), 302), CampanaCasino.NOMBRES[puerta], puerta)
-		entrada = Vector2(Galeria.eje(maxi(0, Galeria.DESTINOS.find(origen))), 375)
+		for destino: String in PlanoGaleria.puertas(sala):
+			var accion: String = "Entrar · %s" % CampanaCasino.NOMBRES[destino] if campana.puerta_abierta(destino) else PlanoGaleria.requisito(destino)
+			_punto("puerta", PlanoGaleria.punto(sala, destino), accion, destino)
+		entrada = PlanoGaleria.entrada(sala, origen)
+	elif sala == "entrada":
+		_decorado.add_child(EntradaCasino.new())
+		_punto("puerta", Vector2(640, 350), "Entrar al casino", "vestibulo")
+		_punto("nota", Vector2(300, 600), "Examinar la farola")
+		entrada = Vector2(640, 593)
 	else:
 		var arte := Sprite2D.new()
 		arte.texture = load("res://casino/arte/%s.webp" % sala)
@@ -40,22 +50,23 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 	return entrada
 
 func _agregar_interacciones(sala: String, nombre_nota: String) -> void:
-	_punto("puerta", Vector2(640, 651), "Volver a la galería", "corredor")
+	var pasillo: String = PlanoGaleria.PADRE[sala]
+	_punto("puerta", Vector2(640, 651), "Salir · %s" % CampanaCasino.NOMBRES[pasillo], pasillo)
 	match sala:
 		"vestibulo":
 			_figura("anfitriona", Vector2(990, 231), 84)
-			_punto("anfitriona", Vector2(985, 279), "Hablar con la anfitriona")
+			_punto("anfitriona", Vector2(985, 279), "Hablar")
 			_punto("nota", Vector2(640, 190), "Examinar el reloj")
 		"tienda":
 			_figura("anfitriona", Vector2(650, 174), 84)
-			_punto("tienda", Vector2(645, 290), "Abrir el mostrador")
+			_punto("tienda", Vector2(645, 290), "Abrir vitrina")
 			_punto("nota", Vector2(168, 385), "Examinar la vitrina")
 		_:
 			_figura(sala, Vector2(640, 310), 95)
-			_punto("mesa", Vector2(640, 521), "Acercarse a la mesa")
+			_punto("mesa", Vector2(640, 521), "Hablar")
 			_punto("nota", Vector2(235, 262), "Examinar " + nombre_nota.to_lower())
 			if sala == "dueno":
-				_punto("salida", Vector2(640, 188), "Examinar el portón")
+				_punto("salida", Vector2(640, 188), "Abrir el portón")
 
 func _figura(id: String, pies: Vector2, alto: float) -> void:
 	var personaje := Sprite2D.new()
@@ -86,3 +97,5 @@ func cercano(posicion: Vector2) -> Dictionary:
 func marcar(elegido: Dictionary) -> void:
 	for punto in puntos:
 		punto.marca.text = "◆" if punto == elegido else "◇"
+	if galeria != null:
+		galeria.resaltar(str(elegido.get("destino", "")) if elegido.get("tipo", "") == "puerta" else "")

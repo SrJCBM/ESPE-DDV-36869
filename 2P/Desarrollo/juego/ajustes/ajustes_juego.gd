@@ -1,7 +1,7 @@
 class_name AjustesJuego
 extends RefCounted
 ## Preferencias que se conservan entre sesiones, como pide el documento de diseño.
-## La campaña no se guarda: cerrar el juego sigue reiniciando el intento.
+## La campaña se guarda aparte, en PartidaGuardada (I5).
 ## Sin Autoload: las mesas y las pruebas no dependen de un estado global; solo los puntos de entrada lo leen.
 
 ## Las pruebas la redirigen a otro archivo para no tocar las preferencias de quien juega.

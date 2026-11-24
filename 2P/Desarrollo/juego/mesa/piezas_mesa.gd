@@ -52,7 +52,8 @@ static func boton_accion(padre: Node, nombre: String, rect: Rect2, primario: boo
 	fondo.name = "Fondo"
 	var atajo := Panel.new()
 	atajo.name = "Atajo"
-	atajo.position = Vector2(12, 26)
+	# Una sola línea: tecla a la izquierda, acción al centro y, si hay coste real, su indicador a la derecha.
+	atajo.position = Vector2(12, (rect.size.y - 28) * 0.5)
 	atajo.size = Vector2(28, 28)
 	atajo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var borde := StyleBoxFlat.new()
@@ -64,13 +65,14 @@ static func boton_accion(padre: Node, nombre: String, rect: Rect2, primario: boo
 	var letra := etiqueta(atajo, tecla, Rect2(0, 0, 28, 28), 16, TINTA if primario else MARFIL)
 	letra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	letra.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var titulo := etiqueta(boton, "", Rect2(47, 14, rect.size.x - 59, 30), 17, TINTA if primario else MARFIL)
+	var titulo := etiqueta(boton, "", Rect2(46, (rect.size.y - 30) * 0.5, rect.size.x - 120, 30), 17, TINTA if primario else MARFIL)
 	titulo.name = "Etiqueta"
 	titulo.theme_type_variation = &"BoldLabel"
-	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var detalle := etiqueta(boton, "", Rect2(47, 44, rect.size.x - 59, 24), 13, TINTA if primario else MUTED)
+	titulo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var detalle := etiqueta(boton, "", Rect2(rect.size.x - 112, (rect.size.y - 24) * 0.5, 100, 24), 13, TINTA if primario else MUTED)
 	detalle.name = "Coste"
-	detalle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	detalle.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	detalle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	return boton
 
 static func texto_accion(boton: Button, titulo: String, detalle: String) -> void:

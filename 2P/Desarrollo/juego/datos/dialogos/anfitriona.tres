@@ -1,0 +1,87 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {
+"anfitriona": {
+"nombre": "La anfitriona",
+"retrato": "res://casino/arte/personaje_anfitriona.webp"
+}
+}
+entradas = [{
+"ir": "saludo",
+"si": "sin_invitacion"
+}, {
+"ir": "pista_0",
+"si": "sellos==0"
+}, {
+"ir": "pista_1",
+"si": "sellos==1"
+}, {
+"ir": "pista_2",
+"si": "sellos==2"
+}, {
+"ir": "pista_3",
+"si": "sellos==3"
+}, {
+"ir": "pista_4"
+}]
+intervenciones = {
+"entrega": {
+"personaje": "anfitriona",
+"texto": "«Buena elección. La tienda queda más allá del Custodio: gánate su sello y la encontrarás junto al Recaudador. Toma asiento cuando estés listo.»"
+},
+"oferta": {
+"opciones": [{
+"ir": "entrega",
+"solicitud": "objeto_inicial:lente",
+"texto": "Lente de humo"
+}, {
+"ir": "entrega",
+"solicitud": "objeto_inicial:prudente",
+"texto": "Sello del prudente"
+}, {
+"ir": "entrega",
+"solicitud": "objeto_inicial:moneda",
+"texto": "Moneda mellada"
+}, {
+"ir": "",
+"texto": "Pensarlo un momento"
+}],
+"personaje": "anfitriona",
+"texto": "«Veinticuatro cartas y diez fichas serán tuyas. Además, la casa regala una de estas piezas, una sola vez. Elige con calma.»"
+},
+"pista_0": {
+"personaje": "anfitriona",
+"texto": "«El reloj verde pertenece al Custodio. Sal al pasillo y busca la puerta iluminada del norte.»"
+},
+"pista_1": {
+"personaje": "anfitriona",
+"texto": "«Su sello abre la puerta del este. Allí esperan el Recaudador y mi tienda. Él adelanta quince fichas y cobra una por cada carta que pidas tras el reparto.»"
+},
+"pista_2": {
+"personaje": "anfitriona",
+"texto": "«Ella colecciona lo que más vale. Vigila qué carta se queda después de cada mano.»"
+},
+"pista_3": {
+"personaje": "anfitriona",
+"texto": "«Tres sellos. El Dueño ya sabe que has llegado. Su puerta está al final del último pasillo.»"
+},
+"pista_4": {
+"personaje": "anfitriona",
+"texto": "«Oigo el pestillo. Vuelve al portón detrás de la última mesa.»"
+},
+"saludo": {
+"opciones": [{
+"ir": "oferta",
+"texto": "Entregar la invitación"
+}, {
+"ir": "",
+"texto": "Volver"
+}],
+"personaje": "anfitriona",
+"texto": "«Llegas a la hora exacta. Aquí todos los relojes se detuvieron esperando a alguien. ¿Me dejas ver tu invitación?»"
+}
+}

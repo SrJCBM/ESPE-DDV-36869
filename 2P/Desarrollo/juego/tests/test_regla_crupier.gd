@@ -73,7 +73,7 @@ func test_textos_de_regla_por_mesa() -> void:
 func test_placa_visible_en_el_dueno_y_oculta_en_el_custodio() -> void:
 	var custodio = _mesa(-1)
 	assert_false(custodio._regla.visible)
-	assert_eq(custodio._nota_umbral.text, "No lo excedas.")
+	assert_eq(custodio._nota_umbral.text, "", "Sin regla que cambie el umbral, no hay nota (I4-03)")
 	var dueno = _mesa(3)
 	assert_true(dueno._regla.visible)
 	assert_string_contains(dueno._regla_texto.text, "Empieza en 25")
