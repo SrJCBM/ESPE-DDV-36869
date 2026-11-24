@@ -4,6 +4,7 @@ extends Control
 ## inicio no hace nada. Se navega con ratón, flechas, Tab y Enter.
 
 signal entrar
+signal continuar
 signal reanudar
 signal volver_al_inicio
 signal salir
@@ -20,8 +21,12 @@ const COMO_JUGAR := "Recorre el casino con WASD o las flechas y pulsa E para hab
 var audio: AudioCasino
 ## Devuelve [título, texto] de las pertenencias del intento.
 var texto_inventario: Callable
-## Devuelve si hay un intento en curso que se perdería al volver al inicio.
+## Devuelve si hay algo que se perdería al volver al inicio.
 var intento_activo: Callable
+## Devuelve el aviso de lo que se pierde al volver al inicio (opcional).
+var texto_confirmar: Callable
+## Devuelve si hay una partida guardada que se pueda continuar (opcional).
+var hay_partida: Callable
 var pantalla := ""
 var botones: Array[Button] = []
 var _raiz := "inicio"
@@ -88,7 +93,11 @@ func abrir(nombre: String) -> void:
 			_titulo("La Última Mesa", 54)
 			_nota("Una noche en la casa de los tres sellos.")
 			_separador()
-			_boton("Entrar al casino", entrar.emit)
+			if hay_partida.is_valid() and hay_partida.call():
+				_boton("Continuar", continuar.emit)
+				_boton("Nueva partida", abrir.bind("confirmar_nueva"))
+			else:
+				_boton("Entrar al casino", entrar.emit)
 			_boton("Cómo jugar", abrir.bind("como_jugar"))
 			_boton("Opciones", abrir.bind("opciones"))
 			_boton("Salir", salir.emit)
@@ -127,9 +136,15 @@ func abrir(nombre: String) -> void:
 		"confirmar":
 			_marco(Rect2(420, 240, 600, 330))
 			_titulo("¿Volver al inicio?", 38)
-			_texto("Se perderá el intento actual: la baraja, las fichas y los sellos.")
+			_texto(str(texto_confirmar.call()) if texto_confirmar.is_valid() else "Se perderá el intento actual: la baraja, las fichas y los sellos.")
 			_boton("Seguir jugando", abrir.bind("pausa"))
 			_boton("Volver al inicio", volver_al_inicio.emit)
+		"confirmar_nueva":
+			_marco(Rect2(420, 240, 600, 330))
+			_titulo("¿Empezar de nuevo?", 38)
+			_texto("Se borrará la partida guardada: la baraja, las fichas y los sellos.")
+			_boton("Cancelar", abrir.bind("inicio"))
+			_boton("Empezar de nuevo", entrar.emit)
 
 func negro_visible(visible_negro: bool) -> void:
 	get_child(0).visible = visible_negro

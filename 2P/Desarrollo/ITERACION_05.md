@@ -83,6 +83,26 @@ Lecturas para Julio:
 - **Comprar Corona y Sello sigue rompiendo al Dueño**, como ya se vio en I2, aunque ahora empiece a comprar en el Recaudador.
 - **Efecto de la variante de la Vela.** Con `--recompensas`, la simulación toma la carta de menor valor efectivo. Con la variante activa, las campañas ganadas sin objeto pasan del 35 % al 40 %, y con el Sello del 49 % al 55 %. La estrategia no busca Racha a propósito: parte de la diferencia viene de que la tercera carta de la oferta cambia.
 
+## Guardado de la partida
+
+**Estado:** implementado por Kenned el 24 de noviembre de 2026 a pedido de Julio. Hasta ahora, cerrar el juego reiniciaba el intento; solo se conservaban los ajustes.
+
+| Aspecto | Comportamiento |
+| --- | --- |
+| **Ranura** | Una sola partida, en `user://partida.json` (JSON con número de versión). Se escribe en un temporal y se renombra, así un cierre a mitad de la escritura no estropea la partida anterior |
+| **Cuándo se guarda** | Automáticamente en los puntos seguros: al recibir la invitación, al entrar en una sala o pasillo, al comprar, al resolver una recompensa, al pausar, justo antes de sentarse en una mesa y al cerrar la ventana |
+| **Qué se guarda** | Invitación, fichas, sellos, Lentes, amuletos, la baraja con la identidad de cada carta, los ajustes, las cartas ganadas y retiradas, una recompensa pendiente, la sala y la posición del visitante |
+| **Mesa en curso** | **No se guarda.** Si el juego se cierra a mitad de una mesa, al continuar el jugador está frente al crupier con lo que tenía al sentarse (sin las 15 fichas del Recaudador, por ejemplo). Alternativa descartada: contar la mesa abandonada como derrota, que castiga un cierre accidental |
+| **Derrota** | Borra la partida: el intento terminó |
+| **Recompensa pendiente** | Si se cierra el juego antes de elegir la carta, al continuar la oferta vuelve a abrirse |
+| **Menú de inicio** | Sin partida: «Entrar al casino». Con partida: **«Continuar»** (enfocado) y **«Nueva partida»**, que pide confirmación antes de borrar |
+| **Volver al inicio desde la pausa** | Explorando, guarda y vuelve sin pedir confirmación: no se pierde nada. En una mesa, avisa de que se pierde la mano en curso |
+| **Archivo dañado** | Un archivo ilegible o de otra versión se ignora (el inicio ofrece «Entrar al casino»). Los datos inválidos (palos, valores u objetos desconocidos) se descartan sin romper el juego |
+
+**Implementación.** `ajustes/partida_guardada.gd` (`PartidaGuardada`) lee, escribe y borra el archivo; `CampanaCasino.a_datos()` y `CampanaCasino.desde_datos()` convierten el intento en datos simples; el casino decide cuándo guardar (`guardar()`) y cómo continuar (`continuar()`). El guardado solo se activa cuando el casino es la escena principal, de modo que las pruebas y las escenas sueltas nunca tocan la partida de quien juega; las pruebas usan su propio archivo.
+
+**Pruebas.** `tests/test_guardado.gd`, 16 pruebas: los datos pasan por JSON sin cambios, se descartan los inválidos, el archivo dañado o de otra versión no se carga, moverse y comprar guardan, continuar restaura la sala y la posición, cerrar en la mesa vuelve a como se estaba al sentarse, perder borra, la recompensa pendiente se vuelve a ofrecer, y el menú ofrece «Continuar» y confirma «Nueva partida». Regresión completa: **257 pruebas y 2.421 aserciones**.
+
 ## Arte y sonido
 
 | Pieza | Descripción |
@@ -104,7 +124,8 @@ Lecturas para Julio:
 ## Para después
 
 - **Pasillo del Dueño** con su propia pantalla y la puerta desde el pasillo de la Coleccionista.
-- **LAN.** No se ha empezado.
+- **LAN.** Queda para una iteración futura, por decisión de Julio. No se ha empezado.
+- **Diseño nuevo del protagonista.** Hasta tener las ilustraciones (la herramienta de generación de Julio vuelve a estar disponible el jueves al mediodía), el juego usa el sprite antiguo del visitante.
 - **Integración a `main`.** Queda para cuando Kenned vuelva; antes debe fusionarse el PR #4 de I4.
 - **Nodos huérfanos de `test_interfaz.gd`.** GUT sigue atribuyéndole 28; es un pendiente aparte de I4, no viene de los cambios de I5.
 

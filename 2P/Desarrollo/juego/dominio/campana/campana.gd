@@ -70,6 +70,54 @@ func atender(solicitud: String) -> bool:
 		return true
 	return false
 
+## Estado del intento como datos simples, para la partida guardada (I5). Solo se guarda
+## entre encuentros: la mesa en curso (`activa`) y la derrota no forman parte de los datos.
+func a_datos() -> Dictionary:
+	var cartas := []
+	for carta in baraja:
+		cartas.append({"id": carta.id_instancia, "palo": carta.definicion.palo,
+			"valor": carta.definicion.valor_impreso, "rasgo": carta.definicion.rasgo})
+	var oferta := []
+	for carta in _recompensas:
+		oferta.append({"palo": carta.palo, "valor": carta.valor_impreso, "rasgo": carta.rasgo})
+	return {
+		"recibida": recibida, "saldo": saldo, "superadas": superadas, "lentes": lentes,
+		"amuletos": Array(amuletos), "baraja": cartas, "ajustadas": ajustadas.duplicate(),
+		"ganadas": ganadas.keys(), "retiradas": retiradas.duplicate(true),
+		"recompensas": oferta, "variante_vela": variante_vela,
+	}
+
+## Reconstruye un intento desde `a_datos()`. Descarta lo que no sea válido (palos,
+## valores, objetos desconocidos) en lugar de fallar: un archivo editado no rompe el juego.
+static func desde_datos(datos: Dictionary) -> CampanaCasino:
+	var c := CampanaCasino.new()
+	c.recibida = bool(datos.get("recibida", false))
+	c.saldo = maxi(0, int(datos.get("saldo", 0)))
+	c.superadas = clampi(int(datos.get("superadas", 0)), 0, MESAS.size())
+	c.lentes = clampi(int(datos.get("lentes", 0)), 0, 2)
+	c.variante_vela = bool(datos.get("variante_vela", true))
+	for id in datos.get("amuletos", []):
+		if TIENDA.buscar(str(id)) != null and str(id) != "lente" and not c.amuletos.has(str(id)):
+			c.amuletos.append(str(id))
+	for d in datos.get("baraja", []):
+		if not d is Dictionary or not _carta_valida(d): continue
+		c.baraja.append(FabricaCartas.crear_carta(str(d.palo), int(d.valor), str(d.get("id", "")), str(d.get("rasgo", ""))))
+	var ajustes: Dictionary = datos.get("ajustadas", {}) if datos.get("ajustadas") is Dictionary else {}
+	for id in ajustes:
+		c.ajustadas[str(id)] = clampi(int(ajustes[id]), -1, 1)
+	for id in datos.get("ganadas", []):
+		c.ganadas[str(id)] = true
+	for d in datos.get("retiradas", []):
+		if d is Dictionary and _carta_valida(d):
+			c.retiradas.append({"palo": str(d.palo), "valor": int(d.valor)})
+	for d in datos.get("recompensas", []):
+		if d is Dictionary and _carta_valida(d):
+			c._recompensas.append(CartaDef.new("%s_%02d" % [d.palo, int(d.valor)], str(d.palo), int(d.valor), str(d.get("rasgo", ""))))
+	return c
+
+static func _carta_valida(d: Dictionary) -> bool:
+	return Palos.es_valido(str(d.get("palo", ""))) and int(d.get("valor", 0)) >= 1 and int(d.get("valor", 0)) <= 10
+
 ## Objetivo de exploración derivado solo del progreso; tienda y paseos no lo cambian.
 func objetivo() -> String:
 	if not recibida: return "Habla con la anfitriona"

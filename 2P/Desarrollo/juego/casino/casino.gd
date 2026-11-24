@@ -55,6 +55,9 @@ var vista_baraja := VistaBaraja.new()
 var _foco_baraja = null
 ## Control enfocado antes de pausar; se devuelve al reanudar.
 var _foco_previo = null
+## Guardado automático de la campaña (I5). Solo se activa cuando el casino es la escena
+## principal, para que las pruebas que montan el casino no toquen la partida de quien juega.
+var guardado_activo := false
 
 func _ready() -> void:
 	# Hasta que entren en el árbol, un Control cuenta como visible.
@@ -114,8 +117,11 @@ func _ready() -> void:
 	add_child(menu)
 	menu.audio = audio
 	menu.texto_inventario = _texto_inventario
-	menu.intento_activo = func() -> bool: return campana.recibida or is_instance_valid(mesa)
-	menu.entrar.connect(_reanudar)
+	menu.intento_activo = _algo_se_pierde
+	menu.texto_confirmar = _aviso_volver_al_inicio
+	menu.hay_partida = func() -> bool: return guardado_activo and PartidaGuardada.existe()
+	menu.entrar.connect(_entrar_desde_menu)
+	menu.continuar.connect(_continuar_desde_menu)
 	menu.reanudar.connect(_reanudar)
 	menu.volver_al_inicio.connect(volver_al_inicio)
 	menu.salir.connect(func() -> void: get_tree().quit())
@@ -128,6 +134,7 @@ func _ready() -> void:
 ## El menú de inicio solo aparece al arrancar el juego, no cuando las pruebas montan el casino.
 func _inicio_si_principal() -> void:
 	if is_inside_tree() and get_tree().current_scene == self:
+		guardado_activo = true
 		abrir_inicio()
 
 func abrir_inicio() -> void:
@@ -138,6 +145,7 @@ func abrir_inicio() -> void:
 func pausar() -> void:
 	if menu.visible:
 		return
+	guardar() # Conserva también la posición exacta del visitante.
 	_foco_previo = get_viewport().gui_get_focus_owner()
 	menu.abrir("pausa")
 	_congelar(true)
@@ -174,15 +182,72 @@ func _congelar(congelado: bool) -> void:
 	move_child(menu, -1)
 	_actualizar_objetivo()
 
-## Abandona el intento (el menú ya pidió confirmación) y vuelve a la pantalla de inicio.
+## Vuelve a la pantalla de inicio. Con guardado, la partida queda guardada (una mesa en
+## curso vuelve a como estaba al sentarse); sin él, se abandona el intento.
 func volver_al_inicio() -> void:
+	guardar()
 	if is_instance_valid(mesa):
 		remove_child(mesa)
 		mesa.queue_free()
 		mesa = null
 		pagina.show()
-	_nuevo_intento()
+	_intento_en_blanco()
 	abrir_inicio()
+
+func _algo_se_pierde() -> bool:
+	if guardado_activo:
+		return is_instance_valid(mesa)
+	return campana.recibida or is_instance_valid(mesa)
+
+func _aviso_volver_al_inicio() -> String:
+	if guardado_activo:
+		return "Se perderá la mano en curso. Al continuar, volverás frente al crupier con lo que tenías al sentarte."
+	return "Se perderá el intento actual: la baraja, las fichas y los sellos."
+
+## «Entrar al casino» o «Nueva partida» (ya confirmada): empieza de cero si había partida.
+func _entrar_desde_menu() -> void:
+	if guardado_activo and PartidaGuardada.existe():
+		PartidaGuardada.borrar()
+		_intento_en_blanco()
+	_reanudar()
+
+func _continuar_desde_menu() -> void:
+	continuar()
+	_reanudar()
+
+## Guarda el intento si se puede: con invitación, sin derrota y fuera de una mesa.
+func guardar() -> void:
+	if not guardado_activo or not campana.recibida or campana.derrota or is_instance_valid(mesa) or not campana.activa.is_empty():
+		return
+	PartidaGuardada.guardar({
+		"campana": campana.a_datos(), "sala": sala,
+		"posicion": [visitante.position.x, visitante.position.y],
+	})
+
+## Carga la partida guardada. false si no hay ninguna válida.
+func continuar() -> bool:
+	var datos := PartidaGuardada.cargar()
+	if datos.is_empty():
+		return false
+	campana = CampanaCasino.desde_datos(datos.campana)
+	_cerrar()
+	var destino := str(datos.get("sala", "vestibulo"))
+	if not CampanaCasino.NOMBRES.has(destino) or not campana.puerta_abierta(destino):
+		destino = "vestibulo"
+	entrar(destino)
+	var posicion = datos.get("posicion", [])
+	if destino == str(datos.get("sala", "")) and posicion is Array and posicion.size() == 2:
+		var punto := Vector2(float(posicion[0]), float(posicion[1]))
+		var limites := PlanoSalas.LIMITES_GALERIA if PlanoGaleria.es_pasillo(destino) else PlanoSalas.LIMITES
+		if limites.has_point(punto):
+			visitante.position = punto
+	if campana.hay_recompensa():
+		_mostrar_recompensa("Tienes una carta de la casa pendiente. Puedes añadirla a tu baraja.")
+	return true
+
+func _notification(que: int) -> void:
+	if que == NOTIFICATION_WM_CLOSE_REQUEST:
+		guardar()
 
 func _cambiar_movimiento(reducido: bool) -> void:
 	if is_instance_valid(mesa):
@@ -304,6 +369,7 @@ func _presentar_jefe() -> void:
 	libro.opcion("Volver a la sala",_cerrar)
 
 func _jugar() -> void:
+	guardar() # Si el juego se cierra en la mesa, se continúa frente al crupier.
 	if not campana.iniciar(sala): return
 	_cerrar()
 	visitante.bloqueado = true
@@ -330,11 +396,16 @@ func _levantarse(victoria: bool, exactos: int) -> void:
 		else:
 			_aviso("Mesa superada","La casa entrega %s fichas. %s" % [premio,ruta])
 	else:
+		if guardado_activo:
+			PartidaGuardada.borrar()
 		_abrir("La casa gana","La última campanada se apaga. Tu siguiente invitación abrirá un intento nuevo.","",Callable())
 		libro.opcion("Volver al vestíbulo",_nuevo_intento)
 
 func _ofrecer_recompensa(premio: int, ruta: String) -> void:
-	_abrir("Una carta de la casa", "Recibes %s fichas. Puedes añadir una carta a tu baraja.\n%s" % [premio, ruta], "", Callable())
+	_mostrar_recompensa("Recibes %s fichas. Puedes añadir una carta a tu baraja.\n%s" % [premio, ruta])
+
+func _mostrar_recompensa(mensaje: String) -> void:
+	_abrir("Una carta de la casa", mensaje, "", Callable())
 	var fila := CartasRecompensa.new()
 	libro.lista.add_child(fila)
 	fila.presentar(campana.opciones_recompensa())
@@ -357,6 +428,12 @@ func _sonido() -> void:
 	libro.opcion("Volver al casino",_cerrar)
 
 func _nuevo_intento() -> void:
+	if guardado_activo:
+		PartidaGuardada.borrar()
+	_intento_en_blanco()
+
+## Intento nuevo en memoria, sin tocar la partida guardada.
+func _intento_en_blanco() -> void:
 	campana = CampanaCasino.new()
 	_cerrar()
 	entrar("entrada")
@@ -386,6 +463,7 @@ func _refrescar() -> void:
 	titulo.text = CampanaCasino.NOMBRES.get(sala,"")
 	hud.presentar(campana, AjustesJuego.movimiento_reducido())
 	_actualizar_objetivo()
+	guardar()
 
 func inventario() -> void:
 	var datos := _texto_inventario()
