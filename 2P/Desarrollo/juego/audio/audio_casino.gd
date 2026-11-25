@@ -30,6 +30,20 @@ func _ready() -> void:
 	_bucle(&"Musica", MUSICA)
 	_bucle(&"Ambiente", AMBIENTE)
 
+## Al cerrar el juego, un sonido que aún suena deja su reproducción retenida por el servidor
+## de audio y Godot la informa como fuga («resources still in use at exit»). Se detienen y
+## sueltan todos los emisores antes de salir.
+func _notification(que: int) -> void:
+	if que == NOTIFICATION_WM_CLOSE_REQUEST or que == NOTIFICATION_EXIT_TREE:
+		detener_todo()
+
+func detener_todo() -> void:
+	for hijo in get_children():
+		if hijo is AudioStreamPlayer:
+			hijo.stop()
+			hijo.stream = null
+	_emisores.clear()
+
 func _crear(canal: StringName, sonido: AudioStream) -> AudioStreamPlayer:
 	var emisor := AudioStreamPlayer.new()
 	emisor.bus = canal

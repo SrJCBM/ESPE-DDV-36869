@@ -145,6 +145,7 @@ func abrir(nombre: String) -> void:
 			_texto("Se borrará la partida guardada: la baraja, las fichas y los sellos.")
 			_boton("Cancelar", abrir.bind("inicio"))
 			_boton("Empezar de nuevo", entrar.emit)
+	_ajustar_marco()
 
 func negro_visible(visible_negro: bool) -> void:
 	get_child(0).visible = visible_negro
@@ -164,6 +165,17 @@ func _marco(rect: Rect2) -> void:
 	_panel.size = rect.size
 	_contenido.position = Vector2(40, 32)
 	_contenido.size = Vector2(rect.size.x - 80, rect.size.y - 64)
+
+## El marco crece hacia arriba si el contenido no cabe (p. ej. el inicio con «Continuar» y
+## «Nueva partida» suma un botón), sin cambiar su borde inferior ni salirse de la pantalla.
+func _ajustar_marco() -> void:
+	var necesario := _contenido.get_combined_minimum_size().y + 64
+	if necesario <= _panel.size.y:
+		return
+	var inferior := _panel.position.y + _panel.size.y
+	_panel.size.y = minf(necesario, BASE.y - 40)
+	_panel.position.y = maxf(20, inferior - _panel.size.y)
+	_contenido.size.y = _panel.size.y - 64
 
 func _titulo(texto: String, puntos: int) -> void:
 	_contenido.add_child(Libro.rotulo(texto, puntos, Libro.PAPEL, true))

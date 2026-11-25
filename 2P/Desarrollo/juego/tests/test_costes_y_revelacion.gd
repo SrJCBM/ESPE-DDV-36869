@@ -226,3 +226,22 @@ func test_racha_formada_con_mascaras_no_se_anuncia_como_bono_seguro() -> void:
 	var racha: Button = mesa.franja_patrones.get_child(4)
 	assert_false(racha.text.contains("LISTO"))
 	assert_string_contains(racha.text, "al revelar")
+
+func test_la_franja_muestra_nombre_y_bono_de_cada_patron() -> void:
+	var c := _crear(["velas_02", "velas_04", "velas_06"])
+	c.procesar_comando(IniciarMano.new())
+	c.procesar_comando(PedirCarta.new())
+	var mesa = Mesa.instantiate()
+	mesa.conectar_controlador = false
+	mesa.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	mesa.size = Vector2(1440, 810)
+	add_child_autofree(mesa)
+	mesa.presentar_vista(c.obtener_vista())
+	var esperados := ["Punto exacto +3", "Al filo +2", "Ascenso +2", "Mano larga +2", "Racha +2"]
+	var ancho := 0.0
+	for i in esperados.size():
+		var boton: Button = mesa.franja_patrones.get_child(i)
+		assert_true(boton.text.begins_with(esperados[i]), boton.text)
+		ancho += boton.custom_minimum_size.x
+	assert_lte(ancho + 4 * 6, mesa.franja_patrones.size.x, "Los cinco caben en la franja")
+	assert_string_contains(mesa.franja_patrones.get_child(4).text, "Activo")

@@ -1,7 +1,7 @@
 extends HBoxContainer
 ## Presenta patrones públicos y resalta las cartas relacionadas.
-## Cada indicador muestra un símbolo y un estado breve; el nombre, el progreso y el bono
-## aparecen en un único espacio de detalle al enfocarlo (I4-05). Tras resolver, se destacan
+## Cada indicador muestra el nombre y el bono del patrón y, debajo, su estado breve; al
+## enfocarlo, el espacio de detalle explica cómo conseguirlo. Tras resolver, se destacan
 ## los patrones aplicados.
 
 signal detalle_cambiado(texto: String)
@@ -10,8 +10,6 @@ signal boton_creado(boton: Button)
 
 const Lectura := preload("res://mesa/lectura_mesa.gd")
 const Piezas := preload("res://mesa/piezas_mesa.gd")
-## Símbolos breves con caracteres que tiene cualquier fuente del proyecto.
-const SIMBOLOS := {"Punto exacto": "=%s", "Al filo": "=%s", "Ascenso": "< <", "Mano larga": "5+", "Racha": "3×"}
 var _mano: HBoxContainer
 var _puede_resaltar: Callable
 var _vista: Dictionary = {}
@@ -52,8 +50,10 @@ func limpiar() -> void:
 
 func _crear_boton(indice: int) -> Button:
 	var boton := Button.new()
-	boton.custom_minimum_size = Vector2(124, 48)
-	boton.add_theme_font_size_override("font_size", 15)
+	# 5 × 131 + 4 × 6 = 679: los cinco caben en los 680 de la franja.
+	boton.custom_minimum_size = Vector2(131, 43)
+	boton.add_theme_font_size_override("font_size", 14)
+	boton.clip_text = true
 	boton.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	boton.pressed.connect(patron_solicitado.emit.bind(indice))
 	boton.mouse_entered.connect(_senalar.bind(indice, true, true))
@@ -65,11 +65,7 @@ func _crear_boton(indice: int) -> Button:
 	return boton
 
 func _estilizar(boton: Button, datos: Dictionary) -> void:
-	var umbral: int = int(_vista.get("umbral", 17))
-	var simbolo: String = SIMBOLOS.get(datos.nombre, "·")
-	if "%s" in simbolo:
-		simbolo = simbolo % (umbral if datos.nombre == "Punto exacto" else umbral - 1)
-	boton.text = "%s\n%s" % [simbolo, Lectura.progreso(datos)]
+	boton.text = "%s +%s\n%s" % [datos.nombre, datos.bono, Lectura.progreso(datos)]
 	boton.tooltip_text = "%s +%s: %s. %s" % [datos.nombre, datos.bono, datos.detalle, datos.explicacion]
 	if datos.condicionado:
 		boton.tooltip_text += " Bono condicionado a no quebrar."

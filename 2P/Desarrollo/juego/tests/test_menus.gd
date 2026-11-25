@@ -202,3 +202,16 @@ func test_si_el_control_ya_no_existe_enfoca_una_accion_de_la_mesa() -> void:
 	efimero.free()
 	juego.menu.botones[0].pressed.emit()
 	assert_eq(juego.get_viewport().gui_get_focus_owner(), juego.mesa.boton_iniciar_pedir)
+
+func test_ninguna_pantalla_del_menu_desborda_su_marco() -> void:
+	var juego = _casino()
+	juego.menu.hay_partida = func() -> bool: return true
+	for nombre in ["inicio", "pausa", "opciones", "como_jugar", "inventario", "confirmar", "confirmar_nueva"]:
+		juego.menu.abrir(nombre)
+		await get_tree().process_frame
+		var panel: Panel = juego.menu._panel
+		var contenido: VBoxContainer = juego.menu._contenido
+		assert_true(contenido.position.y + contenido.get_combined_minimum_size().y <= panel.size.y - 24, "%s: el contenido cabe en el marco" % nombre)
+		assert_true(panel.position.y >= 0 and panel.position.y + panel.size.y <= 720, "%s: el marco no sale de la pantalla" % nombre)
+	juego.menu.abrir("inicio")
+	assert_eq(_textos(juego), ["Continuar", "Nueva partida", "Cómo jugar", "Opciones", "Salir"])

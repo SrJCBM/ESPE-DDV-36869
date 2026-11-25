@@ -78,7 +78,7 @@ func test_se_puede_rodear_al_jefe_por_detras() -> void:
 	juego.campana.recibir_invitacion()
 	juego.entrar("custodio")
 	await get_tree().physics_frame
-	juego.visitante.position = Vector2(560,200)
+	juego.visitante.position = Vector2(560,220)
 	Input.action_press("este")
 	for i in range(60): await get_tree().physics_frame
 	Input.action_release("este")
