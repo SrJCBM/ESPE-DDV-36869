@@ -1,6 +1,6 @@
 # Iteración 05 · Pasillos de los jefes
 
-**Estado general:** en curso. De las nueve tareas, **seis están completas, una está a medias y dos están pendientes** ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). Las correcciones del 25 de noviembre (I5-06) están en la rama `kenned/i5-arranque-campana` (`83f12aa`) y todavía no en `main`. **Base:** I4 con sus correcciones, commit `d9c82b7`.
+**Estado general:** en curso. De las nueve tareas, **seis están completas, una está a medias y dos están pendientes** ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). Las correcciones del 25 de noviembre (I5-06) y este documento se integraron en `main` el 25 de noviembre de 2026, para que Julio continúe desde ahí. **Base:** I4 con sus correcciones, commit `d9c82b7`.
 
 **Objetivo:** que el avance por la campaña se recorra. Cada sello abre una puerta física hacia el pasillo del jefe siguiente, y cada pasillo anuncia con su arte y su sonido a quién se va a enfrentar el jugador.
 
@@ -15,7 +15,7 @@
 | I5-03 | Recompensa verificada y «Ver baraja» | **Completado** · `23ced9f` | Desde el inventario en exploración y desde la pausa, también a mitad de una mano |
 | I5-04 | Variante · Vela de Racha ×2 | **Completado** · `86aed51` | Activada por defecto; el balance queda para Julio |
 | I5-05 | Guardado automático de la partida | **Completado** · `8a4368b` | 16 pruebas en `test_guardado.gd`; «Continuar» y «Nueva partida» en el inicio |
-| I5-06 | Correcciones de la revisión del 25 de noviembre | **Completado** · `83f12aa` | Cierre sin fugas, franja de patrones, menú de inicio, colisiones y respuestas duplicadas del diálogo. Falta integrarlo en `main` |
+| I5-06 | Correcciones de la revisión del 25 de noviembre | **Completado** · `83f12aa` | Cierre sin fugas, franja de patrones, menú de inicio, colisiones y respuestas duplicadas del diálogo. Integrado en `main` |
 | I5-07 | Arte de la entrada y de los pasillos | **Pendiente** | Hoy es provisional: la entrada se dibuja en código y los pasillos tiñen `corredor.webp` |
 | I5-08 | Sonido por jefe | **Pendiente** | Los buses y los controles de volumen de I4-07 ya existen |
 | I5-09 | Guion narrativo y documentos de la rúbrica | **Completado** · `ac08646` | [Guion v4](Diseno/GUION_PROLOGO_Y_DIALOGOS.md), [ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md), navegación, catálogo y presentación |
@@ -158,7 +158,7 @@ Lecturas para Julio:
 
 ## I5-06 · Correcciones de la revisión del 25 de noviembre
 
-**Responsable:** Kenned. **Rama:** `kenned/i5-arranque-campana`, commits `83f12aa` y el de este documento. **Estado:** implementadas y verificadas; falta integrarlas en `main`.
+**Responsable:** Kenned. **Rama:** `kenned/i5-arranque-campana`, commits `83f12aa` y `13658cf`. **Estado:** implementadas, verificadas e integradas en `main` el 25 de noviembre de 2026.
 
 | Problema | Corrección | Comprobación |
 | --- | --- | --- |
