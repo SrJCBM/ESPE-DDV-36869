@@ -1,6 +1,6 @@
 # Iteración 05 · Pasillos de los jefes
 
-**Estado general:** en curso. De las diez tareas, **siete están completas, una está a medias y dos están pendientes** ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). Las correcciones del 25 de noviembre (I5-06) se integraron en `main` ese mismo día. La novela visual (I5-10) está en la rama `kenned/i5-arranque-campana`, pendiente de integrar. **Base:** I4 con sus correcciones, commit `d9c82b7`.
+**Estado general:** en curso. De las diez tareas, **siete están completas, una está a medias y dos están pendientes** ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). Las correcciones del 25 de noviembre (I5-06) se integraron en `main` ese mismo día. La novela visual (I5-10) se integró en `main` el 25 de noviembre de 2026. **Base:** I4 con sus correcciones, commit `d9c82b7`.
 
 **Objetivo:** que el avance por la campaña se recorra. Cada sello abre una puerta física hacia el pasillo del jefe siguiente, y cada pasillo anuncia con su arte y su sonido a quién se va a enfrentar el jugador.
 
@@ -19,7 +19,7 @@
 | I5-07 | Arte de la entrada y de los pasillos | **Pendiente** | Hoy es provisional: la entrada se dibuja en código y los pasillos tiñen `corredor.webp` |
 | I5-08 | Sonido por jefe | **Pendiente** | Los buses y los controles de volumen de I4-07 ya existen |
 | I5-09 | Guion narrativo y documentos de la rúbrica | **Completado** · `ac08646` | [Guion v4](Diseno/GUION_PROLOGO_Y_DIALOGOS.md), [ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md), navegación, catálogo y presentación |
-| I5-10 | Novela visual en el juego: cinemáticas, conversaciones, accesibilidad y créditos | **Completado** · pendiente de integrar | Prólogo y llegada como cinemáticas; anfitriona y crupieres con el guion v4; Historial, Auto y Saltar; opciones de lectura; créditos; efectos, personajes en escena, «examinar» ilustrado y un recorrido hacia delante desde el vestíbulo. 285 pruebas |
+| I5-10 | Novela visual en el juego: cinemáticas, conversaciones, accesibilidad y créditos | **Completado** · `b420ab3`, en `main` | Prólogo y llegada como cinemáticas; anfitriona y crupieres con el guion v4; Historial, Auto y Saltar; opciones de lectura; créditos; efectos, personajes en escena, «examinar» ilustrado y un recorrido hacia delante desde el vestíbulo. 285 pruebas |
 
 ## Avance
 
@@ -200,7 +200,7 @@ Lecturas para Julio:
 
 ## I5-10 · Novela visual en el juego
 
-**Estado:** completado por Kenned el 25 de noviembre de 2026, a partir del guion v4 (I5-09) y la base de diálogos de I4-06. Está en la rama `kenned/i5-arranque-campana`, pendiente de integrar en `main`.
+**Estado:** completado por Kenned el 25 de noviembre de 2026, a partir del guion v4 (I5-09) y la base de diálogos de I4-06. Integrado en `main` el 25 de noviembre de 2026 (`b420ab3`).
 
 **Dos tipos de escena**, según lo acordado con Kenned:
 
