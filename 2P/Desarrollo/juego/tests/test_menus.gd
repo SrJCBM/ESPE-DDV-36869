@@ -34,7 +34,7 @@ func test_el_inicio_ofrece_sus_cuatro_opciones_y_entrar_devuelve_el_control() ->
 	var juego = _casino()
 	assert_false(juego.menu.visible, "Las pruebas montan el casino sin el inicio")
 	juego.abrir_inicio()
-	assert_eq(_textos(juego), ["Entrar al casino", "Cómo jugar", "Opciones", "Salir"])
+	assert_eq(_textos(juego), ["Entrar al casino", "Cómo jugar", "Opciones", "Créditos", "Salir"])
 	assert_eq(juego.pagina.process_mode, Node.PROCESS_MODE_DISABLED)
 	assert_false(juego.indicador_objetivo.visible)
 	_esc(juego)
@@ -206,7 +206,7 @@ func test_si_el_control_ya_no_existe_enfoca_una_accion_de_la_mesa() -> void:
 func test_ninguna_pantalla_del_menu_desborda_su_marco() -> void:
 	var juego = _casino()
 	juego.menu.hay_partida = func() -> bool: return true
-	for nombre in ["inicio", "pausa", "opciones", "como_jugar", "inventario", "confirmar", "confirmar_nueva"]:
+	for nombre in ["inicio", "pausa", "opciones", "como_jugar", "inventario", "confirmar", "confirmar_nueva", "creditos"]:
 		juego.menu.abrir(nombre)
 		await get_tree().process_frame
 		var panel: Panel = juego.menu._panel
@@ -214,4 +214,31 @@ func test_ninguna_pantalla_del_menu_desborda_su_marco() -> void:
 		assert_true(contenido.position.y + contenido.get_combined_minimum_size().y <= panel.size.y - 24, "%s: el contenido cabe en el marco" % nombre)
 		assert_true(panel.position.y >= 0 and panel.position.y + panel.size.y <= 720, "%s: el marco no sale de la pantalla" % nombre)
 	juego.menu.abrir("inicio")
-	assert_eq(_textos(juego), ["Continuar", "Nueva partida", "Cómo jugar", "Opciones", "Salir"])
+	assert_eq(_textos(juego), ["Continuar", "Nueva partida", "Cómo jugar", "Opciones", "Créditos", "Salir"])
+
+func test_los_creditos_nombran_al_equipo_y_vuelven_al_inicio() -> void:
+	var juego = _casino()
+	juego.abrir_inicio()
+	juego.menu.botones[3].pressed.emit()
+	assert_eq(juego.menu.pantalla, "creditos")
+	var textos := []
+	for hijo in juego.menu._contenido.get_children():
+		if hijo is Label: textos.append(hijo.text)
+	for nombre in ["Julio", "Ariel", "Kenned"]:
+		assert_has(textos, nombre)
+	juego.menu.botones[0].pressed.emit()
+	assert_eq(juego.menu.pantalla, "inicio")
+
+func test_las_opciones_de_lectura_se_guardan_y_llegan_al_dialogo() -> void:
+	var juego = _casino()
+	juego.abrir_inicio()
+	juego.menu.abrir("opciones")
+	var panel = juego.menu._contenido.get_child(1)
+	panel.lectura["tamano_texto"].value = 130
+	panel.lectura["velocidad"].value = 120
+	panel.lectura["opacidad"].value = 60
+	assert_eq(AjustesJuego.lectura("tamano_texto"), 130)
+	assert_eq(juego.dialogo.escala_texto, 1.3)
+	assert_eq(juego.dialogo.velocidad, 0.0, "El máximo es instantáneo")
+	assert_almost_eq(juego.dialogo.opacidad, 0.6, 0.001)
+	assert_eq(juego.dialogo.texto.get_theme_font_size("font_size"), 29)

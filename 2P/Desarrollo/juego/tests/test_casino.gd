@@ -190,21 +190,33 @@ func test_recorrido_f5_interaccion_compra_mesa_y_regreso() -> void:
 	juego._unhandled_key_input(e)
 	assert_true(juego.dialogo.visible, "La anfitriona habla en la escena de diálogos")
 	assert_true(juego.visitante.bloqueado)
+	assert_eq(juego.dialogo.actual, "llegada", "La primera vez, la primera respuesta a la anfitriona")
+	juego.dialogo.cerrar()
+	juego.campana.historia = {"vio_vestibulo": "si", "tono": "cortes"}
+	juego._recepcion()
 	juego.dialogo.completar()
 	juego.dialogo.elegir(0)
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	juego.dialogo.completar()
+	juego.dialogo.elegir(2)
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
 	juego.dialogo.completar()
 	juego.dialogo.elegir(0)
 	assert_eq(juego.campana.saldo,10)
 	assert_eq(juego.campana.lentes,1, "La Lente de humo es el objeto inicial elegido")
-	juego.dialogo.completar()
-	juego.dialogo.avanzar()
+	for i in range(6):
+		if not juego.dialogo.visible: break
+		juego.dialogo.completar()
+		juego.dialogo.avanzar()
 	assert_false(juego.visitante.bloqueado)
 	juego.entrar("pasillo_custodio","vestibulo")
 	juego.entrar("tienda")
 	assert_eq(juego.sala,"pasillo_custodio", "La tienda abre tras el primer sello")
 	juego.entrar("custodio")
 	juego._presentar_jefe()
-	juego.libro.primero.pressed.emit()
+	juego._solicitud("tomar_asiento")
 	assert_not_null(juego.mesa)
 	var m: ControladorMesa = juego.mesa.controlador
 	m.partida.meta=1
@@ -272,7 +284,8 @@ func test_campana_completa_con_baraja_normal_y_recompensas_unicas() -> void:
 		assert_eq(juego.sala,CampanaCasino.MESAS[nivel])
 		juego.visitante.position = Vector2(640,536)
 		juego.interactuar(juego.cercano())
-		juego.libro.primero.pressed.emit()
+		assert_true(juego.dialogo.visible, "El crupier habla en la escena de novela visual")
+		juego._solicitud("tomar_asiento")
 		var m: ControladorMesa = juego.mesa.controlador
 		juego.mesa.movimiento_reducido = true
 		m.partida._rng.seed = 98+nivel

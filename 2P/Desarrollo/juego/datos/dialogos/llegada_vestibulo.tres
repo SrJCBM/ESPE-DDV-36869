@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {"narrador": {"nombre": ""}}
+entradas = [{"ir": "p6_1"}]
+intervenciones = {"p6_1": {"personaje": "narrador", "texto": "La puerta se queda entreabierta detrás de mí. Por la rendija entra niebla, y la niebla no se atreve a pasar del felpudo.", "siguiente": "p6_2", "modo": "nvl", "fondo": "vestibulo", "pagina_nueva": true, "sonido": "puerta", "solicitud": "historia:vio_vestibulo"}, "p6_2": {"personaje": "narrador", "texto": "Hay gente. Jugadores en mesas pequeñas, con los ojos fijos en las cartas, que no levantan la vista. Uno lleva una peluca empolvada de hace un siglo. Otra, un luto de una moda que mi madre ya llamaba antigua.", "siguiente": "p6_3", "modo": "nvl"}, "p6_3": {"personaje": "narrador", "texto": "Al acercarme veo sus manos. Tienen los dedos blancos, lisos, brillantes como loza. A uno la porcelana le llega ya hasta la muñeca. Sigue barajando.", "siguiente": "p6_4", "modo": "nvl", "fondo": "cg_jugadores_porcelana"}, "p6_4": {"personaje": "narrador", "texto": "Y en el centro, el reloj. Enorme. Parado a la medianoche, con tres ranuras vacías bajo el cristal.", "siguiente": "p6_5", "modo": "nvl", "fondo": "cg_reloj_ranuras"}, "p6_5": {"personaje": "narrador", "texto": "La anfitriona levanta la vista desde su mostrador. No sonríe.", "siguiente": "", "modo": "nvl"}}
+fondos = {"vestibulo": {"ruta": "res://casino/arte/vestibulo.webp", "descripcion": "El vestíbulo.", "movimiento": "acercar"}, "cg_jugadores_porcelana": {"ruta": "res://historia/ilustraciones/cg_jugadores_porcelana.webp", "descripcion": "Manos de jugadores que barajan: los dedos blancos y lisos como loza; en una, la porcelana llega a la muñeca.", "movimiento": "acercar"}, "cg_reloj_ranuras": {"ruta": "res://historia/ilustraciones/cg_reloj_ranuras.webp", "descripcion": "El gran reloj del vestíbulo, parado a la medianoche, con tres ranuras vacías bajo el cristal.", "movimiento": "acercar"}}

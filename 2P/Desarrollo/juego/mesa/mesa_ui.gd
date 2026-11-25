@@ -71,7 +71,8 @@ var eleccion_llave: EleccionLlave
 var revelacion: RevelacionMano
 ## Respuesta visual al resolver y aviso del cambio de umbral (respuesta_resultado.gd).
 var _respuesta: Respuesta
-## La cuenta de puntos en curso, o null si no hay ninguna.
+## La cuenta de puntos en curso, o null si no hay ninguna. Solo la leen las pruebas.
+@warning_ignore("unused_private_class_variable")
 var _feedback: Tween:
 	get: return _respuesta.tween if _respuesta != null else null
 ## Placa con la regla del crupier sobre el pie del retrato (placa_regla.gd).
@@ -270,9 +271,9 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	var mesa_previa: String = str(vista.get("mesa", ""))
 	var recien_resuelta: bool = vista.get("fase", "") == "decision" and nueva_vista.get("fase", "") != "decision" and not nueva_vista.get("ultima_mano", {}).is_empty()
 	if recien_resuelta and audio != null:
-		var mano: Dictionary = nueva_vista.ultima_mano
-		if mano.quiebra: audio.reproducir(&"quiebra")
-		elif nueva_vista.get("victoria", false) or "Punto exacto" in mano.patrones: audio.reproducir(&"sello")
+		var ultima: Dictionary = nueva_vista.ultima_mano
+		if ultima.quiebra: audio.reproducir(&"quiebra")
+		elif nueva_vista.get("victoria", false) or "Punto exacto" in ultima.patrones: audio.reproducir(&"sello")
 	var puntos_previos: int = int(vista.get("puntos", 0))
 	vista = nueva_vista.duplicate(true)
 	eleccion_llave.presentar(vista)

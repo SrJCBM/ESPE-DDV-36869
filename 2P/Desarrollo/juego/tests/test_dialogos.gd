@@ -14,6 +14,30 @@ func _casino():
 	add_child_autofree(juego)
 	return juego
 
+## Quien ya vio la llegada (P6) y respondió a la anfitriona: el diálogo empieza en «Tu invitación».
+func _ya_llego(juego) -> void:
+	juego.campana.historia = {"vio_vestibulo": "si", "tono": "cortes"}
+
+## Desde «Tu invitación» hasta la oferta: entregar, la línea de la tinta y una respuesta sobre Ferrer.
+func _hasta_oferta(juego) -> void:
+	juego.dialogo.completar()
+	juego.dialogo.elegir(0)
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	juego.dialogo.completar()
+	juego.dialogo.elegir(2)
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	juego.dialogo.completar()
+
+## Avanza hasta que el diálogo se cierre (líneas sin respuestas).
+func _hasta_cerrar(juego) -> void:
+	for i in range(12):
+		if not juego.dialogo.visible:
+			return
+		juego.dialogo.completar()
+		juego.dialogo.avanzar()
+
 func _tecla(juego, codigo: Key) -> void:
 	var tecla := InputEventKey.new()
 	tecla.keycode = codigo
@@ -26,6 +50,9 @@ func test_el_dialogo_de_la_anfitriona_no_tiene_referencias_rotas() -> void:
 
 func test_la_anfitriona_responde_antes_y_despues_de_la_invitacion() -> void:
 	var campana := CampanaCasino.new()
+	assert_eq(ANFITRIONA.inicio(campana.cumple), "llegada", "La primera vez, la primera respuesta (tono)")
+	assert_eq(ANFITRIONA.opciones("llegada", campana.cumple).size(), 4)
+	campana.atender("historia:tono=cortes")
 	assert_eq(ANFITRIONA.inicio(campana.cumple), "saludo")
 	assert_eq(ANFITRIONA.opciones("saludo", campana.cumple).size(), 2)
 	campana.recibir_invitacion()
@@ -49,6 +76,7 @@ func test_condiciones_y_solicitudes_las_decide_la_campana() -> void:
 
 func test_entregar_la_invitacion_desde_el_dialogo_solo_una_vez() -> void:
 	var juego = _casino()
+	_ya_llego(juego)
 	juego._recepcion()
 	assert_true(juego.dialogo.visible)
 	assert_true(juego.visitante.bloqueado, "El visitante queda quieto")
@@ -58,19 +86,17 @@ func test_entregar_la_invitacion_desde_el_dialogo_solo_una_vez() -> void:
 	juego.dialogo.avanzar()
 	assert_eq(juego.dialogo.botones.size(), 2)
 	assert_false(juego.campana.recibida, "Avanzar tampoco")
-	juego.dialogo.elegir(0)
+	_hasta_oferta(juego)
 	assert_eq(juego.dialogo.actual, "oferta")
-	assert_false(juego.campana.recibida, "Entregar la invitación abre la oferta; aún no entrega nada")
-	juego.dialogo.completar()
+	assert_false(juego.campana.recibida, "Entregar la invitación lleva a la oferta; aún no entrega nada")
 	assert_eq(juego.dialogo.botones.size(), 4)
 	juego.dialogo.elegir(2)
 	assert_true(juego.campana.recibida)
 	assert_eq(juego.campana.saldo, 10)
 	assert_eq(juego.campana.amuletos, ["moneda"] as Array[String])
-	assert_eq(juego.dialogo.actual, "entrega")
+	assert_eq(juego.dialogo.actual, "entrega_moneda")
 	assert_eq(juego.hud.saldo.cifra.text, "10")
-	juego.dialogo.completar()
-	juego.dialogo.avanzar()
+	_hasta_cerrar(juego)
 	assert_false(juego.dialogo.visible)
 	assert_false(juego.visitante.bloqueado, "Recupera el control al cerrar")
 	juego.campana.saldo = 3
@@ -80,6 +106,7 @@ func test_entregar_la_invitacion_desde_el_dialogo_solo_una_vez() -> void:
 
 func test_volver_y_esc_cierran_sin_aplicar_nada() -> void:
 	var juego = _casino()
+	_ya_llego(juego)
 	juego._recepcion()
 	juego.dialogo.completar()
 	juego.dialogo.elegir(1)
@@ -94,6 +121,7 @@ func test_volver_y_esc_cierran_sin_aplicar_nada() -> void:
 func test_la_primera_pulsacion_completa_la_linea_que_se_escribe() -> void:
 	var juego = _casino()
 	juego.dialogo.reducido = false
+	_ya_llego(juego)
 	juego.dialogo.abrir(ANFITRIONA, juego.campana.cumple, false)
 	assert_true(juego.dialogo.escribiendo())
 	assert_eq(juego.dialogo.botones.size(), 0, "Las respuestas esperan a la línea completa")
@@ -102,10 +130,11 @@ func test_la_primera_pulsacion_completa_la_linea_que_se_escribe() -> void:
 	assert_eq(juego.dialogo.botones.size(), 2)
 	assert_eq(juego.get_viewport().gui_get_focus_owner(), juego.dialogo.botones[0])
 	_tecla(juego, KEY_E)
-	assert_eq(juego.dialogo.actual, "oferta", "E elige la respuesta enfocada")
+	assert_eq(juego.dialogo.actual, "invitacion", "E elige la respuesta enfocada")
 
 func test_con_movimiento_reducido_el_texto_aparece_completo() -> void:
 	var juego = _casino()
+	_ya_llego(juego)
 	juego.dialogo.abrir(ANFITRIONA, juego.campana.cumple, true)
 	assert_false(juego.dialogo.escribiendo())
 	assert_eq(juego.dialogo.texto.visible_characters, -1)

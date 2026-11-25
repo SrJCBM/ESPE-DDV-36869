@@ -2,7 +2,8 @@ class_name PlanoGaleria
 extends RefCounted
 ## Pasillos de los jefes (I5). Cada pasillo es una pantalla con sus propias puertas: la mesa
 ## de su jefe al norte, la sala que le corresponde al sur y las puertas a los pasillos vecinos
-## a los lados. Las puertas entre pasillos se abren con los sellos de `CampanaCasino.ACCESO`.
+## a los lados. El recorrido avanza de oeste a este: el vestíbulo queda al oeste del pasillo
+## del Custodio (I5-10), así que desde la recepción se sigue hacia delante. Las puertas entre pasillos se abren con los sellos de `CampanaCasino.ACCESO`.
 ##
 ## Primer tramo: el Dueño todavía no tiene pasillo propio; su puerta está al este del pasillo
 ## de la Coleccionista. Todos los pasillos usan por ahora el arte de `corredor.webp`.
@@ -17,7 +18,7 @@ const ORDEN := ["pasillo_custodio", "pasillo_recaudador", "pasillo_coleccionista
 const PASILLOS := {
 	"pasillo_custodio": {
 		"custodio": {"lado": "norte", "x": 538.0, "placa": "I · Custodio"},
-		"vestibulo": {"lado": "sur", "x": 538.0, "placa": "Vestíbulo"},
+		"vestibulo": {"lado": "oeste", "placa": "Vestíbulo"},
 		"pasillo_recaudador": {"lado": "este", "placa": "Hacia el Recaudador"},
 	},
 	"pasillo_recaudador": {

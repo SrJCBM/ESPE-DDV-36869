@@ -25,7 +25,7 @@ func _con_invitacion():
 
 func test_cada_pasillo_tiene_su_mesa_al_norte_y_las_salas_al_sur() -> void:
 	assert_true(PlanoGaleria.norte("pasillo_custodio", "custodio"))
-	assert_eq(PlanoGaleria.lado("pasillo_custodio", "vestibulo"), "sur")
+	assert_eq(PlanoGaleria.lado("pasillo_custodio", "vestibulo"), "oeste", "El recorrido avanza de oeste a este desde el vestíbulo")
 	assert_eq(PlanoGaleria.lado("pasillo_custodio", "pasillo_recaudador"), "este")
 	assert_true(PlanoGaleria.norte("pasillo_recaudador", "recaudador"))
 	assert_eq(PlanoGaleria.lado("pasillo_recaudador", "tienda"), "sur")
@@ -132,3 +132,31 @@ func test_el_dueno_se_alcanza_desde_el_ultimo_pasillo_con_tres_sellos() -> void:
 	juego.interactuar(_punto(juego, "pasillo_coleccionista"))
 	assert_eq(juego.sala, "pasillo_coleccionista")
 	assert_eq(juego.cercano().get("destino", ""), "dueno")
+
+func test_desde_el_vestibulo_se_sigue_hacia_delante() -> void:
+	var juego = _casino()
+	juego.interactuar(_punto(juego, "vestibulo"))
+	var llegada: Vector2 = juego.visitante.position
+	var hacia_pasillo: Vector2 = _punto(juego, "pasillo_custodio").pos
+	var calle: Vector2 = _punto(juego, "entrada").pos
+	assert_gt(llegada.distance_to(hacia_pasillo), 300.0, "La salida al pasillo no es la puerta por la que se entra")
+	assert_lt(llegada.distance_to(calle), 150.0, "Se llega por la puerta de la calle")
+	assert_gt(hacia_pasillo.x, 1000.0, "La salida está al este")
+	juego._entregar()
+	juego.interactuar(_punto(juego, "pasillo_custodio"))
+	assert_eq(juego.sala, "pasillo_custodio")
+	juego.interactuar(_punto(juego, "vestibulo"))
+	assert_eq(juego.sala, "vestibulo")
+	assert_lt(juego.visitante.position.distance_to(hacia_pasillo), 100.0, "Al volver aparece junto a la puerta del este")
+
+func test_la_puerta_de_la_calle_se_cierra_al_entregar_la_invitacion() -> void:
+	var juego = _casino()
+	juego.entrar("vestibulo", "entrada")
+	juego.interactuar(_punto(juego, "entrada"))
+	assert_eq(juego.sala, "entrada", "Antes de entregar la invitación se puede volver a la calle")
+	juego.entrar("vestibulo", "entrada")
+	juego._entregar()
+	juego._cerrar()
+	juego.interactuar(_punto(juego, "entrada"))
+	assert_eq(juego.sala, "vestibulo")
+	assert_string_contains(juego.libro.cuerpo.text, "contorno")

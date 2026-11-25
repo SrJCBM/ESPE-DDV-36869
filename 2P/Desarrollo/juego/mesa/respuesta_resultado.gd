@@ -31,8 +31,6 @@ func celebrar(vista: Dictionary, cartas: Array, puntos_previos: int) -> void:
 		tween.tween_property(_lectura, "modulate", Color.WHITE, 0.4)
 		tween.tween_callback(detener)
 		return
-	var total: int = int(mano.get("total", 0))
-	var multiplicador: int = int(mano.get("multiplicador", 1))
 	var aporte: int = int(mano.get("puntos", 0))
 	var meta: int = int(vista.get("meta", 200))
 	var cuenta := func(valor: float) -> void:

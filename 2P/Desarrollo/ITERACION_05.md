@@ -1,10 +1,10 @@
 # Iteración 05 · Pasillos de los jefes
 
-**Estado general:** en curso. De las nueve tareas, **seis están completas, una está a medias y dos están pendientes** ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). Las correcciones del 25 de noviembre (I5-06) y este documento se integraron en `main` el 25 de noviembre de 2026, para que Julio continúe desde ahí. **Base:** I4 con sus correcciones, commit `d9c82b7`.
+**Estado general:** en curso. De las diez tareas, **siete están completas, una está a medias y dos están pendientes** ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). Las correcciones del 25 de noviembre (I5-06) se integraron en `main` ese mismo día. La novela visual (I5-10) está en la rama `kenned/i5-arranque-campana`, pendiente de integrar. **Base:** I4 con sus correcciones, commit `d9c82b7`.
 
 **Objetivo:** que el avance por la campaña se recorra. Cada sello abre una puerta física hacia el pasillo del jefe siguiente, y cada pasillo anuncia con su arte y su sonido a quién se va a enfrentar el jugador.
 
-**Identificadores.** Kenned redactó el plan el 23 de noviembre de 2026 a partir de lo que acordó con Julio. Los identificadores I5-01 a I5-09 ordenan el trabajo hecho para seguir el avance; Julio puede reasignarlos o cambiar el reparto.
+**Identificadores.** Kenned redactó el plan el 23 de noviembre de 2026 a partir de lo que acordó con Julio. Los identificadores I5-01 a I5-10 ordenan el trabajo hecho para seguir el avance; Julio puede reasignarlos o cambiar el reparto.
 
 ## Plan de trabajo
 
@@ -19,6 +19,7 @@
 | I5-07 | Arte de la entrada y de los pasillos | **Pendiente** | Hoy es provisional: la entrada se dibuja en código y los pasillos tiñen `corredor.webp` |
 | I5-08 | Sonido por jefe | **Pendiente** | Los buses y los controles de volumen de I4-07 ya existen |
 | I5-09 | Guion narrativo y documentos de la rúbrica | **Completado** · `ac08646` | [Guion v4](Diseno/GUION_PROLOGO_Y_DIALOGOS.md), [ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md), navegación, catálogo y presentación |
+| I5-10 | Novela visual en el juego: cinemáticas, conversaciones, accesibilidad y créditos | **Completado** · pendiente de integrar | Prólogo y llegada como cinemáticas; anfitriona y crupieres con el guion v4; Historial, Auto y Saltar; opciones de lectura; créditos; efectos, personajes en escena, «examinar» ilustrado y un recorrido hacia delante desde el vestíbulo. 285 pruebas |
 
 ## Avance
 
@@ -28,9 +29,9 @@
 | [I2](ITERACION_02.md) | La casa de los tres sellos | Campaña completa, versión 0.2.0 | 134 |
 | [I3](ITERACION_03.md) | Pulido, balance y deuda técnica | 8 de 8 | 167 |
 | [I4](ITERACION_04.md) | Interfaz y recorrido del casino | 8 de 8 implementadas; falta el piloto de I4-08 | 221 |
-| **I5** | **Pasillos de los jefes** | **6 de 9, una parcial** | **259** |
+| **I5** | **Pasillos de los jefes** | **7 de 10, una parcial** | **285** |
 
-Con I5, la campaña se juega de principio a fin: entrada, vestíbulo, pasillos, cuatro mesas, tienda, objeto inicial y salida. La partida también sobrevive a un cierre del juego. Lo que falta es sobre todo arte y sonido (I5-07 e I5-08) y una pantalla, el pasillo del Dueño (I5-02).
+Con I5, la campaña se juega de principio a fin: entrada, vestíbulo, pasillos, cuatro mesas, tienda, objeto inicial y salida. La partida también sobrevive a un cierre del juego, y la historia empieza con un prólogo de novela visual. Lo que falta es sobre todo arte y sonido (I5-07 e I5-08) y una pantalla, el pasillo del Dueño (I5-02).
 
 ## Mapa
 
@@ -82,8 +83,8 @@ flowchart LR
 | Espacio | Puertas | Estado |
 | --- | --- | --- |
 | Entrada al casino | Fachada y puerta hacia el vestíbulo. Es breve: presenta el lugar y enseña a moverse y a usar **E**. | **Jugable** con arte provisional dibujado en código. El intento empieza aquí |
-| Vestíbulo | La anfitriona y el paso al pasillo del Custodio. | **Jugable.** La puerta al pasillo pide la invitación |
-| Pasillo del Custodio | Al norte, la mesa del Custodio. Al este, la puerta al pasillo siguiente, cerrada hasta el primer sello. | **Jugable** sobre `corredor.webp` |
+| Vestíbulo | Se llega por la puerta de la calle, al sur. La anfitriona, y al este la puerta al pasillo del Custodio, para seguir hacia delante (I5-10). La puerta de la calle se cierra al entregar la invitación. | **Jugable.** La puerta del este pide la invitación; es un vano provisional en el nicho del arte |
+| Pasillo del Custodio | Al oeste, el vestíbulo. Al norte, la mesa del Custodio. Al este, la puerta al pasillo siguiente, cerrada hasta el primer sello. | **Jugable** sobre `corredor.webp` |
 | Pasillo del Recaudador | Al norte, la mesa del Recaudador; al sur, la tienda. Al este, la puerta al pasillo siguiente, cerrada hasta el segundo sello. | **Jugable** sobre `corredor.webp` |
 | Pasillo de la Coleccionista | Al frente, la mesa de la Coleccionista. Al este, la puerta al pasillo del Dueño, cerrada hasta reunir los tres sellos. | **Provisional:** la puerta del este lleva directamente a la sala del Dueño |
 | Pasillo del Dueño | La mesa del Dueño. La salida se abre desde su sala tras vencerlo. | **Pendiente** |
@@ -197,10 +198,77 @@ Lecturas para Julio:
 | [CATALOGO_JUEGO.md](Diseno/CATALOGO_JUEGO.md) | Cartas, patrones, objetos, crupieres y personajes |
 | [PRESENTACION_Y_JUSTIFICACION.md](Diseno/PRESENTACION_Y_JUSTIFICACION.md) | Exposición en tres bloques iguales de 5 minutos |
 
+## I5-10 · Novela visual en el juego
+
+**Estado:** completado por Kenned el 25 de noviembre de 2026, a partir del guion v4 (I5-09) y la base de diálogos de I4-06. Está en la rama `kenned/i5-arranque-campana`, pendiente de integrar en `main`.
+
+**Dos tipos de escena**, según lo acordado con Kenned:
+
+| Tipo | Cuándo | Cómo se ve |
+| --- | --- | --- |
+| **Conversación** | La anfitriona, la tienda y los crupieres | El sistema de I4-06 sobre la sala: retrato, cuadro con nombre y respuestas. El juego sigue detrás |
+| **Cinemática** | El prólogo (P0–P5) antes de entrar al casino y la llegada al vestíbulo (P6) | Una escena propia, opaca y a pantalla completa (`casino/dialogos/cinematica.gd`), al estilo de Fate. Entra con un fundido breve y al terminar se desvanece para devolver la exploración. La ilustración ocupa la pantalla con viñeta en los bordes; la narración avanza un párrafo por clic en la franja inferior; los diálogos usan el cuadro con los personajes en escena. Con movimiento reducido no hay fundidos ni efectos |
+
+| Pieza | Resultado |
+| --- | --- |
+| **Prólogo** | «Entrar al casino» y «Nueva partida» abren la cinemática P0–P5: la mano de Ignacio, el taller, la invitación, la calle de la niebla y la fachada. Narración a pantalla completa (NVL), diálogos con retrato (ADV), la tarjeta del capítulo y las elecciones del guion (motivo, invitación, farolero). «Saltar ▸» la deja en cualquier momento; Esc no la cierra por accidente. Al terminar, el jugador aparece frente a la fachada |
+| **Llegada al vestíbulo** | La primera vez que se pisa el vestíbulo, la cinemática P6 da paso sola a la conversación con la anfitriona |
+| **Anfitriona** | Guion 7.1–7.3: primera respuesta que fija el tono, la invitación (con la variante de si se intentó quemar), la conversación sobre Ferrer, la oferta de I5-01, una línea por objeto, la puerta que se cierra, la línea según el motivo, las pistas con el saludo del tono y el menú «Preguntar…» (nueve preguntas, tres se desbloquean con sellos) |
+| **Crupieres** | Guion 8: presentación con las tres cifras de la mesa encima del cuadro, «Tomar asiento», «Preguntar…» o «Volver a la sala»; revisita y preguntas tras vencerlo; su línea de victoria en la recompensa y la de derrota en «La casa gana». El Recaudador muestra la página de Ignacio y la Coleccionista, su vitrina |
+| **Efectos** | Fundido cruzado al cambiar de ilustración, acercamiento o desplazamiento lento sobre fondos y CG, temblor (normal y fuerte) y destello por línea. En el prólogo: la campana de la apuesta, la Quiebra de Ignacio, los golpes en la puerta y la llama verde |
+| **Personajes en escena** | Cada línea puede hacer entrar o salir personajes en tres posiciones (izquierda, centro, derecha), con un deslizamiento suave. El que habla queda iluminado, los demás atenuados, y su cara aparece en el cuadro. El guion lo marca con `[ENTRA]` y `[SALE]` (versión 4.1); el prólogo ya lo usa con el Dueño, Ignacio, la anfitriona y el farolero |
+| **Ilustraciones pendientes** | Toda ilustración que falta se muestra como «Ilustración pendiente» con su id y su descripción, sin imágenes provisionales. Se sustituye guardando el archivo con su id en `juego/historia/ilustraciones/` |
+| **Barra de lectura** | Historial (o rueda hacia arriba; Esc lo cierra primero), Auto y Saltar, que adelanta hasta la próxima elección (o manteniendo Ctrl) |
+| **Opciones** | Dos columnas: Sonido, y Lectura y accesibilidad: velocidad del texto (hasta instantáneo), espera del modo Auto, tamaño del texto, opacidad del cuadro y movimiento reducido. Se guardan en `user://ajustes.cfg` |
+| **Créditos** | Nueva entrada del menú de inicio con Julio, Ariel y Kenned y la parte de cada uno |
+| **Examinar** | Las notas de cada sala se abren como una escena con su ilustración y el texto de la sección 11 del guion, con sus variantes: la farola según lo que se habló con el farolero y el reloj del vestíbulo según los sellos. Las diez ilustraciones de notas están descritas en el encargo y se muestran como pendientes |
+| **Una ilustración por momento** | Cada momento clave del guion tiene su CG conectada: los relojes parados, la ventana, el reloj helado, la invitación que no arde, el reverso de la tarjeta, el farolero, el camino de farolas, la ficha que late, la calle que desaparece, los jugadores de porcelana, el reloj de las tres ranuras, la puerta grabada y la cadena del Custodio. Están descritas en [ILUSTRACIONES_PENDIENTES.md](Diseno/ILUSTRACIONES_PENDIENTES.md), que también pide **todos los personajes recortados sobre fondo transparente** |
+| **Recorrido** | Desde el vestíbulo ya no hay que volver atrás: se entra por la puerta de la calle y se sale al pasillo por la puerta del este, y el pasillo del Custodio recibe por el oeste. El recorrido avanza de oeste a este |
+| **Historia en la partida** | `CampanaCasino.historia` guarda las elecciones y descubrimientos (motivo, tono, farolero, página de la garantía, vitrina vista…) y viaja con la partida guardada. Los diálogos los consultan con `historia:clave=valor` y `no:` |
+
+**Implementación.**
+
+- Las conversaciones son datos en `datos/dialogos/`: `prologo.tres`, `llegada_vestibulo.tres`, `anfitriona.tres` y una por crupier.
+- `Conversacion` admite fondos por id, una «siguiente» que depende de condiciones y expresiones de retrato que, si aún no existen, usan el retrato general.
+- `DialogoNovela` añade los modos NVL y tarjeta, sonidos y solicitudes por línea, un anexo para las cifras, la barra y el historial.
+- Las ilustraciones que faltan se muestran como «Ilustración pendiente» con su id y su descripción. Basta con guardar el archivo en `juego/historia/` ([instrucciones](juego/historia/README.md)).
+- `{nombre}` y `{apellido}` usan Klein Moretti hasta que el jugador pueda elegirlos.
+
+**Límites.**
+
+- Todavía no se implementan los eventos E1–E5, las decisiones morales M1–M4 ni los finales del guion.
+- Faltan las ilustraciones y las hojas de expresiones. Para el escenario, los personajes necesitan figuras recortadas sobre fondo transparente; hoy se usan los retratos, que traen fondo, e Ignacio y el farolero no aparecen porque no tienen imagen.
+- Las preguntas ya respondidas siguen en el menú.
+- No hay guardado ni carga a mitad de una cinemática.
+
+**Pruebas.** `test_novela_i5_10.gd` (22 pruebas):
+
+- los siete diálogos no tienen referencias rotas;
+- el prólogo se recorre entero y guarda las elecciones;
+- saltarlo no lo marca como visto, y Esc no lo cierra;
+- la ilustración pendiente muestra su id;
+- la narración avanza un párrafo por clic en la franja inferior;
+- los efectos no se aplican con movimiento reducido;
+- los personajes entran y salen, y se resalta al que habla;
+- examinar abre una escena con la ilustración pendiente y el texto del guion, cada nota tiene su ilustración descrita y las variantes cambian con la historia;
+- las cifras y las marcas se sustituyen, y se puede preguntar al crupier y volver a la mesa;
+- después de la victoria aparecen la revisita y la línea de victoria;
+- la historia se guarda con la partida y el saludo depende del tono;
+- la cinemática ocupa su propia escena y la llegada da paso a la anfitriona;
+- el historial funciona, y Saltar y Auto avanzan solos.
+
+`test_menus.gd` añade los créditos y las opciones de lectura.
+
+**Correcciones durante I5-10.**
+
+- El marco del menú de inicio también se vuelve a medir cuando cambia su contenido. La captura del desborde venía de una ventana del juego abierta antes de la corrección de I5-06.
+- Se corrigieron los ocho avisos de GDScript que mostraba el depurador: operadores ternarios incompatibles en `vista_mano.gd` y `casino.gd`, variables sin usar en `respuesta_resultado.gd`, y en `mesa_ui.gd` una variable sombreada y una propiedad sin usar.
+- La balanza del Recaudador tenía una huella que hacía fallar a veces la prueba de colisiones.
+
 ## Para después
 
 - **LAN.** Queda para una iteración futura, por decisión de Julio. No se ha empezado.
-- **Prólogo de novela visual en el juego**, a partir del guion de I5-09 y la base de diálogos de I4-06.
+- **Eventos, decisiones morales y finales** del guion (E1–E5, M1–M4, finales A–C) sobre las cinemáticas de I5-10.
 - **Nodos huérfanos de `test_interfaz.gd`.** GUT sigue atribuyéndole 28. Es un pendiente aparte de I4; no viene de los cambios de I5.
 - **Piloto de I4-08 con tres personas.** Conviene hacerlo antes de cerrar el diseño de los pasillos, para saber si el jugador encuentra las puertas y entiende las placas.
 
@@ -213,4 +281,4 @@ Lecturas para Julio:
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/qa_limites.gd -- --sala=vestibulo
 ```
 
-I5 pasa **259 pruebas y 2.468 aserciones** en Godot 4.7.2. La integración en `main` del 24 de noviembre se comprobó además con la simulación de campaña y una exportación para Windows.
+I5 pasa **285 pruebas y 2.607 aserciones** en Godot 4.7.2. Las capturas de I5-10 se generan con `tests/qa_novela.gd` y `tests/qa_recorrido.gd`. `test_recorrido.gd` comprueba la salida del vestíbulo hacia delante y la puerta de la calle que se cierra. La integración en `main` del 24 de noviembre se comprobó además con la simulación de campaña y una exportación para Windows.

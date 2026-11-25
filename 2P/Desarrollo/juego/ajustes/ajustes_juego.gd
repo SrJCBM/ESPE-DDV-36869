@@ -29,3 +29,36 @@ static func guardar_volumen(canal: StringName, nivel: int) -> void:
 	archivo.load(ruta)
 	archivo.set_value("audio", str(canal), clampi(nivel, 0, 100))
 	archivo.save(ruta)
+
+## Ajustes de lectura de las conversaciones (I5-10): velocidad del texto en caracteres por
+## segundo (el máximo es instantáneo), espera del modo automático en segundos, tamaño del
+## texto en porcentaje y opacidad del cuadro en porcentaje.
+const LECTURA := {
+	"velocidad": {"predeterminado": 55, "minimo": 20, "maximo": 120},
+	"espera_auto": {"predeterminado": 15, "minimo": 5, "maximo": 40},
+	"tamano_texto": {"predeterminado": 100, "minimo": 90, "maximo": 140},
+	"opacidad": {"predeterminado": 96, "minimo": 40, "maximo": 100},
+}
+
+static func lectura(clave: String) -> int:
+	var limites: Dictionary = LECTURA[clave]
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	return clampi(int(archivo.get_value("lectura", clave, limites.predeterminado)), limites.minimo, limites.maximo)
+
+static func guardar_lectura(clave: String, valor: int) -> void:
+	var limites: Dictionary = LECTURA[clave]
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	archivo.set_value("lectura", clave, clampi(valor, limites.minimo, limites.maximo))
+	archivo.save(ruta)
+
+## Los ajustes de lectura en el formato de `DialogoNovela.configurar`.
+static func ajustes_dialogo() -> Dictionary:
+	var velocidad := lectura("velocidad")
+	return {
+		"velocidad": 0.0 if velocidad >= int(LECTURA.velocidad.maximo) else float(velocidad),
+		"espera_auto": lectura("espera_auto") / 10.0,
+		"escala_texto": lectura("tamano_texto") / 100.0,
+		"opacidad": lectura("opacidad") / 100.0,
+	}

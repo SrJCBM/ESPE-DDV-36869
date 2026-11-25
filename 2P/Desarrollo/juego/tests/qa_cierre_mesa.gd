@@ -17,7 +17,7 @@ func _recorrer() -> void:
 	juego._cerrar()
 	juego.entrar("custodio", "pasillo_custodio")
 	juego._presentar_jefe()
-	juego.libro.primero.pressed.emit()
+	juego._solicitud("tomar_asiento")
 	await process_frame
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
 	for i in range(20): await process_frame

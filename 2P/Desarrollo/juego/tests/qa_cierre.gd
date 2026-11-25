@@ -33,7 +33,7 @@ func _recorrer() -> void:
 	juego.entrar("pasillo_custodio", "vestibulo")
 	juego.entrar("custodio", "pasillo_custodio")
 	juego._presentar_jefe()
-	juego.libro.primero.pressed.emit()
+	juego._solicitud("tomar_asiento")
 	await process_frame
 	var m: ControladorMesa = juego.mesa.controlador
 	# Mano preparada: dos Velas y después otra Vela pedida (Racha en curso y luego activa).

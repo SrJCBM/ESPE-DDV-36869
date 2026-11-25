@@ -1,6 +1,6 @@
 # La Última Mesa · Prólogo y diálogos en formato de novela visual
 
-**Estado:** borrador para revisión de Julio, escrito por Kenned. **Versión 4**, del 24 de noviembre de 2026; los cambios entre versiones están en el [historial](#17-historial-de-versiones). No forma parte de ninguna iteración.
+**Estado:** borrador para revisión de Julio, escrito por Kenned. **Versión 4.1**, del 25 de noviembre de 2026; los cambios entre versiones están en el [historial](#17-historial-de-versiones). No forma parte de ninguna iteración.
 
 **Protagonista:** masculino. El nombre lo elegirá el jugador en una iteración futura; en el texto aparece como `{nombre}` (por defecto **Klein**) y `{apellido}` (por defecto **Moretti**). Los diálogos del protagonista en las opciones funcionan con cualquier nombre.
 
@@ -74,15 +74,18 @@ Detalle en [Finales](#14-finales).
 
 ### Marcas del guion
 
-La presentación imita a las novelas visuales del estilo de Fate. El monólogo interior ocupa la pantalla y los diálogos usan el cuadro inferior con el retrato.
+La presentación imita a las novelas visuales del estilo de Fate. Las **cinemáticas** (prólogo, llegada, eventos y finales) ocupan toda la pantalla con su ilustración: la narración avanza un párrafo por clic en la franja inferior y los diálogos usan el cuadro con los personajes en escena. Las **conversaciones** con la anfitriona y los crupieres se abren sobre la sala, con el retrato junto al cuadro.
 
 | Marca | Significado |
 | --- | --- |
-| `[NVL]` | Narración a pantalla completa sobre el fondo oscurecido. El texto se acumula párrafo a párrafo, como en una página. Se usa para el monólogo interior del protagonista. |
+| `[NVL]` | Narración sin placa de nombre en la franja inferior, sobre la ilustración; cada párrafo sustituye al anterior al hacer clic. Se usa para el monólogo interior del protagonista. |
 | `[ADV]` | Cuadro inferior con placa de nombre y retrato. Es el modo de la escena de diálogos de I4-06 (`DialogoNovela`). |
 | `[FONDO: id]` | Fondo de la escena. Su descripción está en [ILUSTRACIONES_PENDIENTES.md](ILUSTRACIONES_PENDIENTES.md). |
 | `[CG: id]` | Ilustración a pantalla completa de un momento clave. Se desbloquea en la galería. |
-| `[RETRATO: personaje · expresión · lado]` | Retrato que entra o cambia de expresión. La expresión es un id de la hoja de expresiones del personaje ([Personajes](#4-personajes-trasfondos-y-expresiones)). Lado: izquierda, centro o derecha. |
+| `[ENTRA: personaje · lado · expresión]` | El personaje entra en escena (o se mueve) en una de tres posiciones: izquierda, centro o derecha. Se queda hasta que sale. La expresión es un id de su hoja de expresiones ([Personajes](#4-personajes-trasfondos-y-expresiones)). Mientras habla queda iluminado y los demás, atenuados; su cara aparece en el cuadro. |
+| `[SALE: personaje]` | El personaje sale de escena. `[SALE: todos]` vacía el escenario (cambio de escena o tarjeta). |
+| `[RETRATO: personaje · expresión · lado]` | Cambio de expresión de alguien que ya está en escena; en una conversación normal, el retrato del cuadro. |
+| `[EFECTO: temblor · temblor_fuerte · destello]` | Efecto de cinemática en esa línea. Los fondos y CG pueden llevar movimiento lento (acercar o desplazar); al cambiar de fondo hay un fundido cruzado. Con movimiento reducido no se aplican. |
 | `[MÚSICA: pieza]` / `[SONIDO: efecto]` | Pistas del documento de diseño o efectos del banco actual (`campana`, `naipe`, `paso`, `puerta`, `quiebra`, `sello`, `interfaz`). Los nuevos se marcan con *(nuevo)*. |
 | `[ACCIÓN: …]` | Lo que ocurre en pantalla: movimientos, gestos, temblores, fundidos. |
 | `[TRANSICIÓN: …]` | Paso entre escenas: fundido a negro, barrido de humo o corte. |
@@ -347,8 +350,8 @@ Calculado a unas 220 palabras por minuto. Hay una elección o reacción cada 1 o
 > No le quedaba ninguna.
 
 `[ADV]`
-`[RETRATO: Dueño · neutral · derecha]`
-`[RETRATO: Ignacio · desesperado · izquierda]`
+`[ENTRA: Dueño · derecha · neutral]`
+`[ENTRA: Ignacio · izquierda · desesperado]`
 
 **Dueño de la Casa:** «Setecientos veinte. Te faltan treinta, maestro Ferrer. Y ya no te quedan campanadas.»
 
@@ -373,6 +376,7 @@ Calculado a unas 220 palabras por minuto. Hay una elección o reacción cada 1 o
 **Dueño de la Casa:** «Todos lo saben.» *(pausa)* «Acepto. Una mano.»
 
 `[SONIDO: campana, deformada, más grave que las demás]`
+`[EFECTO: temblor]`
 `[ACCIÓN: el reparto deja sobre el tapete una Llave de 2 y un Reloj de 7, que vale 6. Ocho.]`
 
 **Ignacio:** «Ocho. Pido.»
@@ -396,11 +400,14 @@ Calculado a unas 220 palabras por minuto. Hay una elección o reacción cada 1 o
 > Luego también los cerró.
 
 `[SONIDO: quiebra; después, porcelana que cruje]` *(nuevo: «porcelana»)*
+`[EFECTO: destello · temblor_fuerte]`
+`[SALE: Ignacio]`
 `[ADV]`
 
 **Dueño de la Casa:** «Otra cara para la baraja.»
 
 `[ACCIÓN: donde estaba Ignacio solo queda la silla vacía. Sobre el tapete, una Máscara nueva con su rostro. El Dueño la recoge y la pasa entre los dedos. Detrás de él, en la oscuridad, la anfitriona aparece un instante, inmóvil, con una pluma en la mano.]`
+`[ENTRA: anfitriona · izquierda · seria]`
 
 **Dueño de la Casa:** «Anfitriona. La garantía.»
 
@@ -411,6 +418,8 @@ Calculado a unas 220 palabras por minuto. Hay una elección o reacción cada 1 o
 `[TRANSICIÓN: la franja de luz de la verja se cierra como un párpado. Negro.]`
 
 ### P1 · Tarjeta de capítulo
+
+`[SALE: todos]`
 
 `[FONDO: negro_con_grabado]`
 
@@ -518,7 +527,7 @@ Calculado a unas 220 palabras por minuto. Hay una elección o reacción cada 1 o
 
 `[ACCIÓN: bajo la farola, el farolero apoya su pértiga. Tiene los ojos blancos. No se gira, pero habla.]`
 `[ADV]`
-`[RETRATO: farolero · neutral · derecha]`
+`[ENTRA: farolero · derecha · neutral]`
 
 **Farolero:** «Esa ficha suena, muchacho. Desde aquí la oigo. Suena como sonaba la mía.»
 
@@ -536,6 +545,7 @@ Calculado a unas 220 palabras por minuto. Hay una elección o reacción cada 1 o
   > **Farolero:** «Tiempo es justo lo que vas a entregar. Año a año.» *(pausa)* «Buenas noches, entonces. No volveremos a hablar.»
 
 `[ACCIÓN: el farolero levanta la pértiga y enciende una farola más adelante, en un lugar donde un momento antes no había ninguna. Luego otra. Y otra. Forman un camino. Cuando el protagonista mira atrás, la primera farola ya está apagada y el farolero ya no está.]`
+`[SALE: farolero]`
 
 `[NVL]`
 
@@ -1732,4 +1742,5 @@ Para cuando el equipo elija pasar del guion al juego:
 | **1** | 23 nov 2026 | Primera propuesta (mezcla de las ideas B y A): apertura con Ignacio, taller, invitación, anfitriona, jefes con preguntas de lore y reacciones en partida. |
 | **2** | 23 nov 2026 | Más sombría: Ignacio vende a su aprendiz como garantía, cada campanada es un año, las Máscaras siguen conscientes, el vestíbulo se vuelve porcelana, la repetición de la noche y la Máscara de Ignacio en la vitrina. |
 | **3** | 24 nov 2026 | Klein Moretti. Ilustraciones en documento aparte. Trasfondos oscuros, el tiempo que deforma a la gente, eventos de novela visual por sello y ruta, decisiones morales y dos finales. |
+| **4.1** | 25 nov 2026 | Marcas de escena para las cinemáticas: `[ENTRA]`, `[SALE]` y `[EFECTO]`; la narración `[NVL]` avanza párrafo a párrafo sobre la ilustración. Aplicadas en P0 y P4 y en el juego (I5-10). |
 | **4** | 24 nov 2026 | Las fichas del Dueño en el final A (joven, robado o viejo), el final C por no entregar la invitación, la puerta del vestíbulo que se cierra al entregarla, humor ligero, ecos concretos de la repetición, nuevo diseño victoriano de Klein y una revisión completa de coherencia. |

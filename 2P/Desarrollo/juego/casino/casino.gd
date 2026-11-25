@@ -13,21 +13,49 @@ const DialogoNovela := preload("res://casino/dialogos/dialogo_novela.gd")
 const MenuCasino := preload("res://casino/interfaz/menus/menu_casino.gd")
 const VistaBaraja := preload("res://casino/interfaz/baraja/vista_baraja.gd")
 const ANFITRIONA: Conversacion = preload("res://datos/dialogos/anfitriona.tres")
-const BASE := Vector2(1440,810)
-const DIALOGOS := {
-	"custodio": "He guardado la primera silla para ti. Escucha lo que calla la Máscara antes de pedir otra carta.",
-	"recaudador": "Quince fichas de cortesía. Cada carta que pidas después del reparto cuesta una. Hasta el azar lleva cuentas.",
-	"coleccionista": "Quédate con los puntos. Yo conservaré la carta más alta de cada mano, incluso si te pasas.",
-	"dueno": "¿Ya distingues el alba tras la verja? Empiezas en veinticinco. Cada mano que cierres sin pasarte me devuelve un paso, hasta diecisiete."
+## I5-10: el prólogo y las conversaciones de los crupieres son datos del guion v4.
+const PROLOGO: Conversacion = preload("res://datos/dialogos/prologo.tres")
+const LLEGADA: Conversacion = preload("res://datos/dialogos/llegada_vestibulo.tres")
+const Cinematica := preload("res://casino/dialogos/cinematica.gd")
+const CRUPIERES := {
+	"custodio": preload("res://datos/dialogos/custodio.tres"),
+	"recaudador": preload("res://datos/dialogos/recaudador.tres"),
+	"coleccionista": preload("res://datos/dialogos/coleccionista.tres"),
+	"dueno": preload("res://datos/dialogos/dueno.tres"),
 }
+## Nombre del protagonista hasta que el jugador pueda elegirlo.
+const PROTAGONISTA := {"nombre": "Klein", "apellido": "Moretti"}
+const BASE := Vector2(1440,810)
+## Notas examinables del guion v4 (sección 11): título y texto base de cada sala.
 const NOTAS := {
-	"entrada": ["La farola", "Bajo la luz hay una invitación pisoteada con tu nombre. La tuya sigue lacrada en el bolsillo."],
+	"entrada": ["La farola", "Una farola encendida en una calle que ya no existe. No da calor. No da sombra."],
 	"vestibulo": ["El reloj detenido", "Todas las agujas señalan la hora a la que llegaste. Bajo el cristal alguien grabó tres ranuras del tamaño de un sello."],
-	"tienda": ["La vitrina de humo", "La lámpara atraviesa la lente y dibuja dos rostros en el terciopelo. Uno desaparece cuando la luz toca el cristal."],
-	"custodio": ["El péndulo", "Hay diez muescas en la caja. El péndulo solo avanza cuando alguien empieza una mano."],
-	"recaudador": ["El libro mayor", "Las primeras dos cartas de cada mano figuran como cortesía. Junto a cada petición posterior aparece una ficha de tinta roja."],
-	"coleccionista": ["El expositor", "Las piezas más valiosas ocupan el estante superior. En caso de empate, la etiqueta lleva la fecha de la última adquisición."],
-	"dueno": ["La inscripción", "El sol está tallado en el suelo, pero la luz que pasa bajo el portón es real."]
+	"tienda": ["La vitrina de humo", "La lámpara atraviesa la lente y dibuja dos rostros en el terciopelo. Uno desaparece cuando la luz toca el cristal. El otro sigue mirándote cuando apagas la lámpara."],
+	"custodio": ["El péndulo", "Hay diez muescas en la caja. El péndulo solo avanza cuando alguien empieza una mano. Bajo cada muesca hay un nombre rayado."],
+	"recaudador": ["El libro mayor", "Las primeras dos cartas de cada mano figuran como cortesía. Junto a cada petición posterior aparece una ficha de tinta roja. Una página tiene tu nombre en el encabezado y, debajo, otro nombre tachado."],
+	"coleccionista": ["El expositor", "Las piezas más valiosas ocupan el estante superior. En caso de empate, la etiqueta lleva la fecha de la última adquisición. Hay una vitrina vacía, limpia, con una etiqueta en blanco."],
+	"dueno": ["La inscripción", "El sol está tallado en el suelo, pero la luz que pasa bajo el portón es real. Alrededor del sol hay arañazos. Alguien intentó arrastrarse hasta él."]
+}
+## Variantes del guion: la farola según lo que se habló con el farolero en el prólogo, y el
+## reloj del vestíbulo cuando ya tiene sellos ({n}).
+const NOTAS_VARIANTES := {
+	"entrada_escucho": "La farola del farolero sigue encendida. Bajo su luz, en el empedrado, alguien grabó con una uña: «levántate a tiempo».",
+	"entrada_ignacio": "Bajo la luz hay un reloj de bolsillo aplastado, adelantado tres minutos. En la tapa: I. F. Dentro, un retrato tuyo de niño.",
+	"vestibulo_sellos": "Hay {n} sellos en las ranuras. Si acercas el oído, oyes un tic cada mucho tiempo. Cada tic suena como un hueso.",
+}
+## Ilustración de cada nota (I5-10), descrita en ILUSTRACIONES_PENDIENTES.md. Hasta que exista
+## `historia/ilustraciones/<id>.webp`, la escena la muestra como ilustración pendiente.
+const ILUSTRACIONES_NOTAS := {
+	"nota_entrada": "La farola encendida sobre el empedrado vacío, sin calle alrededor: solo niebla y un halo que no proyecta sombra.",
+	"nota_entrada_escucho": "El empedrado bajo la farola, con unas palabras grabadas a uña en la piedra.",
+	"nota_entrada_ignacio": "Un reloj de bolsillo aplastado bajo la farola, con la tapa abierta: las iniciales I. F. y, dentro, el retrato de un niño.",
+	"nota_vestibulo": "La esfera del reloj del vestíbulo de cerca: todas las agujas en la misma hora y tres ranuras vacías bajo el cristal.",
+	"nota_vestibulo_sellos": "La misma esfera con sellos encajados en las ranuras; el segundero tiembla, a punto de moverse.",
+	"nota_tienda": "La lente de humo bajo la lámpara: dos rostros proyectados en el terciopelo; uno se desvanece y el otro mira al espectador.",
+	"nota_custodio": "La caja del péndulo del Custodio con diez muescas y, bajo cada una, un nombre rayado.",
+	"nota_recaudador": "Una página del libro mayor: dos líneas de cortesía, fichas de tinta roja y un encabezado con un nombre tachado debajo de otro.",
+	"nota_coleccionista": "El estante superior del expositor con sus etiquetas fechadas y, al lado, una vitrina vacía y limpia con la etiqueta en blanco.",
+	"nota_dueno": "El sol tallado en el mármol negro, rodeado de arañazos como de uñas, y la línea de luz real bajo el portón.",
 }
 
 var campana := CampanaCasino.new()
@@ -49,6 +77,13 @@ var audio := AudioCasino.new()
 var indicador_objetivo := IndicadorObjetivo.new()
 var vitrina := VitrinaGabinete.new()
 var dialogo := DialogoNovela.new()
+## Escena de cinemática (prólogo, llegada al vestíbulo): pantalla completa con fundidos.
+var cinematica := Cinematica.new()
+## Su diálogo; solo se deja con «Saltar».
+var historia: Control:
+	get: return cinematica.dialogo
+## Lo que sigue al terminar la cinemática en curso.
+var _tras_cinematica := Callable()
 var menu := MenuCasino.new()
 var vista_baraja := VistaBaraja.new()
 ## Control enfocado antes de abrir «Ver baraja»; se devuelve al cerrarla.
@@ -100,12 +135,19 @@ func _ready() -> void:
 	pagina.add_child(dialogo)
 	dialogo.solicitud.connect(_solicitud)
 	dialogo.cerrado.connect(_cerrar)
+	dialogo.formatear = _formatear
+	dialogo.sonido.connect(_sonar)
 	velo.size = BASE
 	velo.color = Color(0.015,0.035,0.026,0.66)
 	pagina.add_child(velo)
 	pagina.add_child(libro)
 	pagina.add_child(vitrina)
 	vitrina.cerrada.connect(_cerrar)
+	pagina.add_child(cinematica)
+	historia.formatear = _formatear
+	cinematica.solicitud.connect(_solicitud)
+	cinematica.sonido.connect(_sonar)
+	cinematica.terminada.connect(_fin_cinematica)
 	vitrina.compra_realizada.connect(func(_id: String) -> void:
 		audio.reproducir(&"interfaz")
 		_refrescar())
@@ -126,6 +168,8 @@ func _ready() -> void:
 	menu.volver_al_inicio.connect(volver_al_inicio)
 	menu.salir.connect(func() -> void: get_tree().quit())
 	menu.movimiento_cambiado.connect(_cambiar_movimiento)
+	menu.lectura_cambiada.connect(_configurar_lectura)
+	_configurar_lectura()
 	menu.ver_baraja.connect(ver_baraja)
 	add_child(vista_baraja)
 	vista_baraja.cerrada.connect(_baraja_cerrada)
@@ -210,6 +254,8 @@ func _entrar_desde_menu() -> void:
 		PartidaGuardada.borrar()
 		_intento_en_blanco()
 	_reanudar()
+	if guardado_activo:
+		iniciar_prologo()
 
 func _continuar_desde_menu() -> void:
 	continuar()
@@ -255,7 +301,7 @@ func _cambiar_movimiento(reducido: bool) -> void:
 	_refrescar()
 
 func _actualizar_objetivo() -> void:
-	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not dialogo.visible and not menu.visible and not vista_baraja.visible and not is_instance_valid(mesa)
+	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not dialogo.visible and not cinematica.activa and not menu.visible and not vista_baraja.visible and not is_instance_valid(mesa)
 	indicador_objetivo.presentar(campana.objetivo(), mostrar)
 
 func _adaptar() -> void:
@@ -270,13 +316,16 @@ func entrar(destino: String, origen := "") -> void:
 	var nota: String = NOTAS.get(sala, [""])[0]
 	visitante.position = exploracion.montar(sala, origen, campana, nota)
 	_refrescar()
+	# P6: la primera vez que se pisa el vestíbulo, una cinemática lleva a la anfitriona.
+	if sala == "vestibulo" and guardado_activo and campana.cumple("no:historia:vio_vestibulo"):
+		reproducir_cinematica.call_deferred(LLEGADA, _recepcion)
 
 func cercano() -> Dictionary:
 	return exploracion.cercano(visitante.position)
 
 func _process(_delta: float) -> void:
 	_actualizar_objetivo()
-	if libro.visible or vitrina.visible or dialogo.visible or menu.visible or is_instance_valid(mesa): return
+	if libro.visible or vitrina.visible or dialogo.visible or cinematica.activa or menu.visible or is_instance_valid(mesa): return
 	var elegido := cercano()
 	exploracion.marcar(elegido)
 	pista.text = _pista(elegido)
@@ -296,7 +345,7 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		pausar()
 		get_viewport().set_input_as_handled()
 		return
-	if is_instance_valid(mesa) or vitrina.visible or dialogo.visible: return
+	if is_instance_valid(mesa) or vitrina.visible or dialogo.visible or cinematica.activa: return
 	if libro.visible:
 		if evento.keycode == KEY_ESCAPE or (evento.keycode == KEY_I and libro.cierre == _cerrar):
 			if libro.cierre.is_valid(): libro.cierre.call()
@@ -315,7 +364,7 @@ func interactuar(p: Dictionary) -> void:
 	match p.tipo:
 		"anfitriona": _recepcion()
 		"tienda": tienda()
-		"nota": _aviso(NOTAS[sala][0],NOTAS[sala][1])
+		"nota": examinar()
 		"mesa": _presentar_jefe()
 		"salida":
 			if campana.superadas == 4:
@@ -324,7 +373,9 @@ func interactuar(p: Dictionary) -> void:
 				libro.opcion("Comenzar otro viaje",_nuevo_intento)
 			else: _aviso("La verja del alba","Falta vencer al Dueño de la Casa.")
 		"puerta":
-			if campana.puerta_abierta(p.destino):
+			if p.destino == "entrada" and campana.recibida:
+				_aviso("La puerta de la calle", "Donde estaba la puerta solo queda su contorno grabado en el mármol. No hay picaporte.")
+			elif campana.puerta_abierta(p.destino):
 				audio.reproducir(&"puerta")
 				entrar(p.destino,sala)
 			else:
@@ -333,7 +384,9 @@ func interactuar(p: Dictionary) -> void:
 ## Conversación con la anfitriona en la escena de diálogos (I4-06); sus líneas son datos.
 func _recepcion() -> void:
 	visitante.bloqueado = true
-	if not dialogo.abrir(ANFITRIONA, campana.cumple, AjustesJuego.movimiento_reducido(), _describir_opcion):
+	if dialogo.visible or cinematica.activa:
+		return
+	if not dialogo.abrir(ANFITRIONA, _condicion, AjustesJuego.movimiento_reducido(), _describir_opcion):
 		visitante.bloqueado = false
 	_actualizar_objetivo()
 
@@ -349,24 +402,111 @@ func _describir_opcion(opcion: Dictionary) -> Dictionary:
 
 ## Una elección del diálogo pide un cambio; la campaña comprueba si corresponde.
 func _solicitud(id: String) -> void:
+	if id == "tomar_asiento":
+		_jugar()
+		return
 	if campana.atender(id):
-		audio.reproducir(&"sello")
+		if not id.begins_with("historia:"):
+			audio.reproducir(&"sello")
 		_refrescar()
+
+## Condiciones de los diálogos: las de la campaña y «mesa_superada» para el crupier de la sala.
+func _condicion(condicion: String) -> bool:
+	if condicion == "mesa_superada":
+		return CampanaCasino.MESAS.find(sala) < campana.superadas
+	return campana.cumple(condicion)
+
+## Marcas del guion: el nombre del protagonista y las cifras de la mesa de la sala.
+func _formatear(texto: String) -> String:
+	var marcas := PROTAGONISTA.duplicate()
+	# La anfitriona saluda según el tono de la primera respuesta (guion 7.3).
+	var tono := str(campana.historia.get("tono", ""))
+	marcas["saludo"] = str(ANFITRIONA.intervencion("saludo_" + tono).get("texto", "")) if not tono.is_empty() else ""
+	var regla: ReglaMesa = CampanaCasino.MESAS_CAMPANA.de(sala) if CampanaCasino.MESAS.has(sala) else null
+	if regla != null:
+		marcas.merge({"umbral": regla.umbral, "meta": regla.meta, "campanadas": regla.campanadas})
+	return texto.format(marcas)
+
+## Ajustes de lectura de Opciones para las conversaciones y las cinemáticas.
+func _configurar_lectura() -> void:
+	var ajustes := AjustesJuego.ajustes_dialogo()
+	dialogo.configurar(ajustes)
+	historia.configurar(ajustes)
+
+func _sonar(id: String) -> void:
+	audio.reproducir(StringName(id))
+
+## Examinar una nota: escena de novela visual con la ilustración del objeto y su descripción.
+func examinar() -> void:
+	if not NOTAS.has(sala):
+		return
+	var variante := ""
+	match sala:
+		"entrada":
+			match str(campana.historia.get("farolero", "")):
+				"escucho": variante = "entrada_escucho"
+				"pregunto_ignacio": variante = "entrada_ignacio"
+		"vestibulo":
+			if campana.superadas > 0: variante = "vestibulo_sellos"
+	var texto: String = NOTAS[sala][1] if variante.is_empty() else str(NOTAS_VARIANTES[variante]).format({"n": mini(campana.superadas, 3)})
+	reproducir_cinematica(conversacion_nota("nota_" + (sala if variante.is_empty() else variante), NOTAS[sala][0], texto))
+
+static func conversacion_nota(fondo: String, titulo: String, texto: String) -> Conversacion:
+	var datos := Conversacion.new()
+	datos.personajes = {"narrador": {"nombre": ""}}
+	datos.fondos = {fondo: {"ruta": "res://historia/ilustraciones/%s.webp" % fondo, "movimiento": "acercar", "descripcion": str(ILUSTRACIONES_NOTAS.get(fondo, titulo))}}
+	datos.entradas = [{"ir": "nota"}]
+	datos.intervenciones = {"nota": {"personaje": "narrador", "modo": "nvl", "fondo": fondo, "texto": "%s\n%s" % [titulo, texto]}}
+	return datos
+
+## Prólogo de novela visual antes de la entrada (I5-10). Al terminar o saltarlo, el jugador
+## aparece frente a la fachada con el control.
+func iniciar_prologo() -> void:
+	reproducir_cinematica(PROLOGO)
+
+## Abre una cinemática a pantalla completa; al terminar, vuelve la exploración y se llama a
+## `despues` (por ejemplo, la conversación que la continúa).
+func reproducir_cinematica(conversacion: Conversacion, despues := Callable()) -> void:
+	if cinematica.activa:
+		return
+	_cerrar()
+	visitante.bloqueado = true
+	_tras_cinematica = despues
+	if not cinematica.reproducir(conversacion, _condicion, AjustesJuego.movimiento_reducido()):
+		visitante.bloqueado = false
+	_actualizar_objetivo()
+
+func _fin_cinematica(_completa: bool) -> void:
+	_cerrar()
+	var despues := _tras_cinematica
+	_tras_cinematica = Callable()
+	if despues.is_valid():
+		despues.call()
 
 ## Atajo de las pruebas y capturas: la misma solicitud que «Entregar la invitación».
 func _entregar() -> void:
 	_solicitud("entregar_invitacion")
 
+## Presentación del crupier en la escena de novela visual (I5-10): sus líneas del guion, las
+## tres cifras de la mesa encima del cuadro y «Tomar asiento», «Preguntar…» o «Volver».
+## Tras vencerlo, la revisita y sus preguntas.
 func _presentar_jefe() -> void:
-	var nivel := CampanaCasino.MESAS.find(sala)
-	var foto := "res://recursos/arte/custodio-grabado.png" if nivel == 0 else "res://casino/arte/personaje_%s.webp" % sala
-	if nivel < campana.superadas:
-		_aviso(CampanaCasino.NOMBRES[sala],"La mesa se ha cerrado. La casa recuerda tu victoria.",foto)
+	if dialogo.visible:
 		return
-	_abrir(CampanaCasino.NOMBRES[sala],"«%s»" % DIALOGOS[sala],foto,_cerrar)
-	libro.lista.add_child(CifrasMesa.new(CampanaCasino.MESAS_CAMPANA.de(sala)))
-	libro.opcion("Tomar asiento",_jugar)
-	libro.opcion("Volver a la sala",_cerrar)
+	visitante.bloqueado = true
+	if not dialogo.abrir(CRUPIERES[sala], _condicion, AjustesJuego.movimiento_reducido()):
+		visitante.bloqueado = false
+		return
+	if not _condicion("mesa_superada"):
+		dialogo.poner_anexo(CifrasMesa.new(CampanaCasino.MESAS_CAMPANA.de(sala)))
+	_actualizar_objetivo()
+
+## Línea del crupier de la sala para la victoria o la derrota, o vacío.
+func _linea_crupier(id: String) -> String:
+	var conversacion: Conversacion = CRUPIERES.get(sala)
+	if conversacion == null:
+		return ""
+	return _formatear(str(conversacion.intervencion(id).get("texto", "")))
 
 func _jugar() -> void:
 	guardar() # Si el juego se cierra en la mesa, se continúa frente al crupier.
@@ -391,14 +531,17 @@ func _levantarse(victoria: bool, exactos: int) -> void:
 	_refrescar()
 	if victoria:
 		var ruta := "Dirígete al portón del norte." if campana.superadas == 4 else "La siguiente sala está abierta."
+		var dicho := _linea_crupier("victoria")
+		dicho = dicho + "\n\n" if not dicho.is_empty() else ""
 		if campana.hay_recompensa():
-			_ofrecer_recompensa(premio, ruta)
+			_ofrecer_recompensa(premio, dicho + ruta)
 		else:
-			_aviso("Mesa superada","La casa entrega %s fichas. %s" % [premio,ruta])
+			_aviso("Mesa superada","%sLa casa entrega %s fichas. %s" % [dicho,premio,ruta])
 	else:
 		if guardado_activo:
 			PartidaGuardada.borrar()
-		_abrir("La casa gana","La última campanada se apaga. Tu siguiente invitación abrirá un intento nuevo.","",Callable())
+		var dicho := _linea_crupier("derrota")
+		_abrir("La casa gana",(dicho + "\n\n" if not dicho.is_empty() else "") + "La última campanada se apaga. Tu siguiente invitación abrirá un intento nuevo.","",Callable())
 		libro.opcion("Volver al vestíbulo",_nuevo_intento)
 
 func _ofrecer_recompensa(premio: int, ruta: String) -> void:
@@ -454,9 +597,11 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 func _cerrar() -> void:
 	vitrina.hide()
 	dialogo.hide()
+	dialogo.poner_anexo(null)
 	libro.hide()
 	velo.hide()
-	visitante.bloqueado = false
+	# Al tomar asiento desde el diálogo, este se cierra con la mesa ya abierta.
+	visitante.bloqueado = is_instance_valid(mesa) or cinematica.activa
 	_refrescar()
 
 func _refrescar() -> void:
@@ -505,8 +650,8 @@ func datos_baraja() -> Dictionary:
 		if ajuste != 0: notas.append("AJUSTE %+d" % ajuste)
 		cartas.append({
 			"palo": carta.definicion.palo, "oculta": oculta,
-			"valor": null if oculta else carta.definicion.valor_impreso,
-			"valor_efectivo": null if oculta else carta.valor_efectivo(),
+			"valor": null if oculta else carta.definicion.valor_impreso as Variant,
+			"valor_efectivo": null if oculta else carta.valor_efectivo() as Variant,
 			"rasgo": "" if oculta else carta.definicion.rasgo, "nota": " · ".join(notas),
 			"ganada": campana.ganadas.has(id), "ajuste": ajuste,
 		})

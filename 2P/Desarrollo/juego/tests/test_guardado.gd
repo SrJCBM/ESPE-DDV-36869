@@ -202,7 +202,7 @@ func test_una_recompensa_pendiente_se_vuelve_a_ofrecer() -> void:
 func test_sin_partida_el_inicio_ofrece_entrar() -> void:
 	var juego = _casino()
 	juego.abrir_inicio()
-	assert_eq(_textos(juego), ["Entrar al casino", "Cómo jugar", "Opciones", "Salir"])
+	assert_eq(_textos(juego), ["Entrar al casino", "Cómo jugar", "Opciones", "Créditos", "Salir"])
 
 func test_con_partida_el_inicio_ofrece_continuar_y_nueva_partida() -> void:
 	var juego = _casino()
@@ -211,7 +211,7 @@ func test_con_partida_el_inicio_ofrece_continuar_y_nueva_partida() -> void:
 	juego._refrescar()
 	var otro = _casino()
 	otro.abrir_inicio()
-	assert_eq(_textos(otro), ["Continuar", "Nueva partida", "Cómo jugar", "Opciones", "Salir"])
+	assert_eq(_textos(otro), ["Continuar", "Nueva partida", "Cómo jugar", "Opciones", "Créditos", "Salir"])
 	assert_eq(otro.get_viewport().gui_get_focus_owner(), otro.menu.botones[0], "Continuar viene enfocado")
 	otro.menu.botones[0].pressed.emit()
 	assert_false(otro.menu.visible)

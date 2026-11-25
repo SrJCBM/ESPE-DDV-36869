@@ -40,9 +40,9 @@ const MUEBLES := {
 	},
 	"recaudador": {
 		"pared_norte_oeste": Rect2(87, 178, 160, 30),
-		"pared_norte_centro": Rect2(524, 178, 44, 30),
-		"balanza": Rect2(568, 178, 146, 57),
-		"pared_norte_este": Rect2(714, 178, 89, 30),
+		"pared_norte_centro": Rect2(524, 178, 44, 22),
+		"balanza": Rect2(568, 178, 146, 72),
+		"pared_norte_este": Rect2(714, 178, 89, 22),
 		"pared_norte_fondo": Rect2(1049, 178, 144, 30),
 		"mesa": Rect2(432, 298, 410, 167),
 		"silla_crupier": Rect2(600, 240, 84, 70),

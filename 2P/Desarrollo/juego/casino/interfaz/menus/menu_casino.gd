@@ -9,6 +9,8 @@ signal reanudar
 signal volver_al_inicio
 signal salir
 signal movimiento_cambiado(reducido: bool)
+## Cambió un ajuste de lectura de las conversaciones (I5-10).
+signal lectura_cambiada
 signal ver_baraja
 
 const Libro := preload("res://casino/interfaz/libro.gd")
@@ -16,6 +18,12 @@ const PanelOpciones := preload("res://casino/interfaz/menus/panel_opciones.gd")
 const FONDO_INICIO := preload("res://casino/arte/vestibulo.webp")
 const BASE := Vector2(1440, 810)
 const MUTED := Color("b9ad91")
+## Créditos (I5-10): el equipo y su parte, como en la exposición.
+const CREDITOS := [
+	["Julio", "Concepto, diseño visual y balance"],
+	["Ariel", "Cartas, mecánicas, objetos y personajes"],
+	["Kenned", "Programación, navegación, experiencia de usuario y narrativa"],
+]
 const COMO_JUGAR := "Recorre el casino con WASD o las flechas y pulsa E para hablar, entrar o examinar. La anfitriona te entrega la baraja, diez fichas y un objeto a elegir.\n\nVence al Custodio, al Recaudador y a la Coleccionista para reunir tres sellos; cada sello abre la puerta del pasillo siguiente y el tercero, la del Dueño. La tienda está junto al Recaudador.\n\nEn la mesa, pide cartas sin pasarte del umbral y plántate para sumar puntos. Cada mano nueva gasta una campanada.\n\nAtajos: I pertenencias · H reglas de la mesa · V sonido · Esc pausa."
 
 var audio: AudioCasino
@@ -65,6 +73,8 @@ func _ready() -> void:
 	_lienzo.add_child(_panel)
 	_contenido.add_theme_constant_override("separation", 10)
 	_panel.add_child(_contenido)
+	# Si una etiqueta o un botón cambia de tamaño después de abrir, el marco vuelve a medirse.
+	_contenido.minimum_size_changed.connect(_ajustar_marco)
 	resized.connect(_adaptar)
 	_adaptar()
 	hide()
@@ -100,6 +110,7 @@ func abrir(nombre: String) -> void:
 				_boton("Entrar al casino", entrar.emit)
 			_boton("Cómo jugar", abrir.bind("como_jugar"))
 			_boton("Opciones", abrir.bind("opciones"))
+			_boton("Créditos", abrir.bind("creditos"))
 			_boton("Salir", salir.emit)
 		"pausa":
 			_marco(Rect2(470, 200, 500, 410))
@@ -111,15 +122,27 @@ func abrir(nombre: String) -> void:
 			_boton("Opciones", abrir.bind("opciones"))
 			_boton("Volver al inicio", _pedir_inicio)
 		"opciones":
-			_marco(Rect2(370, 170, 700, 470))
+			_marco(Rect2(200, 150, 1040, 500))
 			_titulo("Opciones", 40)
 			var opciones := PanelOpciones.new()
 			_contenido.add_child(opciones)
 			opciones.construir(audio)
 			opciones.movimiento_cambiado.connect(movimiento_cambiado.emit)
+			opciones.lectura_cambiada.connect(lectura_cambiada.emit)
 			_separador()
 			_boton("Volver", abrir.bind(_raiz))
 			opciones.movimiento.grab_focus()
+		"creditos":
+			_marco(Rect2(370, 150, 700, 500))
+			_titulo("Créditos", 40)
+			_nota("La Última Mesa · Desarrollo de Videojuegos · ESPE")
+			_separador()
+			for persona: Array in CREDITOS:
+				_contenido.add_child(Libro.rotulo(persona[0], 30, Libro.PAPEL, true))
+				_contenido.add_child(Libro.rotulo(persona[1], 17, MUTED))
+			_separador()
+			_nota("Hecho con Godot 4.7 y GUT. Letras: Cormorant Garamond y DM Sans.")
+			_boton("Volver", abrir.bind(_raiz))
 		"como_jugar":
 			_marco(Rect2(300, 110, 840, 590))
 			_titulo("Cómo jugar", 40)

@@ -24,9 +24,16 @@ func _tecla(juego, codigo: Key) -> void:
 
 ## Abre la conversación y llega a la oferta con sus botones listos.
 func _abrir_oferta(juego) -> void:
+	juego.campana.historia = {"vio_vestibulo": "si", "tono": "cortes"}
 	juego._recepcion()
 	juego.dialogo.completar()
 	juego.dialogo.elegir(0)
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	juego.dialogo.completar()
+	juego.dialogo.elegir(2)
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
 	juego.dialogo.completar()
 	assert_eq(juego.dialogo.actual, "oferta")
 
@@ -38,7 +45,7 @@ func _vencer_al_custodio(juego) -> void:
 	juego.entrar("pasillo_custodio", "vestibulo")
 	juego.entrar("custodio", "pasillo_custodio")
 	juego._presentar_jefe()
-	juego.libro.primero.pressed.emit()
+	juego._solicitud("tomar_asiento")
 	var m: ControladorMesa = juego.mesa.controlador
 	m.partida.meta = 1
 	_cartas(m, ["llaves", "velas"], [2, 3])
@@ -60,7 +67,7 @@ func test_cada_opcion_entrega_baraja_fichas_y_solo_ese_objeto(indice = use_param
 	var id: String = OFERTA[indice]
 	assert_eq(c.lentes, 1 if id == "lente" else 0)
 	assert_eq(c.amuletos, ([] if id == "lente" else [id]) as Array[String])
-	assert_eq(juego.dialogo.actual, "entrega")
+	assert_true(juego.dialogo.actual.begins_with("entrega_"), "Una línea propia de cada objeto")
 	var inventario: String = juego._texto_inventario()[1]
 	assert_string_contains(inventario, "10 fichas")
 	for otro: String in ["prudente", "moneda"]:
@@ -148,7 +155,7 @@ func test_elegir_la_carta_la_suma_y_sale_en_la_siguiente_mesa() -> void:
 	juego.entrar("recaudador", "pasillo_recaudador")
 	assert_eq(juego.sala, "recaudador")
 	juego._presentar_jefe()
-	juego.libro.primero.pressed.emit()
+	juego._solicitud("tomar_asiento")
 	var m: ControladorMesa = juego.mesa.controlador
 	assert_true(m.partida.mazo.has(ganada), "La carta ganada entra en el mazo de la siguiente mesa")
 	assert_eq(m.partida.mazo.size(), 25)

@@ -3,6 +3,9 @@ extends RefCounted
 
 const Galeria := preload("res://casino/exploracion/galeria.gd")
 const EntradaCasino := preload("res://casino/exploracion/entrada_casino.gd")
+const PuertaVestibulo := preload("res://casino/exploracion/puerta_vestibulo.gd")
+## Puerta este del vestíbulo, hacia el pasillo del Custodio.
+const PUERTA_ESTE_VESTIBULO := Vector2(1150, 356)
 const Libro := preload("res://casino/interfaz/libro.gd")
 
 var puntos: Array[Dictionary] = []
@@ -37,21 +40,32 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 		_decorado.add_child(EntradaCasino.new())
 		_punto("puerta", Vector2(640, 350), "Entrar al casino", "vestibulo")
 		_punto("nota", Vector2(300, 600), "Examinar la farola")
-		entrada = Vector2(640, 593)
+		entrada = Vector2(640, 430) if origen == "vestibulo" else Vector2(640, 593)
 	else:
 		var arte := Sprite2D.new()
 		arte.texture = load("res://casino/arte/%s.webp" % sala)
 		arte.centered = false
 		arte.scale = Vector2(1280, 720) / arte.texture.get_size()
 		_decorado.add_child(arte)
-		_agregar_interacciones(sala, nombre_nota)
+		_agregar_interacciones(sala, nombre_nota, campana)
 		entrada = Vector2(640, 550 if sala == "vestibulo" else 593)
+		if sala == "vestibulo" and PlanoGaleria.es_pasillo(origen):
+			entrada = PUERTA_ESTE_VESTIBULO - Vector2(70, 0)
 	PlanoSalas.construir(sala, _decorado)
 	return entrada
 
-func _agregar_interacciones(sala: String, nombre_nota: String) -> void:
+func _agregar_interacciones(sala: String, nombre_nota: String, campana: CampanaCasino) -> void:
 	var pasillo: String = PlanoGaleria.PADRE[sala]
-	_punto("puerta", Vector2(640, 651), "Salir · %s" % CampanaCasino.NOMBRES[pasillo], pasillo)
+	if sala == "vestibulo":
+		# Se llega por la puerta de la calle y se sigue hacia delante, por la puerta del este.
+		var puerta := PuertaVestibulo.new()
+		puerta.abierta = campana.puerta_abierta(pasillo)
+		_decorado.add_child(puerta)
+		var accion := "Salir · %s" % CampanaCasino.NOMBRES[pasillo] if puerta.abierta else PlanoGaleria.requisito(pasillo)
+		_punto("puerta", PUERTA_ESTE_VESTIBULO, accion, pasillo)
+		_punto("puerta", Vector2(640, 651), "Volver a la calle" if not campana.recibida else "La puerta se ha cerrado", "entrada")
+	else:
+		_punto("puerta", Vector2(640, 651), "Salir · %s" % CampanaCasino.NOMBRES[pasillo], pasillo)
 	match sala:
 		"vestibulo":
 			_figura("anfitriona", Vector2(990, 231), 84)

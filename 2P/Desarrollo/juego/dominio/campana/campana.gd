@@ -30,6 +30,9 @@ var ganadas := {}
 var retiradas: Array[Dictionary] = []
 ## Variante de I5: una de las tres cartas de recompensa es una Vela que cuenta doble para Racha.
 var variante_vela := true
+## Elecciones y descubrimientos de la historia (I5-10): motivo, tono, farolero, lo ya visto…
+## Claves y valores son textos; se guardan con la partida.
+var historia := {}
 var _recompensas: Array[CartaDef] = []
 var azar_recompensas := RandomNumberGenerator.new()
 
@@ -40,8 +43,16 @@ func recibir_invitacion() -> void:
 	baraja = FabricaCartas.crear_baraja()
 
 ## Condiciones de progreso que usan los diálogos: «sin_invitacion», «con_invitacion»,
-## «sellos==N» y «sellos>=N». Una condición desconocida no se cumple.
+## «sellos==N», «sellos>=N», «historia:clave=valor» y «historia:clave» (la clave existe).
+## «no:» delante niega cualquier otra. Una condición desconocida no se cumple.
 func cumple(condicion: String) -> bool:
+	if condicion.begins_with("no:"):
+		return not cumple(condicion.trim_prefix("no:"))
+	if condicion.begins_with("historia:"):
+		var par := condicion.trim_prefix("historia:").split("=", true, 1)
+		if par.size() == 1:
+			return historia.has(par[0])
+		return str(historia.get(par[0], "")) == par[1]
 	match condicion:
 		"sin_invitacion": return not recibida
 		"con_invitacion": return recibida
@@ -57,6 +68,12 @@ func cumple(condicion: String) -> bool:
 ## operación; una segunda confirmación no entrega nada. «entregar_invitacion» entrega solo
 ## la baraja y las fichas (pruebas y capturas).
 func atender(solicitud: String) -> bool:
+	if solicitud.begins_with("historia:"):
+		var par := solicitud.trim_prefix("historia:").split("=", true, 1)
+		if par[0].is_empty():
+			return false
+		historia[par[0]] = par[1] if par.size() == 2 else "si"
+		return true
 	if solicitud == "entregar_invitacion":
 		if recibida: return false
 		recibir_invitacion()
@@ -84,7 +101,7 @@ func a_datos() -> Dictionary:
 		"recibida": recibida, "saldo": saldo, "superadas": superadas, "lentes": lentes,
 		"amuletos": Array(amuletos), "baraja": cartas, "ajustadas": ajustadas.duplicate(),
 		"ganadas": ganadas.keys(), "retiradas": retiradas.duplicate(true),
-		"recompensas": oferta, "variante_vela": variante_vela,
+		"recompensas": oferta, "variante_vela": variante_vela, "historia": historia.duplicate(),
 	}
 
 ## Reconstruye un intento desde `a_datos()`. Descarta lo que no sea válido (palos,
@@ -113,6 +130,10 @@ static func desde_datos(datos: Dictionary) -> CampanaCasino:
 	for d in datos.get("recompensas", []):
 		if d is Dictionary and _carta_valida(d):
 			c._recompensas.append(CartaDef.new("%s_%02d" % [d.palo, int(d.valor)], str(d.palo), int(d.valor), str(d.get("rasgo", ""))))
+	var relato = datos.get("historia", {})
+	if relato is Dictionary:
+		for clave in relato:
+			c.historia[str(clave)] = str(relato[clave])
 	return c
 
 static func _carta_valida(d: Dictionary) -> bool:
