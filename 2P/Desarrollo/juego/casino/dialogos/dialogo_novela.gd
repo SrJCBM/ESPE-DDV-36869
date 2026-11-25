@@ -109,10 +109,7 @@ func _mostrar(id: String) -> void:
 	nombre.text = conversacion.nombre(id)
 	texto.text = str(conversacion.intervencion(id).get("texto", ""))
 	_opciones = conversacion.opciones(id, evaluar)
-	for boton in botones:
-		respuestas.remove_child(boton)
-		boton.queue_free()
-	botones.clear()
+	_quitar_respuestas()
 	indicacion.hide()
 	_escritos = 0.0
 	texto.visible_characters = 0
@@ -135,6 +132,8 @@ func _encuadrar_retrato() -> void:
 ## Muestra la línea entera y, después, sus respuestas o la indicación para seguir.
 func completar() -> void:
 	texto.visible_characters = -1
+	# Con movimiento reducido la línea ya se completó al mostrarse: no se repiten las respuestas.
+	_quitar_respuestas()
 	if _opciones.is_empty():
 		indicacion.text = "E · continuar" if not conversacion.siguiente(actual).is_empty() else "E · cerrar"
 		indicacion.show()
@@ -167,6 +166,12 @@ func completar() -> void:
 	respuestas.reset_size()
 	respuestas.position.y = CAJA.position.y - 34 - respuestas.size.y
 	botones[0].grab_focus()
+
+func _quitar_respuestas() -> void:
+	for boton in botones:
+		respuestas.remove_child(boton)
+		boton.queue_free()
+	botones.clear()
 
 func _process(delta: float) -> void:
 	if not escribiendo():

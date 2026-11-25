@@ -110,6 +110,9 @@ func test_con_movimiento_reducido_el_texto_aparece_completo() -> void:
 	assert_false(juego.dialogo.escribiendo())
 	assert_eq(juego.dialogo.texto.visible_characters, -1)
 	assert_eq(juego.dialogo.botones.size(), 2)
+	juego.dialogo.completar()
+	assert_eq(juego.dialogo.botones.size(), 2, "Completar otra vez no repite las respuestas")
+	assert_eq(juego.dialogo.respuestas.get_child_count(), 2)
 
 func test_otra_conversacion_usa_la_misma_escena_solo_con_datos() -> void:
 	var datos := Conversacion.new()
