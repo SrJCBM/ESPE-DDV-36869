@@ -36,6 +36,9 @@ const VELOCIDAD := 55.0 ## Caracteres por segundo, por defecto.
 const HISTORIAL_MAXIMO := 150
 const PASO_SALTO := 0.06 ## Segundos entre líneas al saltar.
 const CAJA := Rect2(140, 600, 1160, 180)
+## Cara pequeña en el cuadro: termina 18 px por encima de la barra de Historial, Auto y Saltar.
+const CARA := 88.0
+const CARA_ARRIBA := 34.0
 const RETRATO := Rect2(150, 112, 376, 488)
 ## Narración NVL: franja inferior, sobre la ilustración.
 const PAGINA := Rect2(210, 612, 1020, 150)
@@ -203,8 +206,8 @@ func _ready() -> void:
 	nombre.size = Vector2(219, 38)
 	add_child(nombre)
 	cara = TextureRect.new()
-	cara.position = CAJA.position + Vector2(30, 40)
-	cara.size = Vector2(96, 96)
+	cara.position = CAJA.position + Vector2(30, CARA_ARRIBA)
+	cara.size = Vector2(CARA, CARA)
 	cara.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	cara.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	cara.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -431,7 +434,9 @@ func _mostrar(id: String) -> void:
 			# Con personajes en escena, el retrato grande cede su sitio a la cara en el cuadro.
 			retrato.texture = null
 		_encuadrar_retrato()
-		_mostrar_cara(ruta if not presentes.is_empty() else "")
+		# I6-08: si quien habla ya está de cuerpo entero en escena, su figura y la placa con su
+		# nombre lo identifican; la cara pequeña solo aparece para quien habla fuera de escena.
+		_mostrar_cara(ruta if not presentes.is_empty() and not presentes.has(quien) else "")
 		if presentes.has(quien) and linea.has("expresion"):
 			var nueva := conversacion.imagen(quien, str(linea.expresion))
 			if ResourceLoader.exists(nueva):
@@ -531,7 +536,7 @@ func _ajustar_texto() -> void:
 		_caja.size.y = CAJA.size.y + extra
 		_placa.position.y = _caja.position.y - 24
 		nombre.position.y = _placa.position.y + 4
-		cara.position.y = _caja.position.y + 40
+		cara.position.y = _caja.position.y + CARA_ARRIBA
 		retrato.position.y = _caja.position.y - retrato.size.y
 		if is_instance_valid(_anexo):
 			_anexo.position.y = _caja.position.y - 78

@@ -570,7 +570,7 @@ func _levantarse(victoria: bool, exactos: int) -> void:
 			PartidaGuardada.borrar()
 		var dicho := _linea_crupier("derrota")
 		_abrir("La casa gana",(dicho + "\n\n" if not dicho.is_empty() else "") + "La última campanada se apaga. Tu siguiente invitación abrirá un intento nuevo.","",Callable())
-		libro.opcion("Volver al vestíbulo",_nuevo_intento)
+		libro.opcion("Nuevo intento",_nuevo_intento)
 
 func _ofrecer_recompensa(premio: int, ruta: String) -> void:
 	_mostrar_recompensa("Recibes %s fichas. Puedes añadir una carta a tu baraja.\n%s" % [premio, ruta])
