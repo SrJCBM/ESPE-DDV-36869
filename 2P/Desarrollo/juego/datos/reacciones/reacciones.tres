@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ReaccionesCrupier" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://mesa/reacciones/reacciones_crupier.gd" id="1_reac"]
+
+[resource]
+script = ExtResource("1_reac")
+lineas = {
+"custodio": {
+"al_filo": ["«Uno por debajo. Al filo, como un buen escape.»", "«Al filo. Un diente menos y no engrana.»"],
+"meta_cerca": ["«Ya casi. No corras ahora.»", "«Te falta poco. Cuéntalo despacio.»"],
+"punto_exacto": ["«Diecisiete justos. Así suena un mecanismo bien ajustado.»", "«Exacto. Ni un diente de más.»"],
+"quiebra": ["«Te pasaste. La mano se pierde; el año, también.»", "«Quiebra. Escucha cómo suena.»"]
+}
+}

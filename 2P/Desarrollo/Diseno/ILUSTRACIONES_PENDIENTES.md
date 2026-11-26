@@ -1,6 +1,6 @@
 # La Última Mesa · Inventario de ilustraciones
 
-**Estado al 25 de noviembre de 2026.** El arte definido en el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md) está hecho. En Godot ya se ven las diez notas jugables, las CG del Custodio, el Recaudador y la Coleccionista, las figuras del recorrido y la placa de diálogo. El arte de los eventos, los finales y los tres puntos de examen futuros está disponible por id. Los recuerdos de I5-11 se encargarán con el guion de Kenned.
+**Estado al 26 de noviembre de 2026.** El arte definido en el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md) está hecho. En Godot ya se ven las diez notas jugables, las CG del Custodio, el Recaudador y la Coleccionista, las figuras del recorrido y la placa de diálogo. El arte de los eventos, los finales y los tres puntos de examen futuros está disponible por id. Con el guion versión 5 quedan por generar los cuatro [recuerdos de los jefes](#recuerdos-de-los-jefes-i5-11-guion-v5) y la [derrota ilustrada](#cg_derrota_manos--fin-del-intento-i6-11-guion-144). La mesa recompuesta (I6-04) pide los [tapetes de los otros tres jefes y un icono de campanada](#piezas-de-interfaz), y la revisión de figuras (I6-09) deja [reglas de entrega para los recortes de exploración](#figuras-de-exploración).
 
 **Estilo:** el de la [dirección artística](DIRECCION_ARTISTICA.md). Grabado de libro antiguo de finales del siglo XIX, líneas finas, sombreado por tramado. Paleta de verde profundo `#0B2119`, latón `#D5B578` y marfil `#F1E4C9`. Para la novela visual se pide **más contraste, más negro y menos dorado**. Sin texto incrustado: rótulos, cartas y etiquetas se escriben en Godot para poder traducirlos. **Nada de sangre ni heridas:** el horror es frío, porcelana y silencio.
 
@@ -28,7 +28,8 @@
 | Fondo de exploración | 1672 × 941 o equivalente 16:9 | `.webp` | Los fondos jugables (`casino/arte/*.webp`) necesitan el suelo libre en la zona caminable. |
 | CG de novela visual | 1920 × 1080 | `.webp` | Se escala al lienzo de 1440 × 810. Dejar libre el tercio inferior: ahí va el cuadro de texto. |
 | Retrato de expresión | 900 × 1200, **fondo transparente** | `.webp` o `.png` con alfa | Busto en proporción 3:4. Se usa en escena (unos 600 px de alto en el lienzo de 1440 × 810) y como cara en el cuadro de texto. **Todas las expresiones de un personaje con el mismo encuadre y la misma escala**, para poder cambiarlas sin que el personaje salte. Recorte limpio del pelo y la ropa, sin halo claro alrededor; la figura llega hasta el borde inferior de la imagen. La cara en el tercio superior, centrada. |
-| Figura de exploración | Hasta 175 px de ancho para figuras individuales y 340 px para grupos o muebles | `.webp` con alfa | Pies en el borde inferior y escala en Godot según el espacio. |
+| Figura de exploración | Hasta 175 px de ancho para figuras individuales y 340 px para grupos o muebles | `.webp` con alfa | Pies (o patas del mueble) en el borde inferior, **sin sombra proyectada ni halo semitransparente**: Godot dibuja la sombra de contacto y apoya la figura en la base de su parte opaca (I6-09). Mismo ángulo cenital a tres cuartos que el fondo. |
+| Tapete de mesa | 1480 × 800 (37 : 20) | `.webp` con alfa fuera del óvalo | Se dibuja a 740 × 400 en el lienzo sin deformarse. El centro, liso y oscuro, porque ahí van las cartas; los adornos solo en el borde (I6-04). |
 | Tarjeta de capítulo | 1920 × 1080 | `.webp` | Fondo de título; el texto lo pone el juego. |
 
 Rutas que ya lee el juego (I5-10): **`juego/historia/ilustraciones/<id>.webp`** para fondos, CG y tarjetas, y **`juego/historia/retratos/<personaje>_<expresion>.webp`** para las expresiones (por ejemplo `anfitriona_seria.webp` o `dueno_interes.webp`). Basta con guardar el archivo con su id para que aparezca; mientras falte, el juego muestra «Ilustración pendiente» o el retrato general. Ids de personaje: `klein`, `anfitriona`, `custodio`, `recaudador`, `coleccionista`, `dueno`, `ignacio` y `farolero`.
@@ -89,7 +90,7 @@ Prioridad: **1** = necesario para el prólogo; **2** = eventos y decisiones; **3
 
 Ilustraciones a pantalla completa para la novela visual. Las escenas ya implementadas las cargan por id desde `juego/historia/ilustraciones/<id>.webp` y muestran «Ilustración pendiente» cuando falta el archivo. Las CG de eventos y finales se incorporarán al montar esas escenas. La galería se reserva para un lote posterior.
 
-**Recuerdos de los jefes · I5-11.** Las preguntas posvictoria podrán abrir flashbacks. El encargo de arte se añade cuando Kenned escriba cada escena. Registrar el id del fondo o CG, el jefe y la pregunta que la activa, la acción que se ve y su prioridad. Los totales de este documento se actualizan al definir esas piezas. [Tarea I5-11](../ITERACION_05.md#i5-11--menús-posvictoria-de-los-jefes)
+**Recuerdos de los jefes · I5-11.** Las preguntas posvictoria del guion versión 5 abren cuatro recuerdos. Su encargo, con id, pregunta, contenido y encuadre, está en [Recuerdos de los jefes](#recuerdos-de-los-jefes-i5-11-guion-v5). [Tarea I5-11](../ITERACION_05.md#i5-11--menús-posvictoria-de-los-jefes)
 
 | Id | Prioridad | Escena | Descripción |
 | --- | :---: | --- | --- |
@@ -127,6 +128,34 @@ Ilustraciones a pantalla completa para la novela visual. Las escenas ya implemen
 | `klein_dueno` | 3 | Final B | **Archivo disponible.** Klein sentado en la silla del Dueño, con la máscara negra puesta y el abrigo oscuro. A su lado, la anfitriona escribe con una pluma sobre un sobre negro. La verja cerrada detrás; ninguna luz. |
 
 ---
+
+### Recuerdos de los jefes (I5-11, guion v5)
+
+Encargo para Julio. Cada recuerdo de [la sección 8 del guion](GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes) se monta sobre una sola CG, con acercamiento lento y narración NVL en el tercio inferior. **No hacen falta retratos nuevos:** en los recuerdos no hay personajes en escena. Para separarlos del presente se pide el mismo grabado con **menos contraste, tono sepia frío y bordes ligeramente desvanecidos**. Ninguna cara del pasado debe verse de frente con detalle. Formato de CG: 1920 × 1080, `juego/historia/ilustraciones/<id>.webp`.
+
+| Id | Prioridad | Jefe y pregunta que lo abre | Qué se ve | Encuadre |
+| --- | :---: | --- | --- | --- |
+| `fb_campanario` | 2 | Custodio · «¿Qué perdió antes de llegar aquí?» → «¿Cómo fue aquel último toque?» | Interior del campanario de una catedral en tiempos de peste. Mateo, de unos 35 años, sin máscara ni halo de campanas, con ropa de campanero de su época, tira de la cuerda de la campana mayor con las dos manos. Por la tronera, abajo y pequeña, la plaza vacía con dos hombres que llevan un ataúd infantil cubierto con una tela clara. Ninguna chimenea echa humo. | Contrapicado desde el suelo de tablas. La cuerda vertical divide la imagen; la campana, arriba, queda cortada por el borde. Mateo de perfil y en sombra en el tercio derecho; la tronera con la plaza, arriba a la izquierda. Tercio inferior: tablas en penumbra. |
+| `fb_deuda_muerto` | 2 | Recaudador · «¿Hay más garantías de Corvera en su libro?» → «Usted también tiene una página de Corvera.» | Despacho estrecho de prestamista en la calle de los Toneleros, de noche, en invierno. Un libro mayor abierto bajo una vela, con una línea sin cerrar (sin texto legible). La mano todavía joven de Ezequiel sostiene la pluma sobre esa línea. Encima del libro, recién aparecido, un sobre negro con el lacre del sol tras la verja. Por la ventana escarchada se ve un portal nevado con un farol, sin nadie. | Cenital cercano sobre el escritorio, como si se mirase por encima de su hombro: el libro y el sobre en el centro, la mano entrando por la derecha y la ventana arriba a la izquierda. Tercio inferior: borde del escritorio en penumbra. |
+| `fb_habitacion_cristal` | 2 | Coleccionista · «¿Guarda algo porque quiere?» → «¿Cómo se llamaba?» | Habitación infantil de una casa burguesa, encerrada entre paredes de vitrina con marcos de latón. Dentro, desenfocadas tras el cristal empañado, una cama pequeña y una niña de seis años sentada de espaldas. En el vaho, dibujos infantiles hechos con el dedo: un caballo y una casa. Fuera, en primer plano, la mano enguantada de Céleste joven repasa el caballo por el otro lado del cristal. Luz gris de invierno. | Plano medio desde fuera de la vitrina, a la altura de la niña: el guante en primer plano a la izquierda, la niña al fondo a la derecha, sin cara visible. Tercio inferior: zócalo de madera y el pie de la vitrina. |
+| `fb_apuesta_alba` | 2 | Dueño · «¿Cómo fue la noche de la apuesta?» → «¿Contra quién jugó?» | Sala de juego más antigua que la Casa actual, con candelabros casi consumidos. El Dueño joven, de espaldas y con levita de otro siglo, sentado ante una mesa de tapete. Enfrente, una silla vacía; detrás de ella, una ventana alta cuyo cristal empieza a ponerse gris por el alba. Cartas sobre la mesa. A la izquierda, por la escalera, baja la luz de una vela desde el piso de arriba. | Plano general desde detrás del Dueño, a la altura del hombro. Su silueta oscura ocupa el tercio izquierdo, sin rostro; la silla vacía y la ventana, en el centro, son el punto de fuga. Tercio inferior: el borde del tapete y sus manos sobre las cartas. |
+
+### `cg_derrota_manos` · Fin del intento (I6-11, guion §14.4)
+
+Encuadre propuesto por Kenned para la derrota ilustrada. Una sola CG sirve para cualquiera de los cuatro crupieres, porque muestra a Klein y no la mesa concreta.
+
+| Aspecto | Indicación |
+| --- | --- |
+| **Plano** | Primer plano cenital a tres cuartos, desde los ojos de Klein: sus dos manos apoyadas sobre el tapete, con los puños de la levita y el borde de la mesa en el tercio inferior. Formato 16:9, 1920 × 1080. |
+| **Sujeto** | La porcelana avanza desde la punta de los dedos: dedos ya blancos, lisos y brillantes como loza, con una grieta fina en un nudillo; el dorso a medio cambiar; las muñecas todavía de carne, donde empieza el puño. La mano derecha intenta cerrarse y no puede. Sin sangre ni roturas violentas. |
+| **Mesa** | Tapete oscuro y desenfocado con ribete de latón, sin el color propio de ninguna sala. Junto a la mano izquierda, la última mano boca arriba y la ficha de marfil. Ninguna Máscara boca abajo, para no sugerir su valor. |
+| **Fondo** | Desenfocada, al fondo a la derecha, una vitrina vacía y limpia con una etiqueta en blanco (el nombre lo pone el juego). Un halo frío de vela sobre las manos; el resto, casi negro. |
+| **Espacio para el texto** | El tercio inferior queda oscuro y sin detalles importantes: ahí va la narración NVL. La vitrina y las manos en los dos tercios superiores. |
+| **Movimiento en el juego** | Acercamiento lento hacia las manos mientras se leen las dos frases del guion; al llegar a la vitrina, un fundido al ADV de la Anfitriona. |
+
+**Secuencia que montará I6-11:** sonido de quiebra, porcelana que cruje y campana con eco; las dos frases NVL de §14.4 sobre esta CG; la variante «vitrina vacía» (la de la Coleccionista depende de `moral.sombra`, que aún no existe); la Anfitriona en ADV, «Ya la estoy escribiendo, señor.»; y la acción **Nuevo intento**. Se conserva la línea del crupier de la derrota antes de la secuencia.
+
+**Variante para más adelante** (`cg_derrota_coleccionista`): el mismo encuadre con los guantes violeta de la Coleccionista entrando desde arriba para levantar las manos de Klein. Solo cuando exista la ruta de sombra.
 
 ## Notas examinables
 
@@ -311,13 +340,20 @@ Variantes extra: **Tobías `saldado`** (porcelana entera con la palabra escrita 
 
 Las cuatro figuras secundarias son poses estáticas con alfa. Amparo y los jugadores de porcelana están en el vestíbulo, Tobías en el pasillo del Custodio y Benavides en el del Recaudador. El recorte del farolero está listo para cuando se decida si se incorpora a la exploración.
 
+**Revisión de I6-09.** Las figuras actuales sirven y no hace falta regenerarlas. Godot las apoya en la base de su parte opaca y les da una sombra de contacto, así que los recortes nuevos o corregidos deben seguir estas reglas:
+
+- Los pies, las patas del banco o del piano tocan el borde inferior. Sin margen transparente debajo: el recorte de los jugadores tenía 34 px vacíos bajo la mesa y flotaba.
+- Sin sombras pintadas en el suelo ni halos semitransparentes alrededor del recorte.
+- El mismo ángulo cenital a tres cuartos que los fondos jugables y que Klein.
+- El alto se fija en Godot respecto a Klein (104 px del mundo). Basta con que todas las figuras de pie compartan la escala de su hoja.
+
 | Id | Prioridad | Descripción |
 | --- | :---: | --- |
 | `figura_klein` | 1 | Integrada como `klein_movimiento.webp` con reposo y caminata en ocho direcciones. Ver los prompts en su hoja de expresiones. |
-| `figura_amparo` | 2 | Doña Amparo sentada a un piano de cola pequeño (el piano puede ser pieza aparte). |
-| `figura_tobias` | 2 | Tobías de pie, mirando hacia arriba, con la gorra en la mano. |
-| `figura_benavides` | 2 | Benavides sentado, abrazando el portafolios. El banco forma parte del recorte generado con ImageGen para el pasillo del Recaudador. |
-| `figura_jugador_porcelana` | 2 | Dos o tres jugadores sentados ante mesitas, con ropa de épocas distintas y manos de porcelana, para poblar el vestíbulo. |
+| `figura_amparo` | 2 | **Integrada.** Doña Amparo sentada a un piano pequeño. En I6-09 quedó contra el muro norte del vestíbulo, bajo el aplique. |
+| `figura_tobias` | 2 | **Integrada.** Tobías de pie, mirando hacia arriba, con la gorra en la mano. |
+| `figura_benavides` | 2 | **Integrada.** Benavides sentado, abrazando el portafolios. El banco forma parte del recorte. En I6-09 quedó contra el muro del pasillo, bajo la caja fuerte. |
+| `figura_jugador_porcelana` | 2 | **Integrada.** Dos jugadores ante una mesita, con ropa de épocas distintas y manos de porcelana. En I6-09 quedó en el lateral oeste, junto a la lámpara de pie. **Corrección opcional:** recortar los 34 px transparentes de debajo de la mesa. Godot ya lo compensa. |
 | `figura_farolero` | 3 | Para la sala de entrada, bajo la farola, si se decide que aparezca también en exploración. |
 
 ---
@@ -330,6 +366,16 @@ Las cuatro figuras secundarias son poses estáticas con alfa. Amparo y los jugad
 | `cuadro_adv` | 2 | **Integrado.** Fondo más oscuro, borde de latón gastado y [campana de la placa](../juego/casino/dialogos/arte/campana_adv.webp). |
 | `tarjeta_galeria` | 3 | **Archivo disponible.** [Miniatura de latón sobre verde oscuro](../juego/historia/ilustraciones/tarjeta_galeria.webp) para escenas aún sin desbloquear en la futura galería. |
 
+**Mesa recompuesta · I6-04.** El tapete ganó superficie y ahora es el fondo de la espera y de la mano, pero solo el Custodio tiene uno ilustrado: las otras tres mesas muestran un paño liso. Además, el coste de iniciar o pedir se lee en una ficha con icono, y la campana actual mide 64 × 60 px. Formato de los tapetes: 1480 × 800 con alfa fuera del óvalo, en `juego/mesa/arte/tapete_<jefe>.webp`. Encuadre común: vista cenital y óvalo de borde a borde. Los adornos, solo en el ribete, arriba, abajo y en los extremos. El centro, liso y oscuro, sin motivos que compitan con las cartas ni texto.
+
+| Id | Prioridad | Descripción |
+| --- | :---: | --- |
+| `tapete_custodio` | 2 | **Integrado** a 1152 × 768. **Reexportar a 1480 × 800** con el mismo diseño, para que no se estire al nuevo tamaño de la mesa. Óvalo de paño verde con ribete de latón y engranajes arriba y abajo. |
+| `tapete_recaudador` | 1 | Paño verde muy oscuro, casi negro, con ribete de latón. Arriba, una cinta de libro mayor con columnas rayadas a tinta roja y negra (sin cifras legibles). Abajo, una fila de cuentas de ábaco de latón. En los extremos, los platillos de la balanza de su sala. |
+| `tapete_coleccionista` | 1 | Terciopelo violeta oscuro con ribete de latón biselado como el marco de una vitrina. En el borde, pequeñas etiquetas de museo en blanco y un filo de cristal. En los extremos, dos guantes de encaje cruzados. |
+| `tapete_dueno` | 1 | Paño negro con ribete de latón ennegrecido. Arriba, la verja del alba en miniatura con una franja de luz fría que la atraviesa. Abajo, un reloj sin agujas. Ninguna luz en el centro: la noche ocupa el paño. |
+| `icono_campanada` | 3 | Campana de latón grabada, la misma de la placa ADV, a 128 × 128 con alfa y sin fondo, legible a 20 px. Sustituye a `campana_adv.webp` en la ficha de coste de la mesa. La ficha del casino del HUD ya sirve para el coste en fichas. |
+
 ---
 
 ## Orden de encargo
@@ -339,6 +385,8 @@ Las cuatro figuras secundarias son poses estáticas con alfa. Amparo y los jugad
 | **1 · Prólogo jugable** | Integrado | Fondos, 14 CG, retratos y marco de narración. |
 | **2 · Jefes y eventos** | Arte completo | Hospicio, CG de encuentros y eventos, 13 notas, cuadro ADV y cuatro figuras del recorrido. |
 | **3 · Finales** | Arte completo | Tres fondos, CG de los desenlaces A–C y miniatura para la galería. |
+| **4 · Guion v5** | Pendiente · Julio | Cuatro recuerdos (`fb_campanario`, `fb_deuda_muerto`, `fb_habitacion_cristal` y `fb_apuesta_alba`) y `cg_derrota_manos`. Más adelante, `cg_derrota_coleccionista`. |
+| **5 · Mesa de I6-04** | Pendiente · Julio | `tapete_recaudador`, `tapete_coleccionista`, `tapete_dueno`, la reexportación de `tapete_custodio` a 1480 × 800 e `icono_campanada`. |
 
 **Lote final.** 42 recursos: cuatro fondos, 18 CG, 13 notas, cinco figuras contando al farolero y dos piezas de interfaz. Las CG de los eventos y finales, los tres puntos de examen adicionales, el farolero de exploración y la galería esperan su puesta en escena.
 

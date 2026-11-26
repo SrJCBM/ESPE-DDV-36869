@@ -9,14 +9,14 @@
 | I6-01 | Portada ilustrada | Implementada y verificada | La invitación y la llegada de Klein a Corvera alternan con un fundido cada 14 s. «Entrar al casino» o «Continuar» conserva el foco mientras cambia la imagen. El ajuste de movimiento reducido deja el fondo fijo. Se revisó con y sin partida guardada. |
 | I6-02 | Visitantes en sus salas | Colocación inicial implementada | Amparo y los jugadores de porcelana están en el vestíbulo, Tobías en el pasillo del Custodio y Benavides en el del Recaudador. El ajuste de proporciones, anclaje y sombras está en I6-09. |
 | I6-03 | Lectura accesible y ayuda breve | Implementada y verificada | Los siete recursos de diálogo conservan libre la barra inferior al 140 %. «Cómo jugar» reúne movimiento, mano y salida en tres bloques breves. El recorte de la cara de Ignacio y las superposiciones de otras pantallas se registran en I6-08. |
-| I6-04 | Composición y lectura de la mesa | Por implementar | Redistribuir la mesa según el estado de la mano. Dar protagonismo a las cartas, mantener visible el coste real y ofrecer los patrones en una consulta breve. Ver [alcance de la mesa](#i6-04--composición-y-lectura-de-la-mesa). |
+| I6-04 | Composición y lectura de la mesa | Implementada y verificada · rama `kenned/i6-mesa` | En la espera, el tapete muestra meta, umbral y campanadas. Durante la mano, las cartas crecen y el patrón cercano se lee junto a la mano. Los cinco patrones pasan a una consulta (T) y el coste es una ficha con icono. Ver [avance de I6-04 e I6-09](#avance-de-i6-04-e-i6-09). |
 | I6-05 | Inventario, baraja, vitrina y recompensa | Por implementar | Presentar fichas, sellos y objetos con sus ilustraciones. Usar un álbum de cartas por palos con detalle al enfocar. En la vitrina se leen el precio y el estado de las piezas. En la recompensa, las tres cartas y «Omitir» tienen espacio propio. |
 | I6-06 | Encuentros de exploración | Propuesto | Dar un diálogo breve a Amparo, Tobías y Benavides con las líneas de la sección 10 del guion. Sobre su figura, la pista de E aparece por proximidad. Usar la porcelana para indicar su evolución por sellos cuando esa parte del guion se conecte. Coordinar con los menús posvictoria de I5-11. |
 | I6-07 | Prueba del recorrido y la lectura | Pendiente | Pedir a tres personas que abran una partida, lleguen al Custodio, resuelvan una Máscara, encuentren la tienda y expliquen qué cambiaría una compra. Anotar dónde se detienen, qué dato buscan y si necesitan abrir la ayuda. |
 | I6-08 | Superposiciones y encuadre | Implementada y verificada · rama `kenned/i6-correcciones` | El panel compartido mide título y párrafo antes de colocar cartas y botones, y crece si hace falta. «Nuevo intento» en la derrota. El coste de la mesa va en su propia línea. La toma de Ignacio ya no muestra la cara recortada. Ver [avance de I6-08](#avance-de-i6-08). |
-| I6-09 | Escala y anclaje de sprites | Por implementar | Revisar las figuras al lado de Klein, de una puerta y del mobiliario. Ajustar pivote, perspectiva, colocación, sombra y huella de colisión en la misma pasada. |
-| I6-10 | Reacciones de los crupieres durante la mano | Propuesto para Kenned | Conectar las líneas de la sección 9 a hitos de la vista pública. El bocadillo se lee junto al retrato y el jugador puede seguir actuando. |
-| I6-11 | Derrota ilustrada | Propuesto para Kenned | Adaptar la escena de porcelana de la sección 14.4 y conectar el nuevo intento. Preparar el encargo de arte cuando quede elegido su encuadre. |
+| I6-09 | Escala y anclaje de sprites | Implementada y verificada · rama `kenned/i6-mesa` | Las figuras se apoyan por la base de su parte visible, guardan escala con Klein y llevan sombra de contacto. El piano y el banco de Benavides quedan contra un muro, la mesa de jugadores en un lateral y el vano del este dentro de su nicho. Las huellas de colisión siguen a cada figura. |
+| I6-10 | Reacciones de los crupieres durante la mano | Primer tramo implementado · rama `kenned/i6-reacciones` | El Custodio comenta Punto exacto, Al filo, Quiebra y la cercanía a la meta en un bocadillo junto a su retrato, sin pausar la mano ni quitar el foco. Ver [avance de I6-10](#avance-de-i6-10). |
+| I6-11 | Derrota ilustrada | Encuadre propuesto · arte de Julio | Encuadre de `cg_derrota_manos` en [ILUSTRACIONES_PENDIENTES.md](Diseno/ILUSTRACIONES_PENDIENTES.md#cg_derrota_manos--fin-del-intento-i6-11-guion-144): las manos de Klein volviéndose porcelana sobre el tapete, con la vitrina vacía al fondo. La secuencia se monta cuando llegue el arte. |
 
 ## Revisión de las pantallas
 
@@ -56,6 +56,59 @@ Implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-correcc
 - Recompensa con ratón y con teclado: elegir una carta la añade una sola vez y una segunda elección se rechaza; «Continuar sin carta» no añade nada; Enter sobre la carta enfocada la elige y cierra el panel.
 - GUT: **296 pruebas y 2.693 aserciones**, todas pasan.
 
+## Avance de I6-04 e I6-09
+
+Implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-mesa`, que parte de `kenned/i6-reacciones`. No se añadió arte para la mesa: se usan el tapete, el dial, la ficha del HUD y la campana del cuadro ADV. Para I6-09 se usaron las figuras de exploración que subió Julio.
+
+**I6-04 · Mesa**
+
+| Estado | Qué se ve |
+| --- | --- |
+| **Espera** | El tapete con «La mesa te espera» y el objetivo: meta, umbral y campanadas, más una línea sobre el coste de cada mano. Sin lectura ni patrones. El foco está en **Iniciar mano**. |
+| **Mano** | El tapete crece (740 × 400) y las cartas llegan a 210 × 300. Hasta cinco cartas se ven siempre enteras, reducidas con su proporción. Desde la sexta conservan ese tamaño y la mano se desplaza hasta la última robada. A 1024 × 576 cada carta mide 90 px de ancho o más. Junto a «Mano N» aparece el patrón cercano, si ayuda a decidir: uno activo («Punto exacto · activo») o uno al que le falta una carta («Mano larga · 4/5»). Un patrón que depende de una Máscara oculta nunca se anuncia como activo. |
+| **Consulta de patrones** | La fila fija de cinco patrones pasa a un botón **PATRONES · T**. Al abrirla, la franja ocupa el lugar de la lectura y el foco pasa al primer patrón; enfocarlo resalta sus cartas y explica cómo conseguirlo. **T**, **Esc** o **CERRAR · T** la cierran y devuelven el foco al botón. Abrir la ayuda, el inventario o un desglose también la cierra. |
+| **Resuelta** | Se lee la fórmula del resultado y los patrones obtenidos. **VER DESGLOSE** abre el detalle. |
+| **Costes** | Iniciar o pedir llevan una ficha con icono y cantidad en su propio espacio: la campana para «−1 campanada» y la ficha del casino para «−1 ficha». El texto completo queda como nombre accesible y en el tooltip. En el Recaudador, el saldo sigue en la cabecera y en la placa de la regla. |
+
+Las acciones ocupan el ancho completo de su columna (238 px), igual que el boleto. Se comprobó a 1024 × 576, 1280 × 720, 1920 × 1080 y en una ventana panorámica de 2560 × 1080. Las reglas y su balance no cambian.
+
+**I6-09 · Figuras**
+
+| Pieza | Resultado |
+| --- | --- |
+| **Apoyo** | Cada figura se coloca por la base de su parte opaca, no por el borde de la imagen. El recorte de los jugadores tenía 34 px transparentes bajo la mesa y flotaba. |
+| **Escala** | El alto es el de la parte visible, entre 0,8 y 1,2 veces el de Klein (104): Tobías 96, Benavides sentado 96, Amparo con el piano 112, los jugadores 118. Las anfitrionas y los jefes, tras el mostrador o la mesa, conservan su escala. |
+| **Sombra** | Sombra de contacto con el mismo estilo que la de Klein, salvo donde un mueble la tapa. |
+| **Colocación** | El piano, contra el muro norte y bajo el aplique. La mesa de los jugadores, en el lateral oeste junto a la lámpara de pie. El banco de Benavides, contra el muro del pasillo bajo la caja fuerte, con sitio para las piernas. El vano del este se dibuja dentro del nicho, entre las molduras, sin marco que sobresalga. |
+| **Huella** | Las colisiones del piano, la mesa de jugadores, Tobías y el banco siguen la base de cada figura. Klein se detiene delante y la puerta del este sigue al alcance. |
+
+**Pruebas.** `tests/test_mesa_i6_04.gd` (10 pruebas) y `tests/test_sprites_i6_09.gd` (8). Se actualizaron las de la mesa de I4 y la del coste de I6-08 para la ficha y la consulta. Las capturas se generan con `tests/qa_i6_04.gd` (cuatro resoluciones) y `tests/qa_i6_09.gd`. Comparativas: [mesa](Diseno/recursos/i6/i6-04_mesa_antes_despues.jpg), [consulta y resoluciones](Diseno/recursos/i6/i6-04_consulta_y_resoluciones.jpg) y [figuras](Diseno/recursos/i6/i6-09_sprites_antes_despues.jpg). GUT: **324 pruebas y 2.858 aserciones**.
+
+## Avance de I6-10
+
+Primer tramo implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-reacciones`, que parte de `kenned/i6-correcciones`.
+
+| Pieza | Resultado |
+| --- | --- |
+| **Líneas** | `datos/reacciones/reacciones.tres` (`ReaccionesCrupier`) guarda las variantes del Custodio de la §9.1 para Punto exacto, Al filo, Quiebra y `meta_cerca`. Los demás jefes y disparadores se añaden como datos |
+| **Cuándo** | Solo al resolver la mano, comparando la vista pública anterior con la nueva (la misma que emite `ControladorMesa.vista_actualizada`). La mano ya está revelada, así que ninguna reacción anticipa una Máscara oculta. Una por acción: si coinciden varias, gana la de mayor prioridad (Quiebra y Punto exacto 8, Al filo y `meta_cerca` 6). `meta_cerca` salta al cruzar el 85 % de la meta, sin victoria |
+| **Bocadillo** | `mesa/interfaz/bocadillo_crupier.gd`, sobre el retrato con la cola hacia su rostro: nombre del crupier y la frase. No recibe clics ni foco, la mano sigue activa, y se retira a los 3 s o con la siguiente acción. Nunca repite seguida la misma variante |
+| **Ajuste** | «Comentarios de los crupieres» en Opciones (Lectura y accesibilidad), activado por defecto y guardado en `user://ajustes.cfg` |
+
+**Pruebas.** `tests/test_reacciones_i6.gd` (10 pruebas):
+
+- disparadores y prioridades;
+- líneas de 90 caracteres como máximo y sin repetir la última;
+- Punto exacto en una mano real sin quitar el foco ni pausar la mano;
+- Quiebra que se retira al actuar;
+- el bocadillo desaparece a los 3 s;
+- ningún comentario al pedir con una Máscara oculta;
+- el ajuste lo desactiva y está en Opciones.
+
+Capturas a 1024 × 576 y 1280 × 720 con `tests/qa_i6_10.gd`. GUT: **306 pruebas y 2.736 aserciones**.
+
+**Siguiente.** Los demás disparadores del Custodio (sentarse, iniciar la mano, pedir arriesgado, campanadas bajas…) y los otros tres jefes, con la probabilidad del 35 % de la §9 para los comunes.
+
 ## Guion para los siguientes encargos
 
 - **I6-10 · Reacciones.** La [sección 9 del guion](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#9-reacciones-de-los-jefes-durante-la-partida) ya contiene líneas para los cuatro jefes, incluidos Punto exacto, Al filo, Quiebra y `meta_cerca` cuando falta menos del 15 % para la meta. El primer tramo puede probarse en el Custodio con esos hitos. Usar la vista pública que emite `ControladorMesa.vista_actualizada`, priorizar un solo comentario por acción, retirarlo en tres segundos o al actuar y añadir el ajuste para desactivarlo. Todo se muestra después de resolver, sin pausar la mano, cambiar el foco ni anticipar el valor de una Máscara oculta. Mantener estos comentarios distintos de las preguntas posvictoria de [I5-11](ITERACION_05.md#i5-11--menús-posvictoria-de-los-jefes).
@@ -71,7 +124,7 @@ Implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-correcc
 
 ## Verificación local
 
-- Godot 4.7.2 y GUT. Pasaron 287 pruebas y 2.649 aserciones. Tras I6-08: 296 pruebas y 2.693 aserciones.
+- Godot 4.7.2 y GUT. Pasaron 287 pruebas y 2.649 aserciones. Tras I6-08: 296 pruebas y 2.693 aserciones. Tras I6-10: 306 y 2.736. Tras I6-04 e I6-09: 324 y 2.858.
 - Medición al 140 % de las intervenciones de los siete recursos de diálogo. Los 47 cruces detectados con la barra inferior bajaron a cero.
 - Capturas del inicio con y sin partida guardada y de «Cómo jugar» a 1024 × 576 y 1280 × 720. La segunda portada, los dos pasillos y el cuadro NVL ampliado se revisaron por separado.
 

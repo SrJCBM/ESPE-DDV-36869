@@ -101,6 +101,24 @@ static func patron(vista: Dictionary, indice: int) -> Dictionary:
 		texto += " Por confirmar al revelar."
 	return {"indices": indices, "texto": texto}
 
+## Patrón que conviene ver junto a la mano mientras se decide (I6-04): uno activo o uno al que
+## le falta un paso, como «Mano larga · 4/5». Vacío si ninguno ayuda a decidir.
+static func patron_cercano(vista: Dictionary) -> String:
+	if vista.get("fase", "") != "decision":
+		return ""
+	var filas: Array = vista.get("patrones_visibles", [])
+	for fila in filas:
+		if fila.estado == "activo" and not fila.get("condicionado", false):
+			return "%s · activo" % fila.nombre
+	var patron := RegEx.create_from_string("(\\d+)/(\\d+)")
+	for fila in filas:
+		if fila.estado in ["activo", "pendiente", "inactivo", "anulado"]:
+			continue
+		var cuenta := patron.search(str(fila.detalle))
+		if cuenta != null and int(cuenta.get_string(2)) - int(cuenta.get_string(1)) == 1:
+			return "%s · %s/%s" % [fila.nombre, cuenta.get_string(1), cuenta.get_string(2)]
+	return ""
+
 static func progreso(fila: Dictionary) -> String:
 	if fila.estado == "anulado": return "Sin bono"
 	if fila.estado == "activo":

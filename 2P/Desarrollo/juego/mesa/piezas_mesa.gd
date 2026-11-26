@@ -5,6 +5,10 @@ const ORO := Color("d5b578")
 const MARFIL := Color("f1e4c9")
 const MUTED := Color("b9c4a8")
 const TINTA := Color("263a2b")
+## Iconos de la ficha de coste de las acciones (I6-04).
+const ICONO_CAMPANADA := "res://casino/dialogos/arte/campana_adv.webp"
+const ICONO_FICHA := "res://recursos/hud/ficha_casino.png"
+const ANCHO_FICHA := 54.0
 
 static func etiqueta(padre: Node, texto: String, rect: Rect2, tamano: int, color: Color, display := false) -> Label:
 	var nueva := Label.new()
@@ -70,23 +74,51 @@ static func boton_accion(padre: Node, nombre: String, rect: Rect2, primario: boo
 	titulo.name = "Etiqueta"
 	titulo.theme_type_variation = &"BoldLabel"
 	titulo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	# El coste completo («−1 campanada») queda como texto accesible; en pantalla se lee como una
+	# ficha con icono y cantidad, en su propio espacio a la derecha del nombre (I6-04).
 	var detalle := etiqueta(boton, "", Rect2(46, rect.size.y * 0.5 + 2, rect.size.x - 58, 20), 13, TINTA if primario else MUTED)
 	detalle.name = "Coste"
-	detalle.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	detalle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	detalle.visible = false
+	var ficha := Panel.new()
+	ficha.name = "Ficha"
+	ficha.position = Vector2(rect.size.x - ANCHO_FICHA - 10, (rect.size.y - 34) * 0.5)
+	ficha.size = Vector2(ANCHO_FICHA, 34)
+	ficha.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var caja := StyleBoxFlat.new()
+	caja.bg_color = Color(TINTA, 0.1) if primario else Color(0, 0, 0, 0.25)
+	caja.border_color = TINTA if primario else ORO
+	caja.set_border_width_all(1)
+	caja.set_corner_radius_all(17)
+	ficha.add_theme_stylebox_override("panel", caja)
+	boton.add_child(ficha)
+	var icono := imagen(ficha, ICONO_CAMPANADA, Rect2(6, 7, 20, 20), true)
+	icono.name = "Icono"
+	var cantidad := etiqueta(ficha, "", Rect2(27, 0, ANCHO_FICHA - 30, 34), 16, TINTA if primario else MARFIL)
+	cantidad.name = "Cantidad"
+	cantidad.theme_type_variation = &"BoldLabel"
+	cantidad.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	ficha.hide()
 	return boton
 
 static func texto_accion(boton: Button, titulo: String, detalle: String) -> void:
 	var nombre: Label = boton.get_node("Etiqueta")
 	var coste: Label = boton.get_node("Coste")
+	var ficha: Panel = boton.get_node("Ficha")
 	nombre.text = titulo
 	coste.text = detalle
-	# Con coste, el nombre sube a la mitad superior y el coste ocupa la inferior; sin él, el
-	# nombre queda centrado.
+	# El nombre siempre centrado en vertical; con coste, la ficha ocupa la derecha y el nombre
+	# se acorta para no cruzarse con ella.
 	var alto := boton.size.y
-	nombre.position.y = alto * 0.5 - 27 if not detalle.is_empty() else (alto - 30) * 0.5
-	coste.position.y = alto * 0.5 + 2
-	coste.visible = not detalle.is_empty()
+	nombre.position.y = (alto - 30) * 0.5
+	nombre.size.x = boton.size.x - 56 - (ANCHO_FICHA + 4 if not detalle.is_empty() else 0.0)
+	coste.visible = false
+	ficha.visible = not detalle.is_empty()
+	if ficha.visible:
+		ficha.get_node("Cantidad").text = detalle.get_slice(" ", 0)
+		var ruta := ICONO_FICHA if detalle.contains("ficha") else ICONO_CAMPANADA
+		var icono: TextureRect = ficha.get_node("Icono")
+		if icono.texture == null or icono.texture.resource_path != ruta:
+			icono.texture = load(ruta)
 	boton.tooltip_text = "%s. %s" % [titulo, detalle]
 	for propiedad in boton.get_property_list():
 		if propiedad.name == "accessibility_name":

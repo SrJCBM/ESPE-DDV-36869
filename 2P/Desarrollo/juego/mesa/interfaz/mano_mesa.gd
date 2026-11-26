@@ -10,11 +10,16 @@ signal carta_creada(carta: Control)
 var scroll := ScrollContainer.new()
 var fila := HBoxContainer.new()
 var _vacio := Control.new()
+## Objetivo de la mesa dentro del tapete vacío (I6-04): meta, umbral y campanadas.
+var objetivo: Label
 var _ultima_carta := ""
 var _revision := 0
 var _dialogo_abierto: Callable
-## Alto de las cartas; la mesa lo reduce para que la mano quepa dentro del tapete.
+## Alto máximo de las cartas; la mesa lo fija para que la mano quepa dentro del tapete.
 var alto_carta := 286.0
+## Proporción de la carta (ancho / alto) y número de cartas que siempre se ven a la vez.
+const PROPORCION := 0.7
+const VISIBLES := 5
 
 func configurar(dialogo_abierto: Callable) -> void:
 	_dialogo_abierto = dialogo_abierto
@@ -37,8 +42,13 @@ func _ready() -> void:
 	_vacio.position = Vector2(432, 310)
 	_vacio.size = Vector2(665, 150)
 	add_child(_vacio)
-	var titulo := Piezas.etiqueta(_vacio, "La mesa te espera", Rect2(0, 40, 665, 50), 34, Piezas.ORO, true)
+	var titulo := Piezas.etiqueta(_vacio, "La mesa te espera", Rect2(0, 0, 665, 50), 34, Piezas.ORO, true)
+	titulo.name = "Titulo"
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	objetivo = Piezas.etiqueta(_vacio, "", Rect2(0, 58, 665, 64), 19, Piezas.MARFIL)
+	objetivo.name = "Objetivo"
+	objetivo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	objetivo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool) -> void:
 	_revision += 1
@@ -47,9 +57,7 @@ func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool) -> void:
 	for nodo in fila.get_children():
 		existentes[str(nodo.get_meta("carta_id", ""))] = nodo
 	_vacio.visible = cartas.is_empty()
-	var ancho := 184.0
-	if cartas.size() >= 4 and cartas.size() <= 5:
-		ancho = minf(184.0, floorf((scroll.size.x - 16.0 * (cartas.size() - 1)) / cartas.size()))
+	var medida := medida_carta(cartas.size())
 	for indice in range(cartas.size()):
 		var datos: Dictionary = cartas[indice]
 		var id := str(datos.get("id", "posicion-%s" % indice))
@@ -61,7 +69,7 @@ func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool) -> void:
 			carta.set_meta("carta_id", id)
 			fila.add_child(carta)
 			carta.ampliacion_solicitada.connect(carta_activada.emit.bind(id))
-		carta.custom_minimum_size = Vector2(ancho, alto_carta)
+		carta.custom_minimum_size = medida
 		fila.move_child(carta, indice)
 		carta.establecer_movimiento_reducido(movimiento_reducido)
 		carta.presentar(datos)
@@ -91,10 +99,22 @@ func colocar(zona: Rect2, alto: float) -> void:
 	scroll.position = zona.position
 	scroll.size = zona.size
 	scroll.get_child(0).custom_minimum_size = Vector2(zona.size.x, alto + 10)
-	_vacio.position = zona.position + Vector2(20, zona.size.y * 0.3)
-	_vacio.size = Vector2(zona.size.x - 40, 120)
+	_vacio.position = zona.position + Vector2(20, zona.size.y * 0.5 - 62)
+	_vacio.size = Vector2(zona.size.x - 40, 124)
+	var medida := medida_carta(fila.get_child_count())
 	for carta in fila.get_children():
-		carta.custom_minimum_size.y = alto
+		carta.custom_minimum_size = medida
+
+## Tamaño de cada carta para una mano de `cantidad` cartas, con su proporción. Hasta tres van a
+## tamaño completo; con cuatro o cinco se reducen para que toda la mano se vea sin desplazarse
+## (Mano larga se decide mirando las cinco). Desde la sexta conservan el tamaño de cinco y la
+## mano se desplaza en horizontal hasta la última carta robada.
+func medida_carta(cantidad: int) -> Vector2:
+	var completo := floorf(alto_carta * PROPORCION)
+	var separacion := float(fila.get_theme_constant("separation"))
+	var ajuste := clampi(cantidad, 1, VISIBLES)
+	var ancho := minf(completo, floorf((scroll.size.x - separacion * (ajuste - 1)) / ajuste))
+	return Vector2(ancho, minf(alto_carta, floorf(ancho / PROPORCION)))
 
 func revelar(indice: int, datos: Dictionary) -> Dictionary:
 	fila.get_child(indice).presentar(datos)

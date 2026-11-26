@@ -1,17 +1,21 @@
 extends Node2D
-## Puerta este del vestíbulo, situada en el nicho entre dos pilastras.
+## Puerta este del vestíbulo, dentro del nicho entre las dos pilastras del fondo (I6-09): se
+## dibuja como un hueco en el muro, entre las molduras de latón, sin marco que sobresalga.
 
 const ORO := Color("cfaa64")
-const APAGADO := Color("8e887c")
-const VANO := Rect2(1226, 300, 40, 112)
+const APAGADO := Color("6f6a5f")
+## Hueco del nicho en el arte del vestíbulo: entre la moldura superior (y ≈ 305) y la inferior
+## (y ≈ 400), y entre la cara de las pilastras y el muro (x ≈ 1233–1262).
+const VANO := Rect2(1235, 309, 26, 88)
 
 var abierta := false
 
 func _draw() -> void:
-	draw_rect(VANO.grow(6), Color("2a1a10"))
+	# Jamba en sombra del lado del vestíbulo: el muro tiene grosor y la puerta queda dentro.
+	var jamba := PackedVector2Array([VANO.position, VANO.position + Vector2(5, 4), Vector2(VANO.position.x + 5, VANO.end.y - 3), Vector2(VANO.position.x, VANO.end.y)])
 	draw_rect(VANO, Color("120c08"))
+	draw_colored_polygon(jamba, Color("070504"))
 	if abierta:
 		# Una franja de luz cálida por la rendija: por aquí sigue el recorrido.
-		draw_rect(Rect2(VANO.position.x + 2, VANO.position.y + 4, 6, VANO.size.y - 8), Color(0.95, 0.78, 0.45, 0.55))
-	draw_rect(VANO.grow(6), ORO if abierta else APAGADO, false, 3.0)
-	draw_line(Vector2(VANO.position.x - 6, VANO.position.y), Vector2(VANO.end.x + 6, VANO.position.y), Color("e2c27e"), 2.0)
+		draw_rect(Rect2(VANO.position.x + 7, VANO.position.y + 6, 4, VANO.size.y - 12), Color(0.95, 0.78, 0.45, 0.6))
+	draw_rect(VANO, ORO if abierta else APAGADO, false, 1.5)

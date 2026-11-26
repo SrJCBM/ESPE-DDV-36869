@@ -16,14 +16,15 @@ const MUEBLES := {
 		"banco_oeste": Rect2(87, 485, 40, 139),
 		"banco_este": Rect2(1154, 485, 39, 139),
 		"maceta": Rect2(447, 193, 35, 49),
-		"piano": Rect2(187, 255, 126, 61),
-		"mesa_jugadores": Rect2(253, 493, 126, 47),
+		# Huellas de las figuras (I6-09): la base de cada una, a la altura de sus pies.
+		"piano": Rect2(236, 205, 128, 57),
+		"mesa_jugadores": Rect2(160, 392, 100, 38),
 	},
 	"pasillo_custodio": {
-		"tobias": Rect2(458, 348, 34, 18),
+		"tobias": Rect2(460, 350, 30, 16),
 	},
 	"pasillo_recaudador": {
-		"banco_benavides": Rect2(856, 337, 76, 28),
+		"banco_benavides": Rect2(918, 290, 84, 28),
 	},
 	"tienda": {
 		"mostrador": Rect2(310, 180, 654, 120),

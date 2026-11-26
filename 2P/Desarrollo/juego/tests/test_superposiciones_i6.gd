@@ -114,16 +114,17 @@ func test_el_coste_de_la_mesa_no_pisa_el_nombre_de_la_accion() -> void:
 func _comprobar_boton(boton: Button, titulo: String, coste: String) -> void:
 	var nombre: Label = boton.get_node("Etiqueta")
 	var detalle: Label = boton.get_node("Coste")
+	var ficha: Control = boton.get_node("Ficha")
 	assert_eq(nombre.text, titulo)
-	assert_eq(detalle.text, coste)
+	assert_eq(detalle.text, coste, "El coste completo queda como texto accesible")
+	# I6-04: el coste se lee como una ficha con icono y cantidad, en su propio espacio.
+	assert_true(ficha.visible, "%s muestra su ficha de coste" % coste)
+	assert_eq(ficha.get_node("Cantidad").text, coste.get_slice(" ", 0))
 	var ancho_nombre := nombre.get_theme_font("font").get_string_size(nombre.text, HORIZONTAL_ALIGNMENT_LEFT, -1, nombre.get_theme_font_size("font_size")).x
-	var ancho_coste := detalle.get_theme_font("font").get_string_size(detalle.text, HORIZONTAL_ALIGNMENT_LEFT, -1, detalle.get_theme_font_size("font_size")).x
-	assert_true(ancho_nombre <= nombre.size.x, "%s cabe en su línea" % titulo)
-	assert_true(ancho_coste <= detalle.size.x, "%s cabe en su línea" % coste)
-	var caja_nombre := Rect2(nombre.position, Vector2(ancho_nombre, nombre.get_theme_font_size("font_size") + 4))
-	var caja_coste := Rect2(Vector2(detalle.position.x, detalle.position.y + (detalle.size.y - detalle.get_theme_font_size("font_size")) * 0.5), Vector2(ancho_coste, detalle.get_theme_font_size("font_size")))
-	assert_false(caja_nombre.intersects(caja_coste), "%s y %s no se cruzan" % [titulo, coste])
-	assert_true(detalle.position.y + detalle.size.y <= boton.size.y, "El coste queda dentro del botón")
+	assert_true(ancho_nombre <= nombre.size.x, "%s cabe en su línea (%s de %s)" % [titulo, ancho_nombre, nombre.size.x])
+	var caja_nombre := Rect2(nombre.position, Vector2(ancho_nombre, nombre.size.y))
+	assert_false(caja_nombre.intersects(ficha.get_rect()), "%s y su ficha no se cruzan" % titulo)
+	assert_true(Rect2(Vector2.ZERO, boton.size).encloses(ficha.get_rect()), "La ficha queda dentro del botón")
 
 func test_en_la_toma_de_ignacio_no_hay_cara_recortada() -> void:
 	var juego = _casino()

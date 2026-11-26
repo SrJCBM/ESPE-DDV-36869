@@ -16,6 +16,8 @@ const FILAS := [
 ]
 
 var movimiento: CheckButton
+## Comentarios de los crupieres durante la mano (I6-10).
+var comentarios: CheckButton
 ## Deslizadores de lectura por clave de AjustesJuego.LECTURA.
 var lectura := {}
 
@@ -40,6 +42,14 @@ func construir(audio: AudioCasino) -> void:
 	movimiento.add_theme_color_override("font_color", Libro.PAPEL)
 	movimiento.toggled.connect(_cambiar)
 	derecha.add_child(movimiento)
+	comentarios = CheckButton.new()
+	comentarios.text = "Comentarios de los crupieres"
+	comentarios.button_pressed = AjustesJuego.comentarios_crupieres()
+	comentarios.add_theme_font_override("font", Libro.SANS)
+	comentarios.add_theme_font_size_override("font_size", 18)
+	comentarios.add_theme_color_override("font_color", Libro.PAPEL)
+	comentarios.toggled.connect(AjustesJuego.guardar_comentarios_crupieres)
+	derecha.add_child(comentarios)
 
 func _columna(padre: Container, titulo: String) -> VBoxContainer:
 	var columna := VBoxContainer.new()
