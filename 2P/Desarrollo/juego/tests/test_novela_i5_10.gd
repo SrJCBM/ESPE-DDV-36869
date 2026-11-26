@@ -263,10 +263,11 @@ func test_los_personajes_entran_salen_y_se_resalta_al_que_habla() -> void:
 		h.completar()
 		h.avanzar()
 	assert_true(h.presentes.has("dueno"), "El Dueño entra a la derecha")
-	assert_false(h.presentes.has("ignacio"), "Sin imagen de Ignacio, no se muestra nadie en su lugar")
+	assert_true(h.presentes.has("ignacio"), "Ignacio entra a la izquierda")
+	assert_eq(h.presentes.ignacio.texture.resource_path, "res://historia/retratos/ignacio_desesperado.webp")
 	assert_eq(h.presentes.dueno.self_modulate, Color.WHITE, "El que habla queda iluminado")
-	assert_false(h.marco_retrato.visible, "Con personajes en escena no hay retrato grande")
-	assert_true(h._marco_cara.visible, "La cara del que habla aparece en el cuadro")
+	assert_null(h.retrato.texture, "Con personajes en escena no hay retrato grande")
+	assert_true(h.cara.visible, "La cara del que habla aparece en el cuadro")
 	for i in range(80):
 		if h.actual == "p0c_2": break
 		h.completar()

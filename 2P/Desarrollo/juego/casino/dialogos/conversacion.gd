@@ -4,7 +4,7 @@ extends Resource
 ##
 ## - `personajes`: id → {"nombre", "retrato", "expresiones"?}. "expresiones" es una ruta con
 ##   %s («res://historia/retratos/custodio_%s.webp»); una intervención con "expresion" usa
-##   ese archivo si existe y, si aún no está dibujado, el retrato general.
+##   ese archivo si existe. De lo contrario usa el retrato neutral, o el general.
 ## - `entradas`: [{"si"?, "ir"}]; se abre por la primera cuya condición se cumpla.
 ## - `intervenciones`: id → {"personaje", "texto", "retrato"?, "siguiente"? | "opciones"?,
 ##   "solicitud"?, "modo"?, "fondo"?, "sonido"?}.
@@ -45,12 +45,7 @@ func retrato(id: String) -> String:
 	var linea := intervencion(id)
 	if linea.has("retrato"):
 		return str(linea.retrato)
-	var personaje: Dictionary = personajes.get(linea.get("personaje", ""), {})
-	if linea.has("expresion") and personaje.has("expresiones"):
-		var ruta := str(personaje.expresiones) % str(linea.expresion)
-		if ResourceLoader.exists(ruta):
-			return ruta
-	return str(personaje.get("retrato", ""))
+	return imagen(str(linea.get("personaje", "")), str(linea.get("expresion", "")))
 
 ## Intervención que sigue a `id`. Con una lista, la primera cuya condición se cumpla.
 func siguiente(id: String, evaluar := Callable()) -> String:
@@ -62,13 +57,18 @@ func siguiente(id: String, evaluar := Callable()) -> String:
 		return ""
 	return str(destino)
 
-## Imagen de un personaje con una expresión (si ya está dibujada) o su retrato general.
+## Expresión específica, recorte neutral o retrato general, en ese orden.
 func imagen(personaje: String, expresion := "") -> String:
 	var datos: Dictionary = personajes.get(personaje, {})
-	if not expresion.is_empty() and datos.has("expresiones"):
-		var ruta := str(datos.expresiones) % expresion
-		if ResourceLoader.exists(ruta):
-			return ruta
+	if datos.has("expresiones"):
+		var plantilla := str(datos.expresiones)
+		if not expresion.is_empty() and expresion != "neutral":
+			var ruta := plantilla % expresion
+			if ResourceLoader.exists(ruta):
+				return ruta
+		var neutral := plantilla % "neutral"
+		if ResourceLoader.exists(neutral):
+			return neutral
 	return str(datos.get("retrato", ""))
 
 ## {"ruta", "descripcion"} del fondo, o vacío si el id no está definido.

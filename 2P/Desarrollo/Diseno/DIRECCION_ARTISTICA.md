@@ -6,6 +6,8 @@ Usar esta guía cuando una IA genere arte, sonido, diálogos o pantallas para el
 
 Casino sobrenatural de finales del siglo XIX. Grabado de libro antiguo para personajes y objetos, con líneas finas y sombreado por tramado. La arquitectura usa mármol, latón envejecido, vidrio, nogal y terciopelo. Las lámparas cálidas iluminan los puntos de interacción. La oscuridad de las paredes enmarca el suelo transitable.
 
+Para las CG, usar ilustración 2D con líneas grabadas, formas claras y un tramado visible. Cuando una carta sea el centro de una escena, tomar el grabado del palo como referencia. La Máscara de Ignacio lleva la porcelana marfil, la cinta granate y la filigrana del [palo de Máscaras](../juego/cartas/arte/carta-mascaras-grabado.png).
+
 | Uso | Referencia |
 | --- | --- |
 | Fondo de mesa | Verde profundo `#0B2119` |
@@ -20,7 +22,7 @@ Casino sobrenatural de finales del siglo XIX. Grabado de libro antiguo para pers
 | Espacio | Paleta y motivo | Rasgos que deben repetirse |
 | --- | --- | --- |
 | Vestíbulo | Mármol verde, reloj monumental y lámparas cálidas | Anfitriona de terciopelo verde con horquilla y aro de llaves |
-| Galería | Esmeralda, alfombra granate y seis puertas alineadas | Placas y umbrales visibles |
+| Pasillos | Mármol y latón con un motivo propio de cada jefe | Vista elevada, suelo despejado y solo los accesos que figuran en el plano jugable |
 | Tienda | Nogal, ámbar, vitrinas y estantes | Lente ahumada, corona de latón, sello de cera y moneda mellada |
 | Custodio | Verde, campanas y péndulo | Máscara larga de latón, ojo de reloj y halo de campanas |
 | Recaudador | Granate, balanza, cajones y libro mayor | Entradas pronunciadas, cabello gris peinado hacia atrás, gafas, libro y ábaco |

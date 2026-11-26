@@ -7,6 +7,7 @@ const Mesa := preload("res://mesa/mesa.tscn")
 const VitrinaGabinete := preload("res://casino/interfaz/vitrina/vitrina_gabinete.gd")
 const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
 const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
+const Minimapa := preload("res://casino/interfaz/minimapa.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
 const CifrasMesa := preload("res://casino/interfaz/cifras_mesa.gd")
 const DialogoNovela := preload("res://casino/dialogos/dialogo_novela.gd")
@@ -63,7 +64,7 @@ var sala := ""
 var pagina := Control.new()
 var mundo := Node2D.new()
 var decorado := Node2D.new()
-## Rombos y placas: sobre el mundo y el visitante, pero debajo de diálogos y velo.
+## Marcas de interacción, por encima del mundo y debajo de los diálogos.
 var capa_superior := Node2D.new()
 var visitante := Visitante.new()
 var libro := Libro.new()
@@ -75,6 +76,7 @@ var exploracion := SalaExplorable.new(decorado, capa_superior)
 var mesa: Control
 var audio := AudioCasino.new()
 var indicador_objetivo := IndicadorObjetivo.new()
+var minimapa := Minimapa.new()
 var vitrina := VitrinaGabinete.new()
 var dialogo := DialogoNovela.new()
 ## Escena de cinemática (prólogo, llegada al vestíbulo): pantalla completa con fundidos.
@@ -132,6 +134,8 @@ func _ready() -> void:
 	pagina.add_child(pista)
 	indicador_objetivo.name = "IndicadorObjetivo"
 	pagina.add_child(indicador_objetivo)
+	minimapa.size = BASE
+	pagina.add_child(minimapa)
 	pagina.add_child(dialogo)
 	dialogo.solicitud.connect(_solicitud)
 	dialogo.cerrado.connect(_cerrar)
@@ -284,8 +288,7 @@ func continuar() -> bool:
 	var posicion = datos.get("posicion", [])
 	if destino == str(datos.get("sala", "")) and posicion is Array and posicion.size() == 2:
 		var punto := Vector2(float(posicion[0]), float(posicion[1]))
-		var limites := PlanoSalas.LIMITES_GALERIA if PlanoGaleria.es_pasillo(destino) else PlanoSalas.LIMITES
-		if limites.has_point(punto):
+		if PlanoSalas.limites(destino).has_point(punto):
 			visitante.position = punto
 	if campana.hay_recompensa():
 		_mostrar_recompensa("Tienes una carta de la casa pendiente. Puedes añadirla a tu baraja.")
@@ -325,21 +328,33 @@ func cercano() -> Dictionary:
 
 func _process(_delta: float) -> void:
 	_actualizar_objetivo()
-	if libro.visible or vitrina.visible or dialogo.visible or cinematica.activa or menu.visible or is_instance_valid(mesa): return
+	var modal := libro.visible or vitrina.visible or dialogo.visible or cinematica.activa or menu.visible or is_instance_valid(mesa)
+	minimapa.visible = not modal
+	if modal:
+		return
+	minimapa.presentar(sala, visitante.position, exploracion.puntos)
+	if minimapa.ampliado:
+		return
 	var elegido := cercano()
 	exploracion.marcar(elegido)
 	pista.text = _pista(elegido)
 
-## Una sola línea cerca de una interacción; una puerta cerrada muestra su requisito.
+## La indicación de la puerta se limita al control; el requisito se lee al interactuar.
 func _pista(elegido: Dictionary) -> String:
 	if elegido.is_empty():
 		return ""
-	if elegido.tipo == "puerta" and not campana.puerta_abierta(elegido.destino):
-		return str(elegido.accion)
+	if elegido.tipo == "puerta":
+		var cerrada: bool = (elegido.destino == "entrada" and campana.recibida) or not campana.puerta_abierta(elegido.destino)
+		return "E · Examinar la puerta" if cerrada else "E · Entrar"
 	return "E · " + str(elegido.accion)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
 	if menu.visible or vista_baraja.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	if minimapa.ampliado:
+		if evento.keycode in [KEY_M, KEY_ESCAPE]:
+			_alternar_mapa()
+		get_viewport().set_input_as_handled()
+		return
 	# La mesa, la vitrina y el diálogo resuelven antes su propio Esc; si llega aquí, pausa.
 	if evento.keycode == KEY_ESCAPE and not libro.visible:
 		pausar()
@@ -352,6 +367,8 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		elif evento.is_action_pressed("interactuar") and libro.lista.get_child_count() == 1:
 			libro.primero.pressed.emit()
 		else: return
+	elif evento.keycode == KEY_M:
+		_alternar_mapa()
 	elif evento.is_action_pressed("interactuar"):
 		var p := cercano()
 		if not p.is_empty(): interactuar(p)
@@ -359,6 +376,11 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 	elif evento.keycode == KEY_V: _sonido()
 	else: return
 	get_viewport().set_input_as_handled()
+
+func _alternar_mapa() -> void:
+	minimapa.ampliado = not minimapa.ampliado
+	visitante.bloqueado = minimapa.ampliado
+	pista.text = ""
 
 func interactuar(p: Dictionary) -> void:
 	match p.tipo:
@@ -371,15 +393,22 @@ func interactuar(p: Dictionary) -> void:
 				audio.reproducir(&"puerta")
 				_abrir("El primer amanecer","El cerrojo cede. Por primera vez oyes pájaros en lugar de campanas. Has salido de la casa.","",Callable())
 				libro.opcion("Comenzar otro viaje",_nuevo_intento)
-			else: _aviso("La verja del alba","Falta vencer al Dueño de la Casa.")
+			else: _aviso_puerta("La verja del alba", "Falta vencer al Dueño de la Casa.")
 		"puerta":
 			if p.destino == "entrada" and campana.recibida:
-				_aviso("La puerta de la calle", "Donde estaba la puerta solo queda su contorno grabado en el mármol. No hay picaporte.")
+				_aviso_puerta("La puerta de la calle", "Donde estaba la puerta solo queda su contorno grabado en el mármol. No hay picaporte.")
 			elif campana.puerta_abierta(p.destino):
 				audio.reproducir(&"puerta")
 				entrar(p.destino,sala)
 			else:
-				_aviso(CampanaCasino.NOMBRES[p.destino], PlanoGaleria.requisito(p.destino) + ".")
+				_aviso_puerta(CampanaCasino.NOMBRES[p.destino], PlanoGaleria.requisito(p.destino))
+
+func _aviso_puerta(titulo_puerta: String, mensaje: String) -> void:
+	var aviso := Conversacion.new()
+	aviso.personajes = {"puerta": {"nombre": titulo_puerta}}
+	aviso.entradas = [{"ir": "aviso"}]
+	aviso.intervenciones = {"aviso": {"personaje": "puerta", "texto": mensaje}}
+	visitante.bloqueado = dialogo.abrir(aviso, _condicion, AjustesJuego.movimiento_reducido(), Callable(), false)
 
 ## Conversación con la anfitriona en la escena de diálogos (I4-06); sus líneas son datos.
 func _recepcion() -> void:
@@ -595,6 +624,7 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 	libro.opcion("Continuar",_cerrar)
 
 func _cerrar() -> void:
+	minimapa.ampliado = false
 	vitrina.hide()
 	dialogo.hide()
 	dialogo.poner_anexo(null)

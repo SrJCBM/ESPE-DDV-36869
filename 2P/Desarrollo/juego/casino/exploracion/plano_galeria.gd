@@ -4,44 +4,42 @@ extends RefCounted
 ## de su jefe al norte, la sala que le corresponde al sur y las puertas a los pasillos vecinos
 ## a los lados. El recorrido avanza de oeste a este: el vestíbulo queda al oeste del pasillo
 ## del Custodio (I5-10), así que desde la recepción se sigue hacia delante. Las puertas entre pasillos se abren con los sellos de `CampanaCasino.ACCESO`.
-##
-## Primer tramo: el Dueño todavía no tiene pasillo propio; su puerta está al este del pasillo
-## de la Coleccionista. Todos los pasillos usan por ahora el arte de `corredor.webp`.
 
 const NORTE := 302.0 ## Punto de interacción al pie de las puertas del norte.
-const SUR := 572.0 ## Punto de interacción ante las puertas del sur, sobre la barandilla.
+const SUR := 602.0 ## Punto de interacción antes del primer escalón del Gabinete.
 const LATERAL := 445.0 ## Altura de las puertas del este y del oeste.
 const ESTE := 1195.0
 const OESTE := 85.0
 ## Orden de los pasillos de oeste a este.
-const ORDEN := ["pasillo_custodio", "pasillo_recaudador", "pasillo_coleccionista"]
+const ORDEN := ["pasillo_custodio", "pasillo_recaudador", "pasillo_coleccionista", "pasillo_dueno"]
 const PASILLOS := {
 	"pasillo_custodio": {
-		"custodio": {"lado": "norte", "x": 538.0, "placa": "I · Custodio"},
+		"custodio": {"lado": "norte", "x": 640.0, "placa": "I · Custodio"},
 		"vestibulo": {"lado": "oeste", "placa": "Vestíbulo"},
 		"pasillo_recaudador": {"lado": "este", "placa": "Hacia el Recaudador"},
 	},
 	"pasillo_recaudador": {
-		"recaudador": {"lado": "norte", "x": 739.0, "placa": "II · Recaudador"},
-		"tienda": {"lado": "sur", "x": 739.0, "placa": "Tienda"},
+		"recaudador": {"lado": "norte", "x": 640.0, "placa": "II · Recaudador"},
+		"tienda": {"lado": "sur", "x": 640.0, "placa": "Tienda"},
 		"pasillo_custodio": {"lado": "oeste", "placa": "Hacia el Custodio"},
 		"pasillo_coleccionista": {"lado": "este", "placa": "Hacia la Coleccionista"},
 	},
 	"pasillo_coleccionista": {
-		"coleccionista": {"lado": "norte", "x": 940.0, "placa": "III · Coleccionista"},
+		"coleccionista": {"lado": "norte", "x": 640.0, "placa": "III · Coleccionista"},
 		"pasillo_recaudador": {"lado": "oeste", "placa": "Hacia el Recaudador"},
-		"dueno": {"lado": "este", "placa": "IV · Dueño"},
+		"pasillo_dueno": {"lado": "este", "placa": "Hacia el Dueño"},
+	},
+	"pasillo_dueno": {
+		"dueno": {"lado": "norte", "x": 640.0, "placa": "IV · Dueño"},
+		"pasillo_coleccionista": {"lado": "oeste", "placa": "Hacia la Coleccionista"},
 	},
 }
 ## Pasillo al que sale cada sala.
 const PADRE := {
 	"vestibulo": "pasillo_custodio", "custodio": "pasillo_custodio",
 	"recaudador": "pasillo_recaudador", "tienda": "pasillo_recaudador",
-	"coleccionista": "pasillo_coleccionista", "dueno": "pasillo_coleccionista",
+	"coleccionista": "pasillo_coleccionista", "dueno": "pasillo_dueno",
 }
-## Ejes de las seis puertas del norte en el arte del corredor.
-const PUERTAS_ARTE := [136.0, 337.0, 538.0, 739.0, 940.0, 1141.0]
-const REQUISITOS := ["Habla con la anfitriona", "Falta el primer sello", "Falta el segundo sello", "Falta el tercer sello"]
 
 static func es_pasillo(sala: String) -> bool:
 	return PASILLOS.has(sala)
@@ -70,28 +68,16 @@ static func entrada(pasillo: String, origen: String) -> Vector2:
 	var puerta: Dictionary = lista[destino]
 	match str(puerta.lado):
 		"norte": return Vector2(puerta.x, 375.0)
-		"sur": return Vector2(puerta.x, 500.0)
+		"sur": return Vector2(puerta.x, SUR - 70.0)
 		"este": return Vector2(ESTE - 70.0, LATERAL)
 	return Vector2(OESTE + 70.0, LATERAL)
 
-## Puertas del arte que este pasillo no usa: se apagan y no tienen interacción.
-static func sin_uso(pasillo: String) -> Array[float]:
-	var usadas := []
-	for destino: String in puertas(pasillo):
-		if norte(pasillo, destino):
-			usadas.append(puertas(pasillo)[destino].x)
-	var libres: Array[float] = []
-	for x: float in PUERTAS_ARTE:
-		if not usadas.has(x):
-			libres.append(x)
-	return libres
-
-## Requisito breve de una puerta cerrada, para la placa y el aviso.
+## Texto que aparece al intentar abrir una puerta cerrada.
 static func requisito(destino: String) -> String:
-	var nivel := CampanaCasino.MESAS.find(destino)
-	if nivel < 0 and CampanaCasino.ACCESO.has(destino):
-		nivel = int(CampanaCasino.ACCESO[destino])
-	return REQUISITOS[nivel] if nivel >= 0 else ""
+	match destino:
+		"pasillo_custodio": return "Habla con la anfitriona antes de seguir."
+		"pasillo_recaudador": return "No tienes el sello necesario para abrir esta puerta."
+	return "No tienes los sellos necesarios para abrir esta puerta."
 
 ## Sala a la que lleva el siguiente paso del intento.
 static func objetivo(campana: CampanaCasino) -> String:

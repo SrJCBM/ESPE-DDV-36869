@@ -1,10 +1,10 @@
 # La Última Mesa · Ilustraciones pendientes
 
-**Estado:** encargo propuesto por Kenned el 24 de noviembre de 2026 a partir del [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md). Incluye el nuevo diseño victoriano de Klein. Este documento solo contiene arte: fondos, ilustraciones de novela visual (CG), hojas de expresiones y figuras. El guion cita cada pieza por su id; las descripciones viven aquí.
+**Estado al 25 de noviembre de 2026.** El proyecto local incluye los retratos del elenco, la caminata de Klein, la fachada jugable, los cuatro pasillos y el arte de apertura del prólogo. El arte del prólogo está completo hasta P6. Los encargos siguientes son las notas examinables, los eventos y los finales. Los identificadores siguen el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md).
 
 **Estilo:** el de la [dirección artística](DIRECCION_ARTISTICA.md). Grabado de libro antiguo de finales del siglo XIX, líneas finas, sombreado por tramado. Paleta de verde profundo `#0B2119`, latón `#D5B578` y marfil `#F1E4C9`. Para la novela visual se pide **más contraste, más negro y menos dorado**. Sin texto incrustado: rótulos, cartas y etiquetas se escriben en Godot para poder traducirlos. **Nada de sangre ni heridas:** el horror es frío, porcelana y silencio.
 
-> **Importante: los personajes, sin fondo.** Desde I5-10 los personajes entran y salen de escena sobre las ilustraciones (izquierda, centro o derecha), y el que habla se ilumina mientras los demás se atenúan. Para que se integren, **cada retrato, expresión y figura de personaje debe entregarse recortado, con fondo transparente** (`.webp` o `.png` con canal alfa). Nada de fondos lisos, marcos, viñetas, sombras proyectadas ni recuadros: el juego pone la luz, la viñeta y el marco. Los retratos actuales (`personaje_*.webp`) traen fondo propio y por eso se ven como un cuadro pegado sobre la escena; son solo provisionales. Los fondos y las CG sí llevan fondo completo.
+> **Personajes recortados.** Entregar retratos, expresiones y figuras de personaje con canal alfa, sin viñetas, sombras proyectadas ni marcos incrustados. La novela visual muestra el recorte directamente sobre el escenario y atenúa al personaje que escucha. Los fondos y las CG cubren el lienzo completo.
 
 ## Índice
 
@@ -38,9 +38,14 @@ Rutas que ya lee el juego (I5-10): **`juego/historia/ilustraciones/<id>.webp`** 
 | Pieza | Archivo | Uso en la novela visual |
 | --- | --- | --- |
 | Vestíbulo, tienda, Custodio, Recaudador, Coleccionista, Dueño, corredor | `casino/arte/<sala>.webp` | Fondos de las escenas en esas salas. |
-| Retratos neutrales | `casino/arte/personaje_*.webp` (627 × 627) y `recursos/arte/custodio-grabado.png` | Referencia de rasgos para las hojas de expresiones. **No sirven como expresión** porque son cuadrados, tienen fondo y otro encuadre; hoy se usan como provisionales en escena. |
+| Retratos originales | `casino/arte/personaje_*.webp` y `recursos/arte/custodio-grabado.png` | Referencias de identidad y respaldo cuando falta un recorte neutral. |
 | Figuras | `casino/arte/figura_*.webp` | Exploración. |
 | Objetos de la oferta | `casino/arte/objeto_*.webp` | Iconos de la oferta inicial; ya están en el juego. |
+| Taller de Ferrer | [`taller_ferrer.webp`](../juego/historia/ilustraciones/taller_ferrer.webp) | Fondo de P2–P3 a 1920 × 1080. |
+| Hojas de expresiones | [`historia/retratos/`](../juego/historia/retratos) | 70 recortes a 900 × 1200 con alfa. Incluyen las 45 expresiones del elenco principal, 5 edades de Klein y 20 retratos de visitantes. |
+| Klein, movimiento | [`klein_movimiento.webp`](../juego/casino/arte/klein_movimiento.webp) | Exploración. Hoja transparente con 8 filas y 5 columnas, celdas de 175 × 224. De arriba abajo: este, sureste, sur, suroeste, oeste, noroeste, norte y noreste. |
+
+El taller, el retrato de Klein y su hoja de movimiento fueron generados con ImageGen. El taller conserva el tercio inferior oscuro para el cuadro de texto. El sprite reutiliza el diseño del retrato y alinea los pies dentro de cada celda.
 
 ---
 
@@ -64,14 +69,16 @@ Prioridad: **1** = necesario para el prólogo; **2** = eventos y decisiones; **3
 
 | Id | Prioridad | Escena | Descripción |
 | --- | :---: | --- | --- |
-| `sala_dueno_noche` | 1 | P0 | La sala del Dueño vista desde detrás de la silla del visitante, en plano medio bajo. Suelo de mármol negro con un gran disco solar de rayos de latón, gastados donde la gente apoya los pies y con arañazos como de uñas. Al fondo, la verja del alba: barrotes con forma de rayos que nacen de un sol a medio esconder; tras ellos, una franja fina de luz rosada que no entra. Mesa de nogal con tapete negro y ribete dorado. Dos candelabros de siete brazos casi consumidos, con la cera chorreada hasta el suelo. Del techo cuelgan campanas sin badajo. En las paredes laterales, hileras de Máscaras de porcelana colgadas como trofeos, con los ojos cerrados. Negro y latón; un único punto rosado al fondo. |
-| `negro_con_grabado` | 1 | P1 | Tarjeta del capítulo: una invitación lacrada sobre terciopelo negro, con el lacre de un sol tras una verja. A su lado, una Máscara de porcelana boca abajo. Centro libre para el título. |
-| `taller_ferrer` | 1 | P2–P3 | Relojería estrecha de puerto, de noche. Mostrador de nogal rayado con una lámpara de aceite de pantalla verde sobre piezas desmontadas. Pared entera de relojes de péndulo, cucús y de mesa, **todos a las doce menos un minuto**. Banco con lupa articulada y pinzas. Estanterías medio vacías: faltan los relojes buenos. En la vitrina, un papel de embargo clavado (sin texto legible). Catre deshecho y maleta pequeña en un rincón. Ventana con niebla y halo de farola. Rótulo de la tienda visto del revés (sin letras: solo la forma del cartel). |
-| `calle_niebla` | 1 | P4 | Calle empedrada del puerto de Corvera con niebla a la cintura. Fachadas estrechas con balcones de hierro; tras algunas ventanas, siluetas inmóviles que miran. Al fondo, el mástil de un velero. Farola de gas con un halo enorme y, a sus pies, charcos que reflejan una luz dorada de interior que no corresponde, como si bajo el agua hubiera otro salón. Gris azulado y verde muy oscuro; el único punto cálido es la farola. |
-| `fachada_casa` | 1 | P5 y sala de entrada | Fachada neoclásica de piedra oscura, demasiado grande para la calle, entre dos almacenes que parecen de juguete. Cuatro pilastras con capiteles de latón; cornisa con espacio para el rótulo (lo pone el juego). **Sin ventanas:** marcos tapiados con mármol verde y, en relieve suave, rostros con los ojos cerrados. Puerta doble de nogal con luz dorada por la rendija, escalinata de tres peldaños, reloj a la medianoche exacta y dos farolas. La niebla rodea el edificio sin tocarlo. **Debe servir como sala jugable:** acera libre desde la mitad inferior. Sustituye al dibujo provisional de `entrada_casino.gd`. |
+| `sala_dueno_noche` | 1 | P0 | **Disponible.** La sala del Dueño vista desde detrás de la silla del visitante, en plano medio bajo. Suelo de mármol negro con un gran disco solar de rayos de latón, gastados donde la gente apoya los pies y con arañazos como de uñas. Al fondo, la verja del alba: barrotes con forma de rayos que nacen de un sol a medio esconder; tras ellos, una franja fina de luz rosada que no entra. Mesa de nogal con tapete negro y ribete dorado. Dos candelabros de siete brazos casi consumidos, con la cera chorreada hasta el suelo. Del techo cuelgan campanas sin badajo. En las paredes laterales, hileras de Máscaras de porcelana colgadas como trofeos, con los ojos cerrados. Negro y latón; un único punto rosado al fondo. |
+| `negro_con_grabado` | 1 | P1 | **Disponible.** Tarjeta del capítulo: una invitación lacrada sobre terciopelo negro, con el lacre de un sol tras una verja. A su lado, una Máscara de porcelana boca abajo. Centro libre para el título. |
+| `taller_ferrer` | 1 | P2–P3 | **Disponible y verificado en Godot.** Relojería estrecha de puerto, de noche. Mostrador de nogal rayado con una lámpara de aceite de pantalla verde sobre piezas desmontadas. Pared entera de relojes de péndulo, cucús y de mesa, **todos a las doce menos un minuto**. Banco con lupa articulada y pinzas. Estanterías medio vacías: faltan los relojes buenos. En la vitrina, un papel de embargo clavado (sin texto legible). Catre deshecho y maleta pequeña en un rincón. Ventana con niebla y halo de farola. Rótulo de la tienda visto del revés (sin letras: solo la forma del cartel). |
+| `calle_niebla` | 1 | P4 | **Disponible.** Calle empedrada del puerto de Corvera con niebla a la cintura. Fachadas estrechas con balcones de hierro; tras algunas ventanas, siluetas inmóviles que miran. Al fondo, el mástil de un velero. Farola de gas con un halo enorme y, a sus pies, charcos que reflejan una luz dorada de interior que no corresponde, como si bajo el agua hubiera otro salón. Gris azulado y verde muy oscuro; el único punto cálido es la farola. |
+| `fachada_casa` | 1 | P5 y sala de entrada | **Disponible.** Fachada neoclásica de piedra oscura, demasiado grande para la calle, entre dos almacenes que parecen de juguete. Cuatro pilastras con capiteles de latón; cornisa con espacio para el rótulo (lo pone el juego). **Sin ventanas:** marcos tapiados con mármol verde y, en relieve suave, rostros con los ojos cerrados. Puerta doble de nogal con luz dorada por la rendija, escalinata de tres peldaños, reloj a la medianoche exacta y dos farolas. La niebla rodea el edificio sin tocarlo. **Debe servir como sala jugable:** acera libre desde la mitad inferior. La entrada jugable comparte este fondo con el prólogo. |
 | `sueno_hospicio` | 2 | E2 | Patio del hospicio de Santa Úrsula en un recuerdo. Muros grises, ropa tendida rígida por la escarcha, una fila de doce niños con batas grandes, una monja de espaldas. Todo desenfocado en los bordes, como una fotografía vieja; las caras de los niños sin rasgos. Tramado gris; ningún color salvo un toque verde en el fondo, donde está la levita de Ignacio. |
-| `pasillo_recaudador` | 2 | E2, M2 | Arte definitivo del pasillo (I5): granate, libros mayores, balanzas y una **caja fuerte empotrada con cristal** en la pared, donde Klein se ve reflejado. Banco de madera junto a la pared. |
-| `pasillo_coleccionista` | 2 | E4 | Arte definitivo del pasillo (I5): violeta, vitrinas con piezas expuestas y **una vitrina grande con cristal limpio** donde aparecen los reflejos del evento. Una rendija en el muro de piedra por la que puede entrar luz. |
+| `pasillo_custodio` | 2 | Exploración · primer sello | **Disponible.** Relojes, péndulos y placas de latón. Dejar a la vista el acceso oeste desde el vestíbulo, la mesa al norte y la salida al este. |
+| `pasillo_recaudador` | 2 | E2, M2 | **Disponible.** Arte definitivo del pasillo (I5): granate, libros mayores, balanzas y una **caja fuerte empotrada con cristal** en la pared, donde Klein se ve reflejado. Banco de madera junto a la pared. |
+| `pasillo_coleccionista` | 2 | E4 | **Disponible.** Arte definitivo del pasillo (I5): violeta, vitrinas con piezas expuestas y **una vitrina grande con cristal limpio** donde aparecen los reflejos del evento. Una rendija en el muro de piedra por la que puede entrar luz. |
+| `pasillo_dueno` | 2 | Exploración · tres sellos | **Disponible.** Mármol oscuro, latón y una primera línea de amanecer tras la verja. La pantalla jugable se abre con tres sellos y solo conecta con la Coleccionista y la mesa del Dueño. |
 | `vestibulo_amanecer` | 3 | Final A | El vestíbulo actual con luz blanca entrando por todas las rendijas del mármol. Los jugadores de porcelana deshaciéndose en polvo blanco. El reloj marca las seis. |
 | `dormitorio_klein_viejo` | 3 | Final C | Dormitorio pequeño y ordenado de un relojero viejo: cama de hierro, una cómoda con los cajones entreabiertos llenos de sobres negros, relojes en todas las paredes, una ventana con niebla. Sirve de fondo antes del CG final. |
 | `verja_alba` | 3 | Final A | La verja del alba abierta, vista desde dentro. Al otro lado, el puerto de Corvera al amanecer: muelle, mástiles y un cielo pálido, casi blanco, que entra en la sala y borra el tramado del mármol. En la oscuridad de la sala, las Máscaras de las paredes con los ojos abiertos. |
@@ -80,12 +87,14 @@ Prioridad: **1** = necesario para el prólogo; **2** = eventos y decisiones; **3
 
 ## Ilustraciones de novela visual (CG)
 
-Ilustraciones a pantalla completa que solo aparecen en la novela visual. Se desbloquean en una galería. Cada momento importante del guion tiene la suya, para que la historia se vea y no solo se lea; el juego ya las tiene conectadas y las muestra en cuanto existe el archivo (`juego/historia/ilustraciones/<id>.webp`). Mientras falten, el juego muestra un recuadro de «Ilustración pendiente» con su id y su descripción, como en el prólogo.
+Ilustraciones a pantalla completa para la novela visual. Las escenas ya implementadas las cargan por id desde `juego/historia/ilustraciones/<id>.webp` y muestran «Ilustración pendiente» cuando falta el archivo. Las CG de eventos y finales se incorporarán al montar esas escenas. La galería se reserva para un lote posterior.
+
+**Recuerdos de los jefes · I5-11.** Las preguntas posvictoria podrán abrir flashbacks. El encargo de arte se añade cuando Kenned escriba cada escena. Registrar el id del fondo o CG, el jefe y la pregunta que la activa, la acción que se ve y su prioridad. Los totales de este documento se actualizan al definir esas piezas. [Tarea I5-11](../ITERACION_05.md#i5-11--menús-posvictoria-de-los-jefes)
 
 | Id | Prioridad | Escena | Descripción |
 | --- | :---: | --- | --- |
-| `cg_ignacio_mascara` | 1 | P0 | Una mano envejecida y temblorosa sobre el tapete negro. Tres cartas abiertas: una Llave de 2, un Reloj de 7 y una Máscara recién volteada con el rostro de Ignacio, los ojos cerrados y la boca entreabierta, a mitad de un grito. Las llamas de los candelabros se inclinan hacia la carta. En el dorso de la mano, la piel se vuelve porcelana desde la punta de los dedos. |
-| `cg_invitacion` | 1 | P3 | Primer plano de dos manos manchadas de aceite que sostienen un sobre negro de papel grueso con el lacre del sol tras la verja. Sobre la palma, una ficha de marfil ennegrecido con una campana grabada. Detrás, desenfocado, el halo de la farola en la niebla. |
+| `cg_ignacio_mascara` | 1 | P0 | **Disponible.** Una mano envejecida y temblorosa sobre el tapete negro. Tres cartas abiertas: una Llave de 2, un Reloj de 7 y una Máscara recién volteada. El rostro de Ignacio se representa en porcelana grabada con la cinta granate y la filigrana del palo de Máscaras. Las llamas de los candelabros se inclinan hacia la carta. En el dorso de la mano, la piel se vuelve porcelana desde la punta de los dedos. |
+| `cg_invitacion` | 1 | P3 | **Disponible.** Primer plano de dos manos manchadas de aceite que sostienen un sobre negro de papel grueso con el lacre del sol tras la verja. Sobre la palma, una ficha de marfil ennegrecido con una campana grabada. Detrás, desenfocado, el halo de la farola en la niebla. |
 | `cg_libro_mayor` | 2 | Recaudador | Libro mayor abierto bajo una lámpara de pantalla granate. Columnas de tinta negra y roja con letra de contable (ilegible salvo una línea subrayada, que el juego superpone). Sello negro de la Casa al margen. La sombra de las gafas del Recaudador y la mano de Klein abierta, sin tocar el papel. |
 | `cg_vitrina_ignacio` | 2 | Coleccionista | Vitrina de cristal biselado con marco de latón y terciopelo violeta. En el centro, sobre un atril, la Máscara de Ignacio con barba y cicatriz, los ojos cerrados y una grieta bajo el ojo derecho por la que baja una gota. Otras Máscaras alrededor con etiquetas en blanco. En el cristal, el reflejo tenue de Klein con la lupa al cuello. |
 | `espejo_klein_35` | 2 | E1 | Klein reflejado en el cristal de la esfera del reloj del vestíbulo. Canas en las sienes. El minutero detrás de su reflejo. |
@@ -102,18 +111,18 @@ Ilustraciones a pantalla completa que solo aparecen en la novela visual. Se desb
 | `mascara_negra` | 3 | Final B | El Dueño, sin máscara (solo una franja de luz donde estaría la cara), tiende la máscara negra a Klein por encima del tapete. |
 | `sobres_en_los_umbrales` | 3 | Final C | Montaje en tres paneles verticales: el mismo sobre negro en tres umbrales distintos (la puerta del taller, una pensión de otra ciudad, una casa con jardín). Klein envejece de un panel a otro, siempre con la mano en el picaporte sin abrir. |
 | `anfitriona_en_el_lecho` | 3 | Final C | Dormitorio modesto de noche. Klein con 81 años en la cama, mirando a la silla de al lado, donde la anfitriona, igual que siempre, sostiene un sobre negro en el regazo. Todos los relojes de la pared parados a las doce menos un minuto. |
-| `cg_relojes_parados` | 1 | P2 | La pared de treinta y dos relojes del taller, todos a las doce menos un minuto; los péndulos detenidos a mitad de recorrido. Lámpara de pantalla verde en primer plano. |
-| `cg_ventana_farola` | 1 | P2 · mirar por la ventana | Ventana empañada del taller. Fuera, la farola encendida sin farolero y, bajo su halo, un hombre con levita verde que no tiene cara. Solo una silueta. |
-| `cg_reloj_helado` | 1 | P2 · comprobar los relojes | Las manos de Klein, manchadas de aceite, abren un reloj de bolsillo: el volante quieto, una escarcha fina sobre el metal y el vaho de su aliento. |
-| `cg_invitacion_arde` | 1 | P3 · intentar quemarla | La esquina de la invitación dentro de la llama de la lámpara. El fuego se ha vuelto verde y el papel sigue intacto; al fondo, las demás llamas del taller se apagan. |
-| `cg_reverso_perdoname` | 1 | P3 · darle la vuelta | El reverso de la tarjeta color hueso: una línea de dirección y, debajo, una letra temblorosa (sin palabras legibles; el texto lo pone el juego). |
-| `cg_farolero` | 1 | P4 | El farolero bajo su farola, apoyado en la pértiga, con los ojos blancos y la niebla a la cintura. No mira a Klein. |
-| `cg_camino_farolas` | 1 | P4 | Una hilera de farolas que se encienden hacia donde la calle debería acabar; detrás de Klein, las primeras ya están apagadas. |
-| `cg_ficha_late` | 1 | P5 · tocar la ficha | La ficha de marfil sobre la palma de Klein, con una campana grabada y un pulso de luz dorada que le ilumina los dedos. |
-| `cg_calle_desaparece` | 1 | P5 · mirar atrás | Klein de espaldas en la escalinata de la Casa; detrás, donde estaba la calle, solo negro. |
-| `cg_jugadores_porcelana` | 1 | P6 | Primer plano de manos que barajan en una mesa pequeña del vestíbulo: dedos blancos y lisos como loza; en una mano la porcelana llega a la muñeca. |
-| `cg_reloj_ranuras` | 1 | P6 | El gran reloj del vestíbulo parado a la medianoche, con tres ranuras vacías bajo el cristal del tamaño de un sello. |
-| `cg_puerta_grabada` | 1 | Vestíbulo · al entregar la invitación | Donde estaba la puerta, una pared de mármol verde con el contorno de una puerta grabado, sin picaporte ni bisagras. |
+| `cg_relojes_parados` | 1 | P2 | **Disponible.** La pared de treinta y dos relojes del taller, todos a las doce menos un minuto; los péndulos detenidos a mitad de recorrido. Lámpara de pantalla verde en primer plano. |
+| `cg_ventana_farola` | 1 | P2 · mirar por la ventana | **Disponible.** Ventana empañada del taller. Fuera, la farola encendida sin farolero y, bajo su halo, un hombre con levita verde que no tiene cara. Solo una silueta. |
+| `cg_reloj_helado` | 1 | P2 · comprobar los relojes | **Disponible.** Las manos de Klein, manchadas de aceite, abren un reloj de bolsillo: el volante quieto, una escarcha fina sobre el metal y el vaho de su aliento. |
+| `cg_invitacion_arde` | 1 | P3 · intentar quemarla | **Disponible.** La esquina de la invitación dentro de la llama de la lámpara. El fuego se ha vuelto verde y el papel sigue intacto; al fondo, las demás llamas del taller se apagan. |
+| `cg_reverso_perdoname` | 1 | P3 · darle la vuelta | **Disponible.** El reverso de la tarjeta color hueso: una línea de dirección y, debajo, una letra temblorosa (sin palabras legibles; el texto lo pone el juego). |
+| `cg_farolero` | 1 | P4 | **Disponible.** El farolero bajo su farola, apoyado en la pértiga, con los ojos blancos y la niebla a la cintura. No mira a Klein. |
+| `cg_camino_farolas` | 1 | P4 | **Disponible.** Una hilera de farolas que se encienden hacia donde la calle debería acabar; detrás de Klein, las primeras ya están apagadas. |
+| `cg_ficha_late` | 1 | P5 · tocar la ficha | **Disponible.** La ficha de marfil sobre la palma de Klein, con una campana grabada y un pulso de luz dorada que le ilumina los dedos. |
+| `cg_calle_desaparece` | 1 | P5 · mirar atrás | **Disponible.** Klein de espaldas en la escalinata de la Casa; detrás, donde estaba la calle, solo negro. |
+| `cg_jugadores_porcelana` | 1 | P6 | **Disponible.** Primer plano de manos que barajan en una mesa pequeña del vestíbulo: dedos blancos y lisos como loza; en una mano la porcelana llega a la muñeca. |
+| `cg_reloj_ranuras` | 1 | P6 | **Disponible.** El gran reloj del vestíbulo parado a la medianoche, con tres ranuras vacías bajo el cristal del tamaño de un sello. |
+| `cg_puerta_grabada` | 1 | Vestíbulo · al entregar la invitación | **Disponible.** Donde estaba la puerta, una pared de mármol verde con el contorno de una puerta grabado, sin picaporte ni bisagras. |
 | `cg_cadena_custodio` | 2 | Custodio · «¿Puede levantarse de esa silla?» | Bajo la mesa del Custodio, una cadena de hierro le sujeta los tobillos a las patas de la silla; eslabones gastados de tanto tirar. Solo se ven sus pies, la cadena y el borde del tapete. |
 | `klein_dueno` | 3 | Final B | Klein sentado en la silla del Dueño, con la máscara negra puesta y el abrigo oscuro. A su lado, la anfitriona escribe con una pluma sobre un sobre negro. La verja cerrada detrás; ninguna luz. |
 
@@ -150,21 +159,22 @@ Algunas notas cambian con la historia y por eso tienen más de una ilustración.
 
 Cada personaje necesita varias expresiones con **el mismo encuadre de busto**, para que el retrato cambie sin moverse. El guion usa exactamente estos ids (`[RETRATO: personaje · id]`). Si hay que recortar, la columna «Mínimo» indica las imprescindibles.
 
+**Retratos disponibles.** La carpeta [`historia/retratos`](../juego/historia/retratos) contiene las expresiones y edades de Klein, las expresiones de los otros siete personajes principales y los tres grados de porcelana de Amparo, Tobías y Benavides. Se generaron con ImageGen y se exportaron como WebP de 900 × 1200 con alfa. Los diálogos ya escritos usan los recortes por su id. Las variantes de eventos y finales quedan preparadas para cuando se implementen esas escenas.
+
 ### Klein Moretti
 
-**Diseño nuevo, victoriano y propio.** Toma rasgos genéricos de la época (levita, sombrero de copa, bastón, reloj de bolsillo) y los convierte en los de un relojero pobre que se viste lo mejor que puede. **No copia** la cara, el peinado ni el vestuario concreto del personaje de *Lord of the Mysteries*: el nombre ya coincide, y repetir también el diseño puede leerse como plagio en un proyecto evaluado.
+**Diseño de referencia para el juego.** Joven relojero de silueta victoriana estilizada, con pelo oscuro al descubierto, levita azul noche y luz fría en el contorno. La lupa y la cadena del reloj identifican su oficio. El [retrato neutral](../juego/historia/retratos/klein_neutral.webp) fija el diseño para las expresiones y el sprite.
 
 | Parte | Descripción |
 | --- | --- |
 | Cara | 27 años, delgado, pómulos marcados, mandíbula estrecha, sin barba. Ojos grises, cansados, con ojeras de trabajar de noche. Una pequeña cicatriz de quemadura en el pulgar derecho. |
-| Pelo | Castaño cobrizo, corto, algo despeinado; un mechón cae sobre la frente cuando se quita el sombrero. |
-| Sombrero | De copa **baja**, de fieltro negro gastado, con la cinta remendada. Heredado de Ignacio y un poco grande. |
-| Ropa | Levita negra de paño, larga hasta la rodilla, con los codos brillantes de uso. Chaleco gris marengo con cadena de plata y un reloj de bolsillo **abierto y parado** a las doce menos un minuto. Camisa blanca de cuello alto, corbata de lazo negra. Pantalón oscuro, botas con los tacones gastados. |
-| Detalles de relojero | Lupa monocular colgada de una cinta al cuello. Guantes de piel marrón con los dedos índice y pulgar del derecho cortados para trabajar. Un destornillador fino en el bolsillo del pecho. Una mancha de aceite en el puño de la camisa. |
+| Pelo | Negro, corto y ondulado, con varios mechones sobre la frente. Se lleva al descubierto en el retrato base y en exploración. |
+| Ropa | Levita azul noche hasta la rodilla, con una pequeña costura de latón en la solapa. Chaleco gris marengo de raya fina, camisa blanca y corbata negra recta. Pantalón oscuro y botas negras. |
+| Detalles de relojero | Lupa monocular de latón oscuro colgada al cuello y cadena de plata. El reloj de bolsillo se para a las doce menos un minuto. |
 | Bastón | Nogal oscuro con empuñadura de latón en forma de rueda dentada. Era el bastón de Ignacio. |
 | Silueta | Alta y estrecha, ligeramente encorvada hacia delante, como quien mira siempre algo pequeño. |
 
-**Sustituye** al sprite actual del visitante (sombrero de ala ancha): hace falta una figura de exploración nueva, `figura_klein` (ver [figuras](#figuras-de-exploración)).
+La hoja de movimiento sustituye al sprite del visitante en exploración (ver [figuras](#figuras-de-exploración)).
 
 | Id | Descripción | Mínimo |
 | --- | --- | :---: |
@@ -186,15 +196,15 @@ Para quien genere el arte con IA. Usar la misma descripción base en todas las p
 
 **Base (retrato de busto):**
 
-> Victorian engraving style portrait, late 19th century book illustration, fine ink lines and crosshatching, ivory and aged brass palette on deep green-black. Bust of a slender 27-year-old watchmaker, sharp cheekbones, clean-shaven, tired grey eyes with dark circles, short messy copper-brown hair. Worn low black felt top hat with a mended band, slightly too big. Long black wool frock coat with shiny elbows, charcoal waistcoat with a silver chain and an open pocket watch, high white collar, black bow tie. Monocular watchmaker's loupe hanging from a ribbon around the neck, brown leather gloves with the right index and thumb cut off. Isolated figure on transparent background, no text, no border, 3:4 framing, consistent bust crop.
+> Stylized Victorian game portrait with clean ink lines, soft cel shading and a restrained teal rim light. Slim 27-year-old watchmaker with grey-green eyes, clean-shaven face, short wavy black hair and a bare head. Midnight blue frock coat, charcoal pinstripe waistcoat, white pointed collar, slim black tie, brass watchmaker's loupe on a cord and a silver watch chain. Isolated on transparent background, no text or border, 3:4 framing, consistent bust crop. Match the neutral portrait.
 
-**Línea de expresión** (añadir al final): `neutral, attentive gaze, one hand on the watch chain` · `frightened, wide eyes, hand pressed on waistcoat pocket` · `dry ironic half smile, one eyebrow raised` · `determined, jaw set, hat brim lowered` · `furious, clenched teeth, white knuckles on a cane with a brass gear handle` · `broken, wet unfocused eyes, hat in hand` · `empty, expressionless, faint shadow of a black mask over the face`.
+**Línea de expresión** (añadir al final): `neutral, attentive gaze, one hand on the watch chain` · `frightened, wide eyes, hand pressed on waistcoat pocket` · `dry ironic half smile, one eyebrow raised` · `determined, jaw set, chin lowered` · `furious, clenched teeth, white knuckles on a cane with a brass gear handle` · `broken, wet unfocused eyes, shoulders slumped` · `empty, expressionless, faint shadow of a black mask over the face`.
 
 **Línea de edad:** `aged 35, grey at the temples` · `aged 45, deep lines, greying hair` · `aged 60, white hair, thin skin, gnarled hands` · `aged 20, boyish face, clothes slightly too large`.
 
 **Figura de cuerpo entero (exploración):**
 
-> Same character, full body, standing three-quarter view, walking with a dark walnut cane with a brass gear handle, worn boots, slightly stooped posture of someone who always looks at small things. Top-down isometric game sprite readability, engraving style, transparent background, 175 px wide.
+> Same character, full body and bare head, navy coat and dark boots. Elevated three-quarter top-down camera, transparent backgrounds, consistent scale and feet aligned to the bottom of every cell. Eight directions, each with a standing pose and four walking frames. Keep the hands free for a readable arm swing.
 
 ### La anfitriona (Leonor)
 
@@ -299,9 +309,11 @@ Variantes extra: **Tobías `saldado`** (porcelana entera con la palabra escrita 
 
 ## Figuras de exploración
 
+El encargo de las figuras secundarias se limita a poses estáticas. El farolero queda opcional hasta decidir si aparece físicamente en la entrada.
+
 | Id | Prioridad | Descripción |
 | --- | :---: | --- |
-| `figura_klein` | 1 | Klein con el diseño victoriano nuevo, de cuerpo entero, para sustituir a `figura_visitante.webp`. Ver los prompts en su hoja de expresiones. |
+| `figura_klein` | 1 | Integrada como `klein_movimiento.webp` con reposo y caminata en ocho direcciones. Ver los prompts en su hoja de expresiones. |
 | `figura_amparo` | 2 | Doña Amparo sentada a un piano de cola pequeño (el piano puede ser pieza aparte). |
 | `figura_tobias` | 2 | Tobías de pie, mirando hacia arriba, con la gorra en la mano. |
 | `figura_benavides` | 2 | Benavides sentado en un banco, abrazando el portafolios. |
@@ -314,7 +326,7 @@ Variantes extra: **Tobías `saldado`** (porcelana entera con la palabra escrita 
 
 | Id | Prioridad | Descripción |
 | --- | :---: | --- |
-| `marco_nvl` | 1 | Marco a pantalla completa para el modo NVL: un velo negro al 80 % con un filete de latón fino en los bordes y esquinas grabadas. |
+| `marco_nvl` | 1 | **Disponible en Godot.** Filete fino de latón con un degradado oscuro bajo la narración para dejar legible el arte. |
 | `cuadro_adv` | 2 | Revisión del cuadro de diálogo actual: más oscuro, con un borde de latón gastado y una pequeña campana en la esquina de la placa del nombre. |
 | `tarjeta_galeria` | 3 | Marco para las miniaturas de la galería de CG; una cerradura de latón para las que aún no se han visto. |
 
@@ -322,10 +334,10 @@ Variantes extra: **Tobías `saldado`** (porcelana entera con la palabra escrita 
 
 ## Orden de encargo
 
-| Lote | Piezas | Para qué |
+| Lote | Piezas pendientes | Para qué |
 | --- | --- | --- |
-| **1 · Prólogo jugable** | Hoja de expresiones y `figura_klein` del nuevo diseño de Klein; `sala_dueno_noche`, `negro_con_grabado`, `taller_ferrer`, `calle_niebla`, `fachada_casa`, `cg_ignacio_mascara`, `cg_invitacion`, `cg_relojes_parados`, `cg_ventana_farola`, `cg_reloj_helado`, `cg_invitacion_arde`, `cg_reverso_perdoname`, `cg_farolero`, `cg_camino_farolas`, `cg_ficha_late`, `cg_calle_desaparece`, `cg_jugadores_porcelana`, `cg_reloj_ranuras`, `cg_puerta_grabada`, `marco_nvl`; expresiones mínimas de la anfitriona, el Dueño, Ignacio y el farolero | Poder montar P0 a P6 completo |
-| **2 · Jefes y eventos** | Expresiones mínimas del Custodio, el Recaudador y la Coleccionista; `cg_libro_mayor`, `cg_vitrina_ignacio`, `cg_cadena_custodio`, las diez ilustraciones de notas examinables (y las tres de notas futuras), los tres espejos de Klein, `sueno_hospicio`, `sueno_ignacio_elige`, `reflejo_dueno`, `mascara_rota`; pasillos definitivos; visitantes con sus grados de porcelana | Eventos E1 a E5 y decisiones M1 a M3 |
-| **3 · Finales** | `fichas_dueno`, `amanecer_joven`, `amanecer_robado`, `dormitorio_klein_viejo`, `sobres_en_los_umbrales`, `anfitriona_en_el_lecho`, `vestibulo_amanecer`, `verja_alba`, `amanecer_muelle`, `farolero_ve`, `mascara_negra`, `klein_dueno`, expresiones restantes y piezas de galería | Los dos finales y la galería |
+| **1 · Prólogo jugable** | **Completo.** Fondos, 14 CG de prioridad 1, retratos y marco de narración. | Prólogo P0–P6 y grabado de la puerta del vestíbulo. |
+| **2 · Jefes y eventos** | `sueno_hospicio`, las CG de prioridad 2, las 13 notas, el acabado de `cuadro_adv` y las cuatro figuras estáticas del vestíbulo. | Ilustrar los encuentros y las notas. Los cuatro pasillos ya tienen arte propio. |
+| **3 · Finales** | Los tres fondos y las CG de prioridad 3, y `tarjeta_galeria`. | Completar los desenlaces A–C y la galería. |
 
-Total: **11 fondos**, **32 CG** y **13 ilustraciones de notas** (10 en el juego y 3 futuras), **45 expresiones** de los ocho personajes principales (31 mínimas) más las cinco edades de Klein, **3 visitantes** con dos expresiones en tres grados de porcelana, **6 figuras** y **3 piezas de interfaz**.
+**Total pendiente.** 4 de 13 fondos (el hospicio y los tres fondos de finales), 18 CG de eventos y finales, 13 ilustraciones de notas (10 ya tienen punto en el juego y 3 corresponden a puntos futuros), cuatro figuras estáticas y dos piezas de interfaz. La figura opcional del farolero y las tres variantes del reloj con sellos se cuentan aparte.

@@ -9,8 +9,6 @@ const PUERTA_ESTE_VESTIBULO := Vector2(1150, 356)
 const Libro := preload("res://casino/interfaz/libro.gd")
 
 var puntos: Array[Dictionary] = []
-## Pasillo montado, para que resalte la puerta cercana; null fuera de los pasillos.
-var galeria: Galeria
 var _decorado: Node2D
 var _marcas: Node2D
 
@@ -24,23 +22,20 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 			capa.remove_child(hijo)
 			hijo.queue_free()
 	puntos.clear()
-	galeria = null
 	var entrada: Vector2
 	if PlanoGaleria.es_pasillo(sala):
-		galeria = Galeria.new()
-		galeria.campana = campana
+		var galeria := Galeria.new()
 		galeria.pasillo = sala
-		galeria.capa_placas = _marcas
 		_decorado.add_child(galeria)
 		for destino: String in PlanoGaleria.puertas(sala):
-			var accion: String = "Entrar · %s" % CampanaCasino.NOMBRES[destino] if campana.puerta_abierta(destino) else PlanoGaleria.requisito(destino)
+			var accion := "Entrar · %s" % CampanaCasino.NOMBRES[destino]
 			_punto("puerta", PlanoGaleria.punto(sala, destino), accion, destino)
 		entrada = PlanoGaleria.entrada(sala, origen)
 	elif sala == "entrada":
 		_decorado.add_child(EntradaCasino.new())
-		_punto("puerta", Vector2(640, 350), "Entrar al casino", "vestibulo")
-		_punto("nota", Vector2(300, 600), "Examinar la farola")
-		entrada = Vector2(640, 430) if origen == "vestibulo" else Vector2(640, 593)
+		_punto("puerta", EntradaCasino.UMBRAL, "Entrar al casino", "vestibulo")
+		_punto("nota", EntradaCasino.FAROLA, "Examinar la farola")
+		entrada = EntradaCasino.UMBRAL + Vector2(0, 70) if origen == "vestibulo" else Vector2(640, 593)
 	else:
 		var arte := Sprite2D.new()
 		arte.texture = load("res://casino/arte/%s.webp" % sala)
@@ -61,7 +56,7 @@ func _agregar_interacciones(sala: String, nombre_nota: String, campana: CampanaC
 		var puerta := PuertaVestibulo.new()
 		puerta.abierta = campana.puerta_abierta(pasillo)
 		_decorado.add_child(puerta)
-		var accion := "Salir · %s" % CampanaCasino.NOMBRES[pasillo] if puerta.abierta else PlanoGaleria.requisito(pasillo)
+		var accion := "Salir · %s" % CampanaCasino.NOMBRES[pasillo]
 		_punto("puerta", PUERTA_ESTE_VESTIBULO, accion, pasillo)
 		_punto("puerta", Vector2(640, 651), "Volver a la calle" if not campana.recibida else "La puerta se ha cerrado", "entrada")
 	else:
@@ -91,11 +86,13 @@ func _figura(id: String, pies: Vector2, alto: float) -> void:
 	_decorado.add_child(personaje)
 
 func _punto(tipo: String, pos: Vector2, accion: String, destino := "") -> void:
-	var marca := Libro.rotulo("◇", 24, Libro.ORO)
-	marca.add_theme_constant_override("outline_size", 5)
-	marca.add_theme_color_override("font_outline_color", Color("15231e"))
-	marca.position = pos - Vector2(10, 25)
-	_marcas.add_child(marca)
+	var marca: Label
+	if tipo not in ["puerta", "salida"]:
+		marca = Libro.rotulo("◇", 24, Libro.ORO)
+		marca.add_theme_constant_override("outline_size", 5)
+		marca.add_theme_color_override("font_outline_color", Color("15231e"))
+		marca.position = pos - Vector2(10, 25)
+		_marcas.add_child(marca)
 	puntos.append({"tipo": tipo, "pos": pos, "accion": accion, "destino": destino, "marca": marca})
 
 func cercano(posicion: Vector2) -> Dictionary:
@@ -110,6 +107,5 @@ func cercano(posicion: Vector2) -> Dictionary:
 
 func marcar(elegido: Dictionary) -> void:
 	for punto in puntos:
-		punto.marca.text = "◆" if punto == elegido else "◇"
-	if galeria != null:
-		galeria.resaltar(str(elegido.get("destino", "")) if elegido.get("tipo", "") == "puerta" else "")
+		if punto.marca != null:
+			punto.marca.text = "◆" if punto == elegido else "◇"

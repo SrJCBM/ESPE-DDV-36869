@@ -727,7 +727,18 @@ Líneas cortas de la anfitriona en la vitrina, una al azar al abrirla, sin repet
 
 ## 8. Los jefes
 
-Cada jefe tiene cuatro momentos: **presentación** (antes de sentarse, con «Tomar asiento»), **preguntas** (menú de lore en la presentación, opcional), **victoria y derrota**, y **revisita** (hablar después de vencerlo). Las reacciones durante la partida están en la [Reacciones](#9-reacciones-de-los-jefes-durante-la-partida).
+Cada jefe tiene cuatro momentos: **presentación** (antes de sentarse, con «Tomar asiento»), **preguntas previas** (menú opcional antes de jugar), **victoria y derrota**, y **revisita** (hablar después de vencerlo). Las reacciones durante la partida están en [Reacciones](#9-reacciones-de-los-jefes-durante-la-partida).
+
+**Revisitas posvictoria · I5-11, pendiente de escritura por Kenned.** Al ganar, las preguntas previas ceden su lugar a un menú propio del jefe vencido. Escribir al menos tres preguntas nuevas por jefe, con respuestas que profundicen en lo que acaba de cambiar y en lo que ese personaje puede saber. Las líneas actuales de revisita sirven como saludo.
+
+| Jefe | Preguntas para desarrollar |
+| --- | --- |
+| Custodio | Qué perdió antes de convertirse en quien cuenta las campanadas, qué recuerda de la primera noche y qué queda de esa época fuera de la Casa. |
+| Recaudador | Cómo aprendió a llevar el libro, quién convirtió el tiempo en deuda y cómo se relacionan las garantías del casino con las deudas de Corvera. |
+| Coleccionista | Qué conserva por voluntad propia, qué significa guardar un rostro y qué relación tienen sus vitrinas con las concesiones del Dueño. |
+| Dueño | Qué cambia al perder, qué recuerda del trato con el amanecer y qué sabe de lo que espera en Corvera al otro lado de la verja. Mantener las revelaciones propias de los desenlaces en su momento. |
+
+Una respuesta puede abrir un **flashback breve y opcional**. Marcar su entrada, las líneas y los fondos con las convenciones del guion. Indicar desde qué pregunta se abre y a qué menú vuelve al terminar o saltarlo. Para las imágenes nuevas, registrar cada `[FONDO: id]` o CG en [Ilustraciones pendientes](ILUSTRACIONES_PENDIENTES.md#ilustraciones-de-novela-visual-cg) cuando el recuerdo esté escrito.
 
 ### 8.1 El Custodio
 
@@ -770,7 +781,7 @@ Cada jefe tiene cuatro momentos: **presentación** (antes de sentarse, con «Tom
 
 **Revisita:**
 
-**Custodio:** «La mesa está cerrada, pero el péndulo te recuerda. Te quedan años, relojero. No los malgastes preguntándome.» → abre el menú de preguntas.
+**Custodio:** «La mesa está cerrada, pero el péndulo te recuerda. Te quedan años, relojero. No los malgastes preguntándome.» → menú posvictoria del Custodio.
 
 ### 8.2 El Recaudador
 
@@ -834,7 +845,7 @@ Después de la página de Ignacio, el Recaudador ofrece la **[decisión M1](#m1-
 
 **Revisita:**
 
-**Recaudador:** «Su página sigue abierta. Pregunte, si quiere. Las respuestas también se anotan. Las preguntas tontas, en rojo.» → menú de preguntas.
+**Recaudador:** «Su página sigue abierta. Pregunte, si quiere. Las respuestas también se anotan. Las preguntas tontas, en rojo.» → menú posvictoria del Recaudador.
 
 ### 8.3 La Coleccionista
 
@@ -910,7 +921,7 @@ Tras la victoria, la Coleccionista ofrece la **[decisión M3](#m3--la-máscara-d
 
 **Revisita:**
 
-**Coleccionista:** «¿Vuelves a mirarlo? Puedes. Mirar todavía es gratis.» → menú de preguntas.
+**Coleccionista:** «¿Vuelves a mirarlo? Puedes. Mirar todavía es gratis.» → menú posvictoria de la Coleccionista.
 
 ### 8.4 El Dueño de la Casa
 
@@ -966,6 +977,8 @@ Si `lore.garantia`: «Ya sabes cómo llegaste. Bien. Odio tener que explicarlo.�
 **Anfitriona** *(fuera de cuadro)***:** «Ya la estoy escribiendo, señor.»
 
 → Ver [fin del intento](#144-fin-del-intento--la-casa-gana).
+
+**Revisita:** al hablarle de nuevo después de ganar y antes de cruzar la verja, se abre su menú posvictoria. Escribir el saludo y las preguntas en I5-11.
 
 ---
 

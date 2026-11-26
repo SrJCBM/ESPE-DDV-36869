@@ -24,7 +24,7 @@ const CREDITOS := [
 	["Ariel", "Cartas, mecánicas, objetos y personajes"],
 	["Kenned", "Programación, navegación, experiencia de usuario y narrativa"],
 ]
-const COMO_JUGAR := "Recorre el casino con WASD o las flechas y pulsa E para hablar, entrar o examinar. La anfitriona te entrega la baraja, diez fichas y un objeto a elegir.\n\nVence al Custodio, al Recaudador y a la Coleccionista para reunir tres sellos; cada sello abre la puerta del pasillo siguiente y el tercero, la del Dueño. La tienda está junto al Recaudador.\n\nEn la mesa, pide cartas sin pasarte del umbral y plántate para sumar puntos. Cada mano nueva gasta una campanada.\n\nAtajos: I pertenencias · H reglas de la mesa · V sonido · Esc pausa."
+const COMO_JUGAR := "Recorre el casino con WASD o las flechas y pulsa E para hablar, entrar o examinar. La anfitriona te entrega la baraja, diez fichas y un objeto a elegir.\n\nVence al Custodio, al Recaudador y a la Coleccionista para reunir tres sellos; cada sello abre la puerta del pasillo siguiente y el tercero, la del Dueño. La tienda está junto al Recaudador.\n\nEn la mesa, pide cartas sin pasarte del umbral y plántate para sumar puntos. Cada mano nueva gasta una campanada.\n\nAtajos: M plano del casino · I pertenencias · H reglas de la mesa · V sonido · Esc pausa."
 
 var audio: AudioCasino
 ## Devuelve [título, texto] de las pertenencias del intento.

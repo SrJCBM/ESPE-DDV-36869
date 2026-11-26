@@ -3,14 +3,14 @@ extends RefCounted
 ## Recursos de un intento local. Solo un encuentro activo puede pagar su recompensa.
 
 const MESAS := ["custodio", "recaudador", "coleccionista", "dueno"]
-const NOMBRES := {"entrada":"Entrada al casino", "vestibulo":"Vestíbulo", "pasillo_custodio":"Pasillo del Custodio", "pasillo_recaudador":"Pasillo del Recaudador", "pasillo_coleccionista":"Pasillo de la Coleccionista", "tienda":"Gabinete de la anfitriona", "custodio":"El Custodio", "recaudador":"El Recaudador", "coleccionista":"La Coleccionista", "dueno":"El Dueño de la Casa"}
+const NOMBRES := {"entrada":"Entrada al casino", "vestibulo":"Vestíbulo", "pasillo_custodio":"Pasillo del Custodio", "pasillo_recaudador":"Pasillo del Recaudador", "pasillo_coleccionista":"Pasillo de la Coleccionista","pasillo_dueno":"Pasillo del Dueño", "tienda":"Gabinete de la anfitriona", "custodio":"El Custodio", "recaudador":"El Recaudador", "coleccionista":"La Coleccionista", "dueno":"El Dueño de la Casa"}
 ## Usos por mesa del Sello del prudente (BALANCE_CAMPANA.md).
 const USOS_PRUDENTE := 1
 ## Objetos que la anfitriona ofrece gratis al aceptar la invitación (I5). Uno por intento.
 const OBJETOS_INICIALES := ["lente", "prudente", "moneda"]
 ## Sellos que exige cada espacio que no es una mesa (I5). Todos piden además la invitación;
 ## un espacio que no figura aquí está siempre abierto.
-const ACCESO := {"pasillo_custodio": 0, "pasillo_recaudador": 1, "tienda": 1, "pasillo_coleccionista": 2}
+const ACCESO := {"pasillo_custodio": 0, "pasillo_recaudador": 1, "tienda": 1, "pasillo_coleccionista": 2, "pasillo_dueno": 3}
 ## Catálogos de datos (Resources): condiciones de las mesas y productos de la tienda.
 const MESAS_CAMPANA: CatalogoMesas = preload("res://datos/mesas/mesas_campana.tres")
 const TIENDA: CatalogoTienda = preload("res://datos/tienda/catalogo_tienda.tres")

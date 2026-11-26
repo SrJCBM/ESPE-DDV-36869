@@ -1,25 +1,26 @@
 # Iteración 05 · Pasillos de los jefes
 
-**Estado general:** en curso. De las diez tareas, **siete están completas, una está a medias y dos están pendientes** ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). Las correcciones del 25 de noviembre (I5-06) se integraron en `main` ese mismo día. La novela visual (I5-10) se integró en `main` el 25 de noviembre de 2026. **Base:** I4 con sus correcciones, commit `d9c82b7`.
+**Estado general:** en curso. Nueve de las once tareas están implementadas, incluida la entrada ilustrada y los cuatro pasillos en los cambios locales. Quedan el sonido por jefe y los diálogos posvictoria ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). I5-06 e I5-10 se integraron el 25 de noviembre de 2026. **Base:** I4 con sus correcciones, commit `d9c82b7`.
 
 **Objetivo:** que el avance por la campaña se recorra. Cada sello abre una puerta física hacia el pasillo del jefe siguiente, y cada pasillo anuncia con su arte y su sonido a quién se va a enfrentar el jugador.
 
-**Identificadores.** Kenned redactó el plan el 23 de noviembre de 2026 a partir de lo que acordó con Julio. Los identificadores I5-01 a I5-10 ordenan el trabajo hecho para seguir el avance; Julio puede reasignarlos o cambiar el reparto.
+**Identificadores.** Kenned redactó el plan el 23 de noviembre de 2026 a partir de lo que acordó con Julio. Los identificadores I5-01 a I5-11 mantienen el orden del trabajo y las tareas pendientes.
 
 ## Plan de trabajo
 
 | ID | Tarea | Estado | Evidencia o pendiente |
 | --- | --- | --- | --- |
 | I5-01 | Oferta inicial de la anfitriona | **Completado** · `23ced9f` | Baraja, diez fichas y un objeto a elegir en una sola operación |
-| I5-02 | Entrada y pasillos por jefe | **Parcial** · `23ced9f` | Entrada, vestíbulo y tres pasillos jugables. Falta el pasillo propio del Dueño |
+| I5-02 | Entrada y pasillos por jefe | **Implementado en local** | Entrada, vestíbulo y cuatro pasillos jugables. El del Dueño requiere tres sellos |
 | I5-03 | Recompensa verificada y «Ver baraja» | **Completado** · `23ced9f` | Desde el inventario en exploración y desde la pausa, también a mitad de una mano |
 | I5-04 | Variante · Vela de Racha ×2 | **Completado** · `86aed51` | Activada por defecto; el balance queda para Julio |
 | I5-05 | Guardado automático de la partida | **Completado** · `8a4368b` | 16 pruebas en `test_guardado.gd`; «Continuar» y «Nueva partida» en el inicio |
 | I5-06 | Correcciones de la revisión del 25 de noviembre | **Completado** · `83f12aa` | Cierre sin fugas, franja de patrones, menú de inicio, colisiones y respuestas duplicadas del diálogo. Integrado en `main` |
-| I5-07 | Arte de la entrada y de los pasillos | **Pendiente** | Hoy es provisional: la entrada se dibuja en código y los pasillos tiñen `corredor.webp` |
+| I5-07 | Arte de la entrada y de los pasillos | **Implementado en local** | Fachada ilustrada y cuatro fondos propios con los accesos del plano |
 | I5-08 | Sonido por jefe | **Pendiente** | Los buses y los controles de volumen de I4-07 ya existen |
 | I5-09 | Guion narrativo y documentos de la rúbrica | **Completado** · `ac08646` | [Guion v4](Diseno/GUION_PROLOGO_Y_DIALOGOS.md), [ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md), navegación, catálogo y presentación |
 | I5-10 | Novela visual en el juego: cinemáticas, conversaciones, accesibilidad y créditos | **Completado** · `b420ab3`, en `main` | Prólogo y llegada como cinemáticas; anfitriona y crupieres con el guion v4; Historial, Auto y Saltar; opciones de lectura; créditos; efectos, personajes en escena, «examinar» ilustrado y un recorrido hacia delante desde el vestíbulo. 285 pruebas |
+| I5-11 | Menús posvictoria de los jefes | **Pendiente · Kenned** | Preguntas nuevas para cada jefe vencido, con recuerdos opcionales y su encargo de ilustraciones |
 
 ## Avance
 
@@ -31,7 +32,7 @@
 | [I4](ITERACION_04.md) | Interfaz y recorrido del casino | 8 de 8 implementadas; falta el piloto de I4-08 | 221 |
 | **I5** | **Pasillos de los jefes** | **7 de 10, una parcial** | **285** |
 
-Con I5, la campaña se juega de principio a fin: entrada, vestíbulo, pasillos, cuatro mesas, tienda, objeto inicial y salida. La partida también sobrevive a un cierre del juego, y la historia empieza con un prólogo de novela visual. Lo que falta es sobre todo arte y sonido (I5-07 e I5-08) y una pantalla, el pasillo del Dueño (I5-02).
+Con I5, la campaña se juega de principio a fin: entrada, vestíbulo, cuatro pasillos, cuatro mesas, tienda, objeto inicial y salida. La partida se guarda entre encuentros y la historia empieza con un prólogo de novela visual. Quedan el sonido por jefe (I5-08), los menús posvictoria (I5-11) y las escenas y piezas narrativas del [encargo de ilustraciones](Diseno/ILUSTRACIONES_PENDIENTES.md).
 
 ## Mapa
 
@@ -58,7 +59,7 @@ flowchart LR
 - **Elección inicial de objeto.** La anfitriona entrega la baraja, diez fichas y un objeto a elegir al aceptar la invitación. Ver [I5-01](#i5-01--oferta-inicial-de-la-anfitriona).
 - **El Dueño tiene su propio pasillo**, igual que los otros tres jefes.
 - **Sin atajos a la tienda.** El jugador camina de vuelta por los pasillos. Al volver de una mesa aparece frente a su puerta, como en I4-02.
-- Cada puerta cerrada indica el sello que falta. Se conservan la luz de la puerta siguiente, el candado y las placas de I4-02.
+- Ante una puerta cerrada, **E** abre un diálogo de novela visual. La primera puerta que exige un sello dice que falta el sello necesario. Las siguientes indican que faltan los sellos necesarios. El vestíbulo pide hablar con la anfitriona.
 
 ## I5-01 · Oferta inicial de la anfitriona
 
@@ -78,20 +79,18 @@ flowchart LR
 
 ## I5-02 · Entrada y pasillos por jefe
 
-**Estado:** parcial. Funciona el recorrido entrada → vestíbulo → pasillo del Custodio → mesa. El primer sello abre la puerta del este hacia el pasillo del Recaudador, que tiene su mesa al norte y la tienda al sur. El segundo sello abre el pasillo de la Coleccionista. Con tres sellos se abre la puerta del Dueño. Al volver de una sala o de otro pasillo, el visitante aparece frente a la puerta por la que llegó. Cada pasillo ilumina la puerta que acerca al siguiente objetivo.
+**Estado:** implementado en local. El primer sello abre el pasillo del Recaudador, el segundo el de la Coleccionista y el tercero el del Dueño. Al volver de una sala o de otro pasillo, el visitante aparece frente a la puerta de regreso. Cada pasillo ilumina el acceso que acerca al siguiente objetivo.
 
 | Espacio | Puertas | Estado |
 | --- | --- | --- |
-| Entrada al casino | Fachada y puerta hacia el vestíbulo. Es breve: presenta el lugar y enseña a moverse y a usar **E**. | **Jugable** con arte provisional dibujado en código. El intento empieza aquí |
+| Entrada al casino | Fachada con puerta hacia el vestíbulo y farola examinable | **Jugable**, con el fondo que se usa al llegar en el prólogo |
 | Vestíbulo | Se llega por la puerta de la calle, al sur. La anfitriona, y al este la puerta al pasillo del Custodio, para seguir hacia delante (I5-10). La puerta de la calle se cierra al entregar la invitación. | **Jugable.** La puerta del este pide la invitación; es un vano provisional en el nicho del arte |
-| Pasillo del Custodio | Al oeste, el vestíbulo. Al norte, la mesa del Custodio. Al este, la puerta al pasillo siguiente, cerrada hasta el primer sello. | **Jugable** sobre `corredor.webp` |
-| Pasillo del Recaudador | Al norte, la mesa del Recaudador; al sur, la tienda. Al este, la puerta al pasillo siguiente, cerrada hasta el segundo sello. | **Jugable** sobre `corredor.webp` |
-| Pasillo de la Coleccionista | Al frente, la mesa de la Coleccionista. Al este, la puerta al pasillo del Dueño, cerrada hasta reunir los tres sellos. | **Provisional:** la puerta del este lleva directamente a la sala del Dueño |
-| Pasillo del Dueño | La mesa del Dueño. La salida se abre desde su sala tras vencerlo. | **Pendiente** |
+| Pasillo del Custodio | Oeste al vestíbulo, norte a la mesa y este al Recaudador con el primer sello | **Jugable**, 3 accesos |
+| Pasillo del Recaudador | Oeste al Custodio, norte a la mesa, sur al Gabinete y este a la Coleccionista con el segundo sello | **Jugable**, 4 accesos |
+| Pasillo de la Coleccionista | Oeste al Recaudador, norte a la mesa y este al Dueño con tres sellos | **Jugable**, 3 accesos |
+| Pasillo del Dueño | Oeste a la Coleccionista y norte a la mesa. La salida se abre desde su sala tras vencerlo | **Jugable**, 2 accesos |
 
-**Implementación.** `PlanoGaleria` pasó de una lista de puertas a una lista de pasillos (`PASILLOS`, `PADRE`, `ORDEN`). Cada puerta tiene su lado y, si está al norte o al sur, su posición sobre el arte. Los sellos que exige cada pasillo y la tienda están en `CampanaCasino.ACCESO`, y `puerta_abierta` los consulta. La entrada es una sala más en `PlanoSalas` y `SalaExplorable`, con la fachada como obstáculo. Se reutilizan la luz, los candados, las placas y los puntos de regreso de I4-02.
-
-**Pendiente.** El pasillo del Dueño como pantalla propia, con la puerta desde el pasillo de la Coleccionista.
+**Implementación.** `PlanoGaleria` define los accesos de los pasillos y los puntos de regreso. `CampanaCasino.ACCESO` valida los sellos necesarios. Las puertas se dibujan en el fondo y el minimapa transparente de la esquina superior derecha muestra los accesos y la posición real del visitante. **M** abre el plano completo y destaca la sala actual. **M** o **Esc** devuelven el control.
 
 ## I5-03 · Recompensa verificada y «Ver baraja»
 
@@ -173,14 +172,13 @@ Lecturas para Julio:
 
 ## I5-07 · Arte de la entrada y de los pasillos
 
-**Estado:** pendiente. Hasta tener las ilustraciones, el juego usa el arte provisional y el sprite antiguo del visitante. La herramienta de generación de Julio vuelve a estar disponible el jueves al mediodía.
+**Estado:** implementado en local. Los fondos de exploración tienen cámara elevada y accesos pintados en la posición de sus puntos de interacción.
 
 | Pieza | Descripción |
 | --- | --- |
-| Entrada al casino | Fachada exterior de noche con la puerta del casino. Hoy se dibuja en `casino/exploracion/entrada_casino.gd`. |
-| Cuatro pasillos | Uno por jefe, con la paleta común y un motivo propio: relojes y péndulos para el Custodio, libros mayores y balanzas para el Recaudador, vitrinas y piezas expuestas para la Coleccionista, y el amanecer tras la verja para el Dueño. Cada pasillo muestra solo sus puertas. Hoy los tres primeros usan `corredor.webp` con un tinte y apagan las puertas sobrantes. |
-| Puertas laterales y del sur | Puertas reales en el arte de cada pasillo para sustituir los vanos de latón provisionales. |
-| Diseño nuevo del protagonista | Según las hojas de expresiones de [ILUSTRACIONES_PENDIENTES.md](Diseno/ILUSTRACIONES_PENDIENTES.md). |
+| Entrada al casino | `historia/ilustraciones/fachada_casa.webp`, con el umbral y la farola accesibles desde la acera. |
+| Cuatro pasillos | Fondos `casino/arte/pasillo_*.webp`: relojes y péndulos, libros y balanza, vitrinas y máscaras, y mármol negro con un sol de latón. Los pasos laterales y la escalera del Gabinete forman parte del dibujo. |
+| Protagonista | `casino/arte/klein_movimiento.webp`, en ocho direcciones. Retratos y arte narrativo en el [encargo de ilustraciones](Diseno/ILUSTRACIONES_PENDIENTES.md). |
 
 ## I5-08 · Sonido por jefe
 
@@ -265,12 +263,22 @@ Lecturas para Julio:
 - Se corrigieron los ocho avisos de GDScript que mostraba el depurador: operadores ternarios incompatibles en `vista_mano.gd` y `casino.gd`, variables sin usar en `respuesta_resultado.gd`, y en `mesa_ui.gd` una variable sombreada y una propiedad sin usar.
 - La balanza del Recaudador tenía una huella que hacía fallar a veces la prueba de colisiones.
 
+## I5-11 · Menús posvictoria de los jefes
+
+**Responsable.** Kenned. Empezar por el [encargo narrativo en la sección 8 del guion](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes) y después conectar las preguntas en los cuatro recursos de `juego/datos/dialogos/`.
+
+- Reutilizar la condición `mesa_superada`. Antes del encuentro se conserva el menú de presentación. Al volver después de la victoria, `revisita → preguntas_revisita` abre preguntas y respuestas propias. Cada respuesta regresa a ese menú o permite volver a la sala.
+- Escribir al menos tres preguntas nuevas por jefe. En conjunto deben ampliar su historia personal, el origen o las reglas de la Casa, la relación con el Dueño y algún detalle del mundo exterior. Las revelaciones deben respetar los hechos, el momento narrativo y las condiciones del guion vigente.
+- Algunas preguntas pueden ofrecer un **flashback opcional**. Reutilizar la cinemática de I5-10. Terminarlo o saltarlo devuelve al menú posvictoria. Por cada imagen que pida el guion, anotar su identificador, escena, descripción y prioridad en [Ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md#ilustraciones-de-novela-visual-cg).
+
+**Criterio de cierre.** Probar los cuatro jefes antes y después de vencerlos. En la revisita no aparecen las preguntas de presentación, las cifras de la mesa ni «Tomar asiento». Las respuestas y los flashbacks permiten volver a la revisita sin volver a combatir ni cobrar otra recompensa. El Dueño puede hablar antes de cruzar la salida. Registrar la prueba después de guardar y continuar, y qué recuerdos requieren arte.
+
 ## Para después
 
 - **LAN.** Queda para una iteración futura, por decisión de Julio. No se ha empezado.
 - **Eventos, decisiones morales y finales** del guion (E1–E5, M1–M4, finales A–C) sobre las cinemáticas de I5-10.
 - **Nodos huérfanos de `test_interfaz.gd`.** GUT sigue atribuyéndole 28. Es un pendiente aparte de I4; no viene de los cambios de I5.
-- **Piloto de I4-08 con tres personas.** Conviene hacerlo antes de cerrar el diseño de los pasillos, para saber si el jugador encuentra las puertas y entiende las placas.
+- **Piloto de I4-08 con tres personas.** Comprobar si se orientan con el minimapa y si entienden los requisitos al intentar pasar por una puerta.
 
 ## Verificación
 

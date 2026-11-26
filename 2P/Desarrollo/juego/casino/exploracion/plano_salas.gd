@@ -4,11 +4,9 @@ extends RefCounted
 ## deja paso a ambos lados de cada mesa, a los asientos y al portón del Dueño.
 
 const LIMITES := Rect2(87, 178, 1106, 475)
-const LIMITES_GALERIA := Rect2(48, 288, 1184, 310)
+const LIMITES_ENTRADA := Rect2(87, 393, 1106, 260)
+const LIMITES_GALERIA := Rect2(48, 288, 1184, 327)
 const MUEBLES := {
-	"entrada": {
-		"fachada": Rect2(87, 178, 1106, 140),
-	},
 	"vestibulo": {
 		"pared_norte_oeste": Rect2(87, 178, 360, 27),
 		"pared_norte_centro": Rect2(482, 178, 63, 27),
@@ -77,8 +75,13 @@ const MUEBLES := {
 	},
 }
 
+static func limites(sala: String) -> Rect2:
+	if sala == "entrada":
+		return LIMITES_ENTRADA
+	return LIMITES_GALERIA if PlanoGaleria.es_pasillo(sala) else LIMITES
+
 static func construir(sala: String, padre: Node2D) -> void:
-	var area := LIMITES_GALERIA if PlanoGaleria.es_pasillo(sala) else LIMITES
+	var area := limites(sala)
 	var a := area.position
 	var b := area.end
 	_agregar(padre, "Norte", Rect2(a - Vector2(30,30), Vector2(area.size.x+60,30)))

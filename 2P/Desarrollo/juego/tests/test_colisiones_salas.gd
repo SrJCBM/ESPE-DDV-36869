@@ -10,11 +10,11 @@ func test_muebles_bloquean_el_movimiento(sala = use_parameters(["entrada", "vest
 	juego.entrar(sala)
 	await get_tree().physics_frame
 	await get_tree().physics_frame
-	for id in PlanoSalas.MUEBLES[sala]:
+	for id in PlanoSalas.MUEBLES.get(sala, {}):
 		var mueble: StaticBody2D = juego.decorado.get_node(id)
 		var rect: Rect2 = PlanoSalas.MUEBLES[sala][id]
 		assert_true(_choca_con(juego.visitante, rect, mueble), "%s · %s permite cruzar su centro" % [sala, id])
-	_comprobar_rutas(juego, PlanoSalas.LIMITES)
+	_comprobar_rutas(juego, PlanoSalas.limites(sala))
 	await get_tree().process_frame
 
 func test_en_cada_pasillo_se_puede_llegar_a_todas_sus_puertas(pasillo = use_parameters(PlanoGaleria.ORDEN)) -> void:

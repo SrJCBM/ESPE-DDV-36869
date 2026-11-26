@@ -19,7 +19,7 @@ Las piezas se generaron con la herramienta integrada ImageGen para La Última Me
 
 ## Corredor común · pedido retirado
 
-El pedido de un corredor con cuatro puertas al norte y dos al sur queda **retirado**. La [iteración 05](../ITERACION_05.md#arte-y-sonido) sustituye el corredor común por una entrada y un pasillo propio para cada jefe; el arte se pide allí. Mientras tanto I4 usa el `corredor.webp` actual con dos vanos provisionales al sur.
+El pedido de un corredor con cuatro puertas al norte y dos al sur queda **retirado**. La [iteración 05](../ITERACION_05.md#i5-07--arte-de-la-entrada-y-de-los-pasillos) sustituye el corredor común por una entrada y un pasillo propio para cada jefe. En I4 se usaba `corredor.webp` con dos vanos provisionales al sur.
 
 ## Prompts de generación
 

@@ -35,27 +35,29 @@ func test_las_figuras_se_ordenan_por_los_pies() -> void:
 	var anfitriona: Sprite2D = _figuras(juego)[0]
 	assert_eq(anfitriona.position, Vector2(990, 231), "El origen de la figura está en sus pies.")
 	assert_almost_eq(anfitriona.offset.y, -anfitriona.texture.get_height() * 0.5, 0.01)
-	for punto in juego.exploracion.puntos: assert_eq(punto.marca.get_parent(), juego.capa_superior)
+	for punto in juego.exploracion.puntos:
+		if punto.marca != null:
+			assert_eq(punto.marca.get_parent(), juego.capa_superior)
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-func test_rombos_y_placas_quedan_sobre_el_mundo_y_bajo_los_dialogos() -> void:
+func test_rombos_y_minimapa_quedan_sobre_el_mundo_y_bajo_los_dialogos() -> void:
 	var juego = _casino()
 	var indice: int = juego.capa_superior.get_index()
 	assert_gt(indice, juego.mundo.get_index())
 	assert_lt(indice, juego.velo.get_index())
 	assert_lt(indice, juego.libro.get_index())
+	assert_gt(juego.minimapa.get_index(), juego.mundo.get_index())
+	assert_lt(juego.minimapa.get_index(), juego.dialogo.get_index())
 	assert_eq(juego.capa_superior.z_index, 0)
 
-func test_las_placas_de_la_galeria_quedan_sobre_el_visitante() -> void:
+func test_las_puertas_del_pasillo_carecen_de_placas_y_marcas() -> void:
 	var juego = _casino()
 	juego.campana.recibir_invitacion()
 	juego.entrar("pasillo_custodio", "vestibulo")
-	var placas: Node2D = juego.capa_superior.get_node("Placas")
-	assert_eq(placas.z_index, 0, "Sin z_index: un valor alto las pondría sobre los diálogos.")
-	juego.entrar("vestibulo")
-	await get_tree().process_frame
-	assert_null(juego.capa_superior.get_node_or_null("Placas"), "Al salir de la galería se retiran.")
+	assert_null(juego.capa_superior.get_node_or_null("Placas"))
+	for punto: Dictionary in juego.exploracion.puntos:
+		assert_null(punto.marca)
 	await get_tree().process_frame
 	await get_tree().process_frame
 

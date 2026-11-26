@@ -39,17 +39,17 @@ func test_cerca_de_algo_aparece_una_sola_accion_breve() -> void:
 	juego._process(0.0)
 	assert_eq(juego.pista.text, "E · Abrir vitrina")
 
-func test_una_puerta_cerrada_muestra_su_requisito_al_acercarse() -> void:
+func test_las_puertas_solo_muestran_el_control_al_acercarse() -> void:
 	var juego = _casino()
 	juego._entregar()
 	juego._cerrar()
 	juego.entrar("pasillo_custodio", "vestibulo")
 	juego.visitante.position = PlanoGaleria.punto("pasillo_custodio", "pasillo_recaudador") + Vector2(-20, 0)
 	juego._process(0.0)
-	assert_eq(juego.pista.text, "Falta el primer sello")
+	assert_eq(juego.pista.text, "E · Examinar la puerta")
 	juego.visitante.position = PlanoGaleria.punto("pasillo_custodio", "custodio") + Vector2(0, 20)
 	juego._process(0.0)
-	assert_eq(juego.pista.text, "E · Entrar · El Custodio")
+	assert_eq(juego.pista.text, "E · Entrar")
 
 func test_la_presentacion_del_crupier_muestra_tres_cifras_y_tomar_asiento() -> void:
 	var juego = _casino()

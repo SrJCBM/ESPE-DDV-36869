@@ -36,12 +36,12 @@ const VELOCIDAD := 55.0 ## Caracteres por segundo, por defecto.
 const HISTORIAL_MAXIMO := 150
 const PASO_SALTO := 0.06 ## Segundos entre líneas al saltar.
 const CAJA := Rect2(140, 600, 1160, 180)
-const RETRATO := Rect2(150, 150, 360, 470)
+const RETRATO := Rect2(150, 112, 376, 488)
 ## Narración NVL: franja inferior, sobre la ilustración.
 const PAGINA := Rect2(210, 612, 1020, 150)
 const FUNDIDO_FONDO := 0.6
 const LADOS := {"izquierda": 330.0, "centro": 720.0, "derecha": 1110.0}
-const ALTO_FIGURA := 600.0
+const ALTO_FIGURA := 510.0
 const ATENUADO := Color(0.48, 0.48, 0.48)
 const MUTED := Color("b9ad91")
 
@@ -74,7 +74,6 @@ var _lista_historial: VBoxContainer
 var _desplazamiento: ScrollContainer
 var _espera := 0.0
 var retrato: TextureRect
-var marco_retrato: Panel
 var nombre: Label
 var texto: Label
 var texto_nvl: Label
@@ -93,13 +92,13 @@ var franja: TextureRect
 var presentes := {}
 var escenario: Control
 var cara: TextureRect
-var _marco_cara: Panel
 var _movimiento: Tween
 var _sacudida: Tween
 var boton_saltar: Button
 ## Id del fondo visible, o vacío.
 var fondo_actual := ""
 var _sombra: ColorRect
+var _marco_nvl: Panel
 var _caja: Panel
 var _placa: Panel
 var _anexo: Control
@@ -157,14 +156,21 @@ func _ready() -> void:
 	franja.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	franja.hide()
 	add_child(franja)
+	_marco_nvl = Panel.new()
+	_marco_nvl.position = Vector2(20, 20)
+	_marco_nvl.size = BASE - Vector2(40, 40)
+	_marco_nvl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var borde := StyleBoxFlat.new()
+	borde.draw_center = false
+	borde.border_color = Color(0.83, 0.71, 0.47, 0.45)
+	borde.set_border_width_all(1)
+	_marco_nvl.add_theme_stylebox_override("panel", borde)
+	_marco_nvl.hide()
+	add_child(_marco_nvl)
 	escenario = Control.new()
 	escenario.size = BASE
 	escenario.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(escenario)
-	marco_retrato = Panel.new()
-	marco_retrato.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	marco_retrato.add_theme_stylebox_override("panel", Libro.caja(Color("06120e"), Libro.ORO))
-	add_child(marco_retrato)
 	retrato = TextureRect.new()
 	retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	retrato.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -188,20 +194,14 @@ func _ready() -> void:
 	nombre.position = _placa.position + Vector2(18, 4)
 	nombre.size = Vector2(250, 38)
 	add_child(nombre)
-	_marco_cara = Panel.new()
-	_marco_cara.position = CAJA.position + Vector2(26, 36)
-	_marco_cara.size = Vector2(104, 104)
-	_marco_cara.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_marco_cara.add_theme_stylebox_override("panel", Libro.caja(Color("06120e"), Libro.ORO))
-	_marco_cara.hide()
-	add_child(_marco_cara)
 	cara = TextureRect.new()
-	cara.position = Vector2(4, 4)
+	cara.position = CAJA.position + Vector2(30, 40)
 	cara.size = Vector2(96, 96)
 	cara.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	cara.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	cara.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_marco_cara.add_child(cara)
+	cara.hide()
+	add_child(cara)
 	texto = Libro.rotulo("", 22, Libro.PAPEL)
 	texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	texto.vertical_alignment = VERTICAL_ALIGNMENT_TOP
@@ -349,7 +349,7 @@ func configurar(ajustes: Dictionary) -> void:
 	_aplicar_modo()
 
 ## Abre la conversación en la entrada que corresponda al progreso. false si no hay ninguna.
-func abrir(datos: Conversacion, condicion: Callable, movimiento_reducido := false, descripcion := Callable()) -> bool:
+func abrir(datos: Conversacion, condicion: Callable, movimiento_reducido := false, descripcion := Callable(), barra_lectura := true) -> bool:
 	conversacion = datos
 	evaluar = condicion
 	describir = descripcion
@@ -367,6 +367,7 @@ func abrir(datos: Conversacion, condicion: Callable, movimiento_reducido := fals
 	escena.position = Vector2.ZERO
 	texto_nvl.text = ""
 	boton_saltar.visible = permitir_saltar
+	barra.visible = barra_lectura
 	auto = false
 	saltando = false
 	boton_auto.set_pressed_no_signal(false)
@@ -428,7 +429,6 @@ func _mostrar(id: String) -> void:
 		texto.text = frase
 		_desde = 0
 	else:
-		marco_retrato.hide()
 		retrato.texture = null
 		_mostrar_cara("")
 		texto_nvl.text = frase
@@ -469,6 +469,7 @@ func _aplicar_modo() -> void:
 	if is_instance_valid(_anexo):
 		_anexo.visible = adv
 	franja.visible = modo == "nvl"
+	_marco_nvl.visible = franja.visible
 	# La narración y las tarjetas dejan ver la ilustración entera.
 	if escenario != null:
 		escenario.visible = adv
@@ -584,7 +585,7 @@ func _cambiar_escenario(cambio: Dictionary) -> void:
 	figura.texture = load(ruta)
 	var medida := figura.texture.get_size() * (ALTO_FIGURA / figura.texture.get_height())
 	figura.size = medida
-	var destino := Vector2(float(LADOS.get(str(cambio.get("lado", "centro")), 720.0)) - medida.x * 0.5, BASE.y - 40 - medida.y)
+	var destino := Vector2(float(LADOS.get(str(cambio.get("lado", "centro")), 720.0)) - medida.x * 0.5, CAJA.position.y + 10 - medida.y)
 	if nueva and not reducido and is_inside_tree():
 		figura.position = destino + Vector2(0, 24)
 		figura.modulate.a = 0.0
@@ -620,9 +621,9 @@ func _resaltar(quien: String) -> void:
 ## Cara del que habla en el cuadro (la parte alta de su imagen), o nada.
 func _mostrar_cara(ruta: String) -> void:
 	var visible_cara := not ruta.is_empty() and ResourceLoader.exists(ruta)
-	_marco_cara.visible = visible_cara and modo == "adv"
-	texto.position.x = CAJA.position.x + (150 if _marco_cara.visible else 36)
-	texto.size.x = CAJA.size.x - (186 if _marco_cara.visible else 72)
+	cara.visible = visible_cara and modo == "adv"
+	texto.position.x = CAJA.position.x + (150 if cara.visible else 36)
+	texto.size.x = CAJA.size.x - (186 if cara.visible else 72)
 	if not visible_cara:
 		return
 	var imagen: Texture2D = load(ruta)
@@ -644,18 +645,15 @@ static func _estilo_pendiente() -> StyleBoxFlat:
 	estilo.set_expand_margin_all(-18)
 	return estilo
 
-## El retrato conserva su proporción, apoyado sobre el cuadro y con un filo de latón.
+## El retrato recortado conserva su proporción y se apoya sobre el cuadro de texto.
 func _encuadrar_retrato() -> void:
-	marco_retrato.visible = retrato.texture != null
 	if retrato.texture == null:
 		return
 	var proporcion := retrato.texture.get_size()
 	var escala := minf(RETRATO.size.x / proporcion.x, RETRATO.size.y / proporcion.y)
 	var medida := proporcion * escala
 	retrato.size = medida
-	retrato.position = Vector2(RETRATO.position.x, RETRATO.end.y - medida.y)
-	marco_retrato.position = retrato.position - Vector2(4, 4)
-	marco_retrato.size = medida + Vector2(8, 8)
+	retrato.position = Vector2(RETRATO.get_center().x - medida.x * 0.5, RETRATO.end.y - medida.y)
 
 ## Muestra la línea entera y, después, sus respuestas o la indicación para seguir.
 func completar() -> void:
@@ -666,17 +664,19 @@ func completar() -> void:
 		indicacion.text = "E · continuar" if not conversacion.siguiente(actual, evaluar).is_empty() else "E · cerrar"
 		indicacion.show()
 		return
+	var junto_a_personajes := not presentes.is_empty()
+	var ancho := 420.0 if junto_a_personajes else 520.0
 	for indice in _opciones.size():
 		var boton := Button.new()
 		boton.text = _formato(str(_opciones[indice].get("texto", "")))
 		boton.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		boton.custom_minimum_size = Vector2(520, 44)
+		boton.custom_minimum_size = Vector2(ancho, 44)
+		boton.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		var extra: Dictionary = describir.call(_opciones[indice]) if describir.is_valid() else {}
 		if not str(extra.get("detalle", "")).is_empty():
 			# Nombre y efecto en una línea cada uno, con el icono del objeto a la izquierda.
 			boton.text += "\n" + str(extra.detalle)
 			boton.custom_minimum_size.y = 66
-			boton.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		if ResourceLoader.exists(str(extra.get("icono", ""))):
 			boton.icon = load(str(extra.icono))
 			boton.expand_icon = true
@@ -693,6 +693,7 @@ func completar() -> void:
 		botones.append(boton)
 	respuestas.reset_size()
 	var tope := CAJA.position.y - 34 if modo == "adv" else PAGINA.position.y - 30
+	respuestas.position.x = (BASE.x - ancho) * 0.5 if junto_a_personajes else CAJA.end.x - ancho
 	respuestas.position.y = tope - respuestas.size.y
 	botones[0].grab_focus()
 
@@ -805,7 +806,7 @@ func saltar() -> void:
 func _gui_input(evento: InputEvent) -> void:
 	if not evento is InputEventMouseButton or not evento.pressed:
 		return
-	if evento.button_index == MOUSE_BUTTON_WHEEL_UP and not panel_historial.visible:
+	if evento.button_index == MOUSE_BUTTON_WHEEL_UP and barra.visible and not panel_historial.visible:
 		abrir_historial()
 		accept_event()
 	elif evento.button_index == MOUSE_BUTTON_LEFT and not panel_historial.visible:
