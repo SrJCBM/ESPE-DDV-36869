@@ -326,7 +326,7 @@ func test_cuatro_cartas_completas_caben_sin_desplazamiento() -> void:
 	await get_tree().process_frame
 	var ultima: Control = mesa.mano.fila.get_child(3)
 	assert_lte(ultima.get_global_rect().end.x, mesa.mano.scroll.get_global_rect().end.x)
-	assert_lte(mesa.mano.fila.size.x, 704.0)
+	assert_lte(mesa.mano.fila.size.x, mesa.mano.scroll.size.x)
 	assert_eq(mesa.mano.scroll.scroll_horizontal, 0)
 
 func test_cinco_cartas_completas_caben_sin_desplazamiento() -> void:
@@ -336,8 +336,9 @@ func test_cinco_cartas_completas_caben_sin_desplazamiento() -> void:
 	await get_tree().process_frame
 	var ultima: Control = mesa.mano.fila.get_child(4)
 	assert_lte(ultima.get_global_rect().end.x, mesa.mano.scroll.get_global_rect().end.x)
-	assert_lte(mesa.mano.fila.size.x, 704.0)
+	assert_lte(mesa.mano.fila.size.x, mesa.mano.scroll.size.x)
 	assert_eq(mesa.mano.scroll.scroll_horizontal, 0)
+	assert_almost_eq(ultima.size.x / ultima.size.y, 0.7, 0.01, "I6-04: las cartas reducidas conservan su proporción")
 
 func test_doce_cartas_conservan_tamano_y_muestran_la_ultima_al_robar() -> void:
 	var mesa = _mesa()
@@ -347,7 +348,8 @@ func test_doce_cartas_conservan_tamano_y_muestran_la_ultima_al_robar() -> void:
 	await get_tree().process_frame
 	var primera: Control = mesa.mano.fila.get_child(0)
 	var ultima: Control = mesa.mano.fila.get_child(11)
-	assert_eq(ultima.size, Vector2(184, preload("res://mesa/interfaz/composicion_mesa.gd").ALTO_CARTA))
+	assert_eq(ultima.size, mesa.mano.medida_carta(5), "Desde la sexta, conservan el tamaño de una mano de cinco")
+	assert_gte(ultima.size.x, 120.0, "Legibles a 1024 × 576 (85 px de ancho)")
 	assert_gt(mesa.mano.scroll.scroll_horizontal, 0)
 	assert_lte(ultima.get_global_rect().end.x, mesa.mano.scroll.get_global_rect().end.x)
 	assert_lt(primera.get_global_rect().position.x, mesa.mano.scroll.get_global_rect().position.x)

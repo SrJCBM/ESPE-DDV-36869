@@ -13,6 +13,8 @@ const Piezas := preload("res://mesa/piezas_mesa.gd")
 var _mano: HBoxContainer
 var _puede_resaltar: Callable
 var _vista: Dictionary = {}
+## La franja es una consulta (I6-04): solo se ve mientras la persona la tiene abierta.
+var abierta := false
 var _raton := -1
 var _foco := -1
 
@@ -40,7 +42,7 @@ func presentar(vista: Dictionary) -> void:
 	_refrescar()
 
 func ocultar_por_seleccion(ocultar: bool) -> void:
-	visible = not ocultar and not _vista.get("cartas", []).is_empty() and not _vista.get("patrones_visibles", []).is_empty()
+	visible = abierta and not ocultar and not _vista.get("cartas", []).is_empty() and not _vista.get("patrones_visibles", []).is_empty()
 
 func limpiar() -> void:
 	_raton = -1

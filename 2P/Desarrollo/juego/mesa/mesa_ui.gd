@@ -53,6 +53,11 @@ var boton_ayuda: Button
 var boton_reiniciar: Button
 var boton_demostracion: Button
 var boton_desglose: Button
+## Abre y cierra la consulta de patrones (I6-04). T hace lo mismo.
+var boton_patrones: Button
+## Patrón cercano junto a la mano, p. ej. «Mano larga · 4/5».
+var _cercano: Label
+var _franja_fondo: Panel
 var mano: ManoMesa
 var _titulo_estado: Label
 var _contador: Label
@@ -164,6 +169,9 @@ func _construir() -> void:
 	lienzo.add_child(bocadillo)
 	Piezas.etiqueta(lienzo, nombre, C.NOMBRE, 46, MARFIL, true)
 	_titulo_estado = Piezas.etiqueta(lienzo, "", C.ESTADO, 16, ORO)
+	_cercano = Piezas.etiqueta(lienzo, "", C.CERCANO, 16, MARFIL)
+	_cercano.name = "PatronCercano"
+	_cercano.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	# El tapete ilustrado es la prueba de estilo del Custodio; las demás mesas conservan el paño liso.
 	if campana == null or campana.activa == "custodio":
 		tapete = Piezas.imagen(lienzo, TAPETE_CUSTODIO, C.TAPETE)
@@ -216,6 +224,8 @@ func _construir() -> void:
 	oscuro.set_corner_radius_all(4)
 	franja_fondo.add_theme_stylebox_override("panel", oscuro)
 	lienzo.add_child(franja_fondo)
+	_franja_fondo = franja_fondo
+	franja_fondo.hide()
 	franja_patrones = FranjaPatrones.new()
 	lienzo.add_child(franja_patrones)
 	franja_patrones.configurar(mano.fila, _puede_resaltar_patrones)
@@ -224,6 +234,10 @@ func _construir() -> void:
 	franja_patrones.detalle_cambiado.connect(_mostrar_detalle_patron)
 	franja_patrones.patron_solicitado.connect(_mostrar_patron)
 	franja_patrones.boton_creado.connect(modal.suspender_si_abierto)
+	boton_patrones = Piezas.boton_texto(lienzo, "boton_patrones", "PATRONES · T", C.CONSULTA, alternar_patrones, 13)
+	boton_patrones.tooltip_text = "Consultar los patrones y su progreso. T abre y cierra; Esc cierra."
+	Piezas.estilo_modal(boton_patrones)
+	boton_patrones.hide()
 	_lectura_titulo = Piezas.etiqueta(lienzo, "SIGUIENTE PASO", C.LECTURA_TITULO, 12, MUTED)
 	_lectura_titulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_lectura = Piezas.etiqueta(lienzo, "—", C.LECTURA, 36, MARFIL, true)
@@ -236,6 +250,7 @@ func _construir() -> void:
 	boton_plantarse = Piezas.boton_accion(lienzo, "boton_plantarse", C.PLANTARSE, false, _plantarse, "S")
 	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "")
 	_mazo = Piezas.etiqueta(lienzo, "", Rect2(40, 780, 350, 24), 12, MUTED)
+	_mazo.name = "Mazo"
 	_respuesta = Respuesta.new(_lectura, _puntos, _umbral)
 	_respuesta.boleto = boleto
 	add_child(_respuesta)
@@ -348,6 +363,8 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	_presentar_lectura(cartas)
 	_actualizar_orientacion()
 	franja_patrones.presentar(vista)
+	mano.objetivo.text = "Meta %s  ·  umbral %s  ·  %s campanadas\nCada mano nueva cuesta una campanada." % [vista.get("meta", 200), vista.get("umbral", 17), vista.get("campanadas", 10)]
+	_sincronizar_consulta()
 	if not modal.visible:
 		var actual := get_viewport().gui_get_focus_owner()
 		if terminada or actual == null or not actual.is_visible_in_tree() or (actual is BaseButton and actual.disabled):
@@ -389,6 +406,55 @@ func _presentar_lectura(cartas: Array) -> void:
 			var ocultas: int = int(intervalo.get("ocultas", 0))
 			_explicacion.text = conocidas + "\n%s %s" % [ocultas, "oculta" if ocultas == 1 else "ocultas"]
 	_explicacion.visible = not _explicacion.text.is_empty()
+
+## Consulta de patrones (I6-04): sustituye a la fila fija. Al abrirla, la franja ocupa el lugar
+## de la lectura y el foco pasa al primer patrón; al cerrarla, vuelve al botón.
+func alternar_patrones() -> void:
+	if franja_patrones.abierta:
+		cerrar_patrones()
+	else:
+		abrir_patrones()
+
+func abrir_patrones() -> void:
+	if vista.get("cartas", []).is_empty() or modal.visible or revelacion.activa:
+		return
+	franja_patrones.abierta = true
+	franja_patrones.ocultar_por_seleccion(not eleccion_llave.seleccionada.is_empty())
+	_sincronizar_consulta()
+	for boton in franja_patrones.get_children():
+		if boton.visible:
+			boton.grab_focus()
+			return
+
+func cerrar_patrones(enfocar := true) -> void:
+	if not franja_patrones.abierta:
+		return
+	franja_patrones.abierta = false
+	franja_patrones.limpiar()
+	franja_patrones.ocultar_por_seleccion(false)
+	_sincronizar_consulta()
+	_presentar_lectura(vista.get("cartas", []))
+	_actualizar_orientacion()
+	if enfocar and boton_patrones.is_visible_in_tree():
+		boton_patrones.grab_focus()
+
+## Muestra la lectura o la consulta, nunca las dos, y el patrón cercano solo con la consulta cerrada.
+func _sincronizar_consulta() -> void:
+	var hay_cartas: bool = not vista.get("cartas", []).is_empty()
+	if not hay_cartas:
+		franja_patrones.abierta = false
+		franja_patrones.ocultar_por_seleccion(false)
+	var abierta: bool = franja_patrones.visible
+	_franja_fondo.visible = abierta
+	boton_patrones.visible = hay_cartas
+	boton_patrones.text = "CERRAR · T" if abierta else "PATRONES · T"
+	boton_patrones.position = C.CONSULTA_ABIERTA.position if abierta else C.CONSULTA.position
+	_mensaje.size = C.DETALLE_CONSULTA.size if abierta else C.DETALLE.size
+	if abierta:
+		_lectura_titulo.hide()
+		_lectura.hide()
+		_explicacion.hide()
+	_cercano.text = "" if abierta else Lectura.patron_cercano(vista)
 
 func _construir_regla() -> void:
 	_regla = PlacaRegla.new()
@@ -507,6 +573,7 @@ func _abrir_modal(titulo: String, caja: Rect2 = ModalMesa.MARCO_NORMAL) -> void:
 	_respuesta.detener()
 	dial.detener()
 	eleccion_llave.cancelar()
+	cerrar_patrones(false)
 	franja_patrones.limpiar()
 	_actualizar_orientacion()
 	modal.abrir(titulo, caja)
@@ -593,6 +660,7 @@ func _activar_carta(carta: Dictionary, id: String) -> void:
 
 func _cambio_eleccion_llave(activa: bool) -> void:
 	franja_patrones.ocultar_por_seleccion(activa)
+	_sincronizar_consulta()
 	if activa:
 		franja_patrones.limpiar()
 		_mensaje.hide()
@@ -601,7 +669,7 @@ func _cambio_eleccion_llave(activa: bool) -> void:
 
 func _actualizar_orientacion() -> void:
 	_mensaje.position = C.DETALLE.position
-	_mensaje.size = C.DETALLE.size
+	_mensaje.size = C.DETALLE_CONSULTA.size if franja_patrones.abierta else C.DETALLE.size
 	_mensaje.text = Lectura.pista(vista)
 	_mensaje.visible = not _mensaje.text.is_empty()
 	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "")
@@ -626,7 +694,7 @@ func _mostrar_detalle_patron(texto: String) -> void:
 	_actualizar_orientacion()
 	if not texto.is_empty():
 		_mensaje.position = C.DETALLE.position
-		_mensaje.size = C.DETALLE.size
+		_mensaje.size = C.DETALLE_CONSULTA.size if franja_patrones.abierta else C.DETALLE.size
 		_mensaje.text = texto
 		_mensaje.show()
 
@@ -656,6 +724,10 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		revelacion.terminar()
 		get_viewport().set_input_as_handled()
 		return
+	if evento.keycode == KEY_ESCAPE and franja_patrones.abierta:
+		cerrar_patrones()
+		get_viewport().set_input_as_handled()
+		return
 	if evento.keycode == KEY_ESCAPE and not eleccion_llave.seleccionada.is_empty():
 		eleccion_llave.cancelar()
 		get_viewport().set_input_as_handled()
@@ -665,6 +737,7 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		KEY_S: _plantarse()
 		KEY_L: mostrar_devolucion()
 		KEY_H: mostrar_ayuda()
+		KEY_T: alternar_patrones()
 		KEY_I: _ver_objetos()
 		KEY_V: _sonido()
 		KEY_R: _solicitar_reinicio()

@@ -31,7 +31,7 @@ func test_acciones_apiladas_bajo_el_boleto_con_el_mismo_ancho() -> void:
 	await get_tree().process_frame
 	var pedir: Rect2 = mesa.boton_iniciar_pedir.get_rect()
 	var plantar: Rect2 = mesa.boton_plantarse.get_rect()
-	assert_eq(pedir.size, Vector2(230, 64))
+	assert_eq(pedir.size, Vector2(238, 64), "I6-04: el ancho completo de la columna, como el boleto")
 	assert_eq(plantar.size.x, pedir.size.x)
 	assert_gte(pedir.position.y, mesa.boleto.get_rect().end.y, "Debajo del boleto")
 	assert_gt(plantar.position.y, pedir.end.y - 1, "Pedir arriba, Plantarse debajo")
@@ -41,6 +41,8 @@ func test_los_patrones_quedan_fuera_del_tapete() -> void:
 	var mesa = _mesa()
 	mesa.controlador.procesar_comando(IniciarMano.new())
 	await get_tree().process_frame
+	assert_false(mesa.franja_patrones.visible, "I6-04: la franja es una consulta, cerrada al empezar")
+	mesa.abrir_patrones()
 	assert_true(mesa.franja_patrones.visible)
 	assert_gte(mesa.franja_patrones.get_rect().position.y, mesa.tapete.get_rect().end.y)
 
