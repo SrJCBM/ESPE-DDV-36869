@@ -1,6 +1,6 @@
 # La Última Mesa · Inventario de ilustraciones
 
-**Estado al 26 de noviembre de 2026.** El arte definido en el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md) está hecho. En Godot ya se ven las diez notas jugables, las CG del Custodio, el Recaudador y la Coleccionista, las figuras del recorrido y la placa de diálogo. El arte de los eventos, los finales y los tres puntos de examen futuros está disponible por id. Con el guion versión 5 quedan por generar los cuatro [recuerdos de los jefes](#recuerdos-de-los-jefes-i5-11-guion-v5) y la [derrota ilustrada](#cg_derrota_manos--fin-del-intento-i6-11-guion-144). La mesa recompuesta (I6-04) pide los [tapetes de los otros tres jefes y un icono de campanada](#piezas-de-interfaz), y la revisión de figuras (I6-09) deja [reglas de entrega para los recortes de exploración](#figuras-de-exploración).
+**Estado al 26 de noviembre de 2026.** El arte jugable del guion v4 y de I6 está integrado en Godot. Ya se ven las diez notas, las figuras del recorrido, los cuatro [recuerdos de los jefes](#recuerdos-de-los-jefes-i5-11-guion-v5), la [derrota de Klein](#cg_derrota_manos--fin-del-intento-i6-11-guion-144) y los [tapetes e icono de campanada](#piezas-de-interfaz). El arte ya preparado para los eventos, finales y puntos de examen futuros se conserva por id. La derrota de la ruta de sombra se generará cuando se implemente esa ruta. [Guion](GUION_PROLOGO_Y_DIALOGOS.md).
 
 **Estilo:** el de la [dirección artística](DIRECCION_ARTISTICA.md). Grabado de libro antiguo de finales del siglo XIX, líneas finas, sombreado por tramado. Paleta de verde profundo `#0B2119`, latón `#D5B578` y marfil `#F1E4C9`. Para la novela visual se pide **más contraste, más negro y menos dorado**. Sin texto incrustado: rótulos, cartas y etiquetas se escriben en Godot para poder traducirlos. **Nada de sangre ni heridas:** el horror es frío, porcelana y silencio.
 
@@ -131,7 +131,7 @@ Ilustraciones a pantalla completa para la novela visual. Las escenas ya implemen
 
 ### Recuerdos de los jefes (I5-11, guion v5)
 
-Encargo para Julio. Cada recuerdo de [la sección 8 del guion](GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes) se monta sobre una sola CG, con acercamiento lento y narración NVL en el tercio inferior. **No hacen falta retratos nuevos:** en los recuerdos no hay personajes en escena. Para separarlos del presente se pide el mismo grabado con **menos contraste, tono sepia frío y bordes ligeramente desvanecidos**. Ninguna cara del pasado debe verse de frente con detalle. Formato de CG: 1920 × 1080, `juego/historia/ilustraciones/<id>.webp`.
+Las cuatro imágenes están integradas como WebP de 1920 × 1080 en `juego/historia/ilustraciones/`. Cada recuerdo usa un grabado con narración NVL en el tercio inferior y un acercamiento lento. [Sección 8 del guion](GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes).
 
 | Id | Prioridad | Jefe y pregunta que lo abre | Qué se ve | Encuadre |
 | --- | :---: | --- | --- | --- |
@@ -153,7 +153,7 @@ Encuadre propuesto por Kenned para la derrota ilustrada. Una sola CG sirve para 
 | **Espacio para el texto** | El tercio inferior queda oscuro y sin detalles importantes: ahí va la narración NVL. La vitrina y las manos en los dos tercios superiores. |
 | **Movimiento en el juego** | Acercamiento lento hacia las manos mientras se leen las dos frases del guion; al llegar a la vitrina, un fundido al ADV de la Anfitriona. |
 
-**Secuencia que montará I6-11:** sonido de quiebra, porcelana que cruje y campana con eco; las dos frases NVL de §14.4 sobre esta CG; la variante «vitrina vacía» (la de la Coleccionista depende de `moral.sombra`, que aún no existe); la Anfitriona en ADV, «Ya la estoy escribiendo, señor.»; y la acción **Nuevo intento**. Se conserva la línea del crupier de la derrota antes de la secuencia.
+**Secuencia implementada.** La despedida del crupier sobre la mesa da paso a las manos y la vitrina vacía en NVL. Se oye un chasquido de porcelana. La Anfitriona escribe otra invitación y **Nuevo intento** devuelve al jugador a la entrada.
 
 **Variante para más adelante** (`cg_derrota_coleccionista`): el mismo encuadre con los guantes violeta de la Coleccionista entrando desde arriba para levantar las manos de Klein. Solo cuando exista la ruta de sombra.
 
@@ -366,11 +366,11 @@ Las cuatro figuras secundarias son poses estáticas con alfa. Amparo y los jugad
 | `cuadro_adv` | 2 | **Integrado.** Fondo más oscuro, borde de latón gastado y [campana de la placa](../juego/casino/dialogos/arte/campana_adv.webp). |
 | `tarjeta_galeria` | 3 | **Archivo disponible.** [Miniatura de latón sobre verde oscuro](../juego/historia/ilustraciones/tarjeta_galeria.webp) para escenas aún sin desbloquear en la futura galería. |
 
-**Mesa recompuesta · I6-04.** El tapete ganó superficie y ahora es el fondo de la espera y de la mano, pero solo el Custodio tiene uno ilustrado: las otras tres mesas muestran un paño liso. Además, el coste de iniciar o pedir se lee en una ficha con icono, y la campana actual mide 64 × 60 px. Formato de los tapetes: 1480 × 800 con alfa fuera del óvalo, en `juego/mesa/arte/tapete_<jefe>.webp`. Encuadre común: vista cenital y óvalo de borde a borde. Los adornos, solo en el ribete, arriba, abajo y en los extremos. El centro, liso y oscuro, sin motivos que compitan con las cartas ni texto.
+**Mesa recompuesta · I6-04.** Los cuatro tapetes están integrados como WebP de 1480 × 800 con alfa fuera del óvalo en `juego/mesa/arte/`. Comparten una vista cenital con centro oscuro y decoración en el borde. El icono nuevo identifica el coste de iniciar con una campanada.
 
 | Id | Prioridad | Descripción |
 | --- | :---: | --- |
-| `tapete_custodio` | 2 | **Integrado** a 1152 × 768. **Reexportar a 1480 × 800** con el mismo diseño, para que no se estire al nuevo tamaño de la mesa. Óvalo de paño verde con ribete de latón y engranajes arriba y abajo. |
+| `tapete_custodio_i6` | 2 | **Integrado.** El óvalo verde con ribete de latón y engranajes se adaptó al nuevo encuadre. |
 | `tapete_recaudador` | 1 | Paño verde muy oscuro, casi negro, con ribete de latón. Arriba, una cinta de libro mayor con columnas rayadas a tinta roja y negra (sin cifras legibles). Abajo, una fila de cuentas de ábaco de latón. En los extremos, los platillos de la balanza de su sala. |
 | `tapete_coleccionista` | 1 | Terciopelo violeta oscuro con ribete de latón biselado como el marco de una vitrina. En el borde, pequeñas etiquetas de museo en blanco y un filo de cristal. En los extremos, dos guantes de encaje cruzados. |
 | `tapete_dueno` | 1 | Paño negro con ribete de latón ennegrecido. Arriba, la verja del alba en miniatura con una franja de luz fría que la atraviesa. Abajo, un reloj sin agujas. Ninguna luz en el centro: la noche ocupa el paño. |
@@ -385,8 +385,8 @@ Las cuatro figuras secundarias son poses estáticas con alfa. Amparo y los jugad
 | **1 · Prólogo jugable** | Integrado | Fondos, 14 CG, retratos y marco de narración. |
 | **2 · Jefes y eventos** | Arte completo | Hospicio, CG de encuentros y eventos, 13 notas, cuadro ADV y cuatro figuras del recorrido. |
 | **3 · Finales** | Arte completo | Tres fondos, CG de los desenlaces A–C y miniatura para la galería. |
-| **4 · Guion v5** | Pendiente · Julio | Cuatro recuerdos (`fb_campanario`, `fb_deuda_muerto`, `fb_habitacion_cristal` y `fb_apuesta_alba`) y `cg_derrota_manos`. Más adelante, `cg_derrota_coleccionista`. |
-| **5 · Mesa de I6-04** | Pendiente · Julio | `tapete_recaudador`, `tapete_coleccionista`, `tapete_dueno`, la reexportación de `tapete_custodio` a 1480 × 800 e `icono_campanada`. |
+| **4 · Guion v5** | Integrado | Cuatro recuerdos y `cg_derrota_manos`. Más adelante, `cg_derrota_coleccionista`. |
+| **5 · Mesa de I6-04** | Integrado | Cuatro tapetes e `icono_campanada`. |
 
 **Lote final.** 42 recursos: cuatro fondos, 18 CG, 13 notas, cinco figuras contando al farolero y dos piezas de interfaz. Las CG de los eventos y finales, los tres puntos de examen adicionales, el farolero de exploración y la galería esperan su puesta en escena.
 

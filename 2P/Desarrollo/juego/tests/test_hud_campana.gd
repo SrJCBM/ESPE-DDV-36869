@@ -61,8 +61,8 @@ func test_el_casino_muestra_sellos_y_saldo_reales() -> void:
 	assert_eq(juego.hud.saldo.cifra.text, "37")
 	assert_eq(_obtenidos(juego.hud.sellos), [true, true, false])
 	juego.inventario()
-	assert_string_contains(juego.libro.cuerpo.text, "Sello del Recaudador · conseguido")
-	assert_string_contains(juego.libro.cuerpo.text, "Sello de la Coleccionista · pendiente")
+	assert_eq(juego.libro.lista.find_child("recaudador", true, false).tooltip_text, "Sello del Recaudador · conseguido")
+	assert_eq(juego.libro.lista.find_child("coleccionista", true, false).tooltip_text, "Sello de la Coleccionista · pendiente")
 
 func test_la_mesa_de_campana_usa_el_mismo_recuadro() -> void:
 	var campana := CampanaCasino.new()

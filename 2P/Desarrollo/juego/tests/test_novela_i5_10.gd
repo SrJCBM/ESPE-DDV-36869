@@ -27,9 +27,64 @@ func _recorrer(dialogo, maximo := 200) -> int:
 	return pasos
 
 func test_los_dialogos_del_guion_no_tienen_referencias_rotas() -> void:
-	for nombre in ["prologo", "anfitriona", "custodio", "recaudador", "coleccionista", "dueno"]:
+	for nombre in ["prologo", "anfitriona", "custodio", "recaudador", "coleccionista", "dueno",
+			"amparo", "tobias", "benavides", "fb_campanario", "fb_deuda_muerto",
+			"fb_habitacion_cristal", "fb_apuesta_alba", "derrota_v5"]:
 		var conversacion: Conversacion = load("res://datos/dialogos/%s.tres" % nombre)
 		assert_eq(conversacion.errores(), PackedStringArray(), nombre)
+
+func test_el_recuerdo_de_cada_jefe_vuelve_a_las_preguntas_pendientes(indice = use_parameters([0, 1, 2, 3])) -> void:
+	var juego = _casino()
+	juego._entregar()
+	juego._cerrar()
+	juego.campana.superadas = indice + 1
+	var jefe: String = CampanaCasino.MESAS[indice]
+	juego.entrar(jefe)
+	juego._presentar_jefe()
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	juego.dialogo.completar()
+	assert_eq(juego.dialogo.botones.size(), 4, "Tres preguntas y una salida")
+	var memoria := [0, 2, 0, 1]
+	juego.dialogo.elegir(memoria[indice])
+	juego.dialogo.completar()
+	assert_eq(juego.dialogo.botones.size(), 2, "Abrir el recuerdo u otra pregunta")
+	juego.dialogo.elegir(0)
+	assert_true(juego.cinematica.activa)
+	assert_not_null(juego.historia.fondo.texture, "El recuerdo tiene su ilustración")
+	assert_lt(_recorrer(juego.historia, 20), 20)
+	assert_eq(juego.dialogo.actual, "pos_fin_recuerdo")
+	juego.dialogo.completar()
+	juego.dialogo.avanzar()
+	juego.dialogo.completar()
+	assert_eq(juego.dialogo.botones.size(), 3)
+	assert_eq(juego.sala, jefe)
+	assert_true(juego.visitante.bloqueado)
+
+func test_los_visitantes_conversan_y_la_porcelana_avanza_con_los_sellos() -> void:
+	var juego = _casino()
+	juego._entregar()
+	juego._cerrar()
+	var encuentros := {"vestibulo": "amparo", "pasillo_custodio": "tobias", "pasillo_recaudador": "benavides"}
+	for sala in encuentros:
+		juego.campana.superadas = 1
+		juego.entrar(sala)
+		var id: String = encuentros[sala]
+		var puntos: Array = juego.exploracion.puntos.filter(func(p): return p.destino == id)
+		assert_eq(puntos.size(), 1)
+		juego.visitante.position = puntos[0].pos
+		juego.interactuar(juego.cercano())
+		juego.dialogo.completar()
+		assert_eq(juego.dialogo.actual, "saludo")
+		assert_string_contains(juego.dialogo.conversacion.retrato("saludo"), id + "_neutral_p2")
+		juego.dialogo.elegir(0)
+		assert_eq(juego.dialogo.actual, "respuesta_1")
+		juego.dialogo.cerrar()
+		juego.campana.superadas = 3
+		juego.interactuar(juego.cercano())
+		assert_eq(juego.dialogo.actual, "porcelana")
+		assert_string_contains(juego._pista(juego.cercano()), "Examinar")
+		juego.dialogo.cerrar()
 
 func test_las_intervenciones_largas_dejan_libre_la_barra_al_ciento_cuarenta_por_ciento() -> void:
 	var novela = load("res://casino/dialogos/dialogo_novela.gd").new()
@@ -186,6 +241,7 @@ func test_la_victoria_trae_la_linea_del_crupier() -> void:
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
 	juego.mesa.boton_plantarse.pressed.emit()
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
+	juego.libro.primero.pressed.emit()
 	assert_string_contains(juego.libro.cuerpo.text, "Has contado bien")
 
 func test_la_historia_se_guarda_con_la_partida() -> void:

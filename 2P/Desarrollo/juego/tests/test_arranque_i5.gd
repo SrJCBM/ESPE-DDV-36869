@@ -68,11 +68,12 @@ func test_cada_opcion_entrega_baraja_fichas_y_solo_ese_objeto(indice = use_param
 	assert_eq(c.lentes, 1 if id == "lente" else 0)
 	assert_eq(c.amuletos, ([] if id == "lente" else [id]) as Array[String])
 	assert_true(juego.dialogo.actual.begins_with("entrega_"), "Una línea propia de cada objeto")
-	var inventario: String = juego._texto_inventario()[1]
-	assert_string_contains(inventario, "10 fichas")
-	for otro: String in ["prudente", "moneda"]:
-		if otro != id:
-			assert_false(inventario.contains(CampanaCasino.TIENDA.buscar(otro).nombre), "Solo el objeto elegido")
+	juego.inventario()
+	var panel: Control = juego.libro.lista.get_child(0)
+	assert_eq(panel.find_child("Cifra", true, false).text, "10")
+	var objetos: Node = panel.get_child(2)
+	assert_eq(objetos.get_child_count(), 1, "Solo el objeto elegido")
+	assert_eq(objetos.get_child(0).tooltip_text, CampanaCasino.TIENDA.buscar(id).nombre)
 
 func test_la_oferta_muestra_icono_nombre_y_efecto_del_catalogo() -> void:
 	var juego = _casino()
@@ -166,8 +167,9 @@ func test_omitir_conserva_la_baraja() -> void:
 	juego._cerrar()
 	var antes: Array = juego.campana.baraja.map(func(c: CartaEnPartida) -> String: return c.id_instancia)
 	_vencer_al_custodio(juego)
-	assert_eq(juego.libro.primero.text, "Continuar sin carta")
-	juego.libro.primero.pressed.emit()
+	var omitir: Button = juego.libro.lista.get_child(-1)
+	assert_eq(omitir.text, "Omitir carta")
+	omitir.pressed.emit()
 	assert_false(juego.campana.hay_recompensa())
 	assert_eq(juego.campana.baraja.map(func(c: CartaEnPartida) -> String: return c.id_instancia), antes)
 	assert_true(juego.campana.ganadas.is_empty())
@@ -240,7 +242,9 @@ func test_ver_baraja_refleja_ganadas_ajustes_y_retiros() -> void:
 	juego.ver_baraja()
 	var textos := PackedStringArray()
 	for linea in juego.vista_baraja.resumen.get_children():
-		if linea is Label: textos.append(linea.text)
+		if linea is Label:
+			textos.append(linea.text)
+			textos.append(linea.tooltip_text)
 	var resumen := "\n".join(textos)
 	assert_string_contains(resumen, "Ganadas como recompensa: 1")
 	assert_string_contains(resumen, "Con el valor ajustado: 1")

@@ -21,7 +21,12 @@ const ModalMesa := preload("res://mesa/interfaz/modal_mesa.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
 const DialCampanadas := preload("res://mesa/interfaz/dial_campanadas.gd")
 const C := preload("res://mesa/interfaz/composicion_mesa.gd")
-const TAPETE_CUSTODIO := "res://mesa/arte/tapete_custodio.webp"
+const TAPETES := {
+	"custodio": "res://mesa/arte/tapete_custodio_i6.webp",
+	"recaudador": "res://mesa/arte/tapete_recaudador.webp",
+	"coleccionista": "res://mesa/arte/tapete_coleccionista.webp",
+	"dueno": "res://mesa/arte/tapete_dueno.webp",
+}
 const ORO := Piezas.ORO
 const MARFIL := Piezas.MARFIL
 const MUTED := Piezas.MUTED
@@ -44,8 +49,13 @@ var vista: Dictionary = {}
 var bocadillo: Control
 ## Última línea dicha por disparador, para no repetirla.
 var _ultimas_reacciones := {}
+var _azar_reacciones := RandomNumberGenerator.new()
 ## Si es false, la mesa no comenta (Opciones · Comentarios de los crupieres).
-var comentarios := true
+var comentarios := true:
+	set(activos):
+		comentarios = activos
+		if not activos and is_instance_valid(bocadillo):
+			bocadillo.ocultar()
 var lienzo: Control
 var boton_iniciar_pedir: Button
 var boton_plantarse: Button
@@ -172,10 +182,9 @@ func _construir() -> void:
 	_cercano = Piezas.etiqueta(lienzo, "", C.CERCANO, 16, MARFIL)
 	_cercano.name = "PatronCercano"
 	_cercano.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	# El tapete ilustrado es la prueba de estilo del Custodio; las demás mesas conservan el paño liso.
-	if campana == null or campana.activa == "custodio":
-		tapete = Piezas.imagen(lienzo, TAPETE_CUSTODIO, C.TAPETE)
-		tapete.name = "Tapete"
+	var id_tapete := campana.activa if campana != null else "custodio"
+	tapete = Piezas.imagen(lienzo, TAPETES.get(id_tapete, TAPETES.custodio), C.TAPETE)
+	tapete.name = "Tapete"
 	_umbral = Piezas.etiqueta(lienzo, "", Rect2(32, 660, 115, 112), 88, ORO, true)
 	Piezas.etiqueta(lienzo, "UMBRAL", Rect2(155, 671, 215, 28), 18, ORO)
 	_nota_umbral = Piezas.etiqueta(lienzo, "", Rect2(155, 703, 215, 29), 20, MUTED)
@@ -290,23 +299,26 @@ func _mostrar_carta_revelada(indice: int, datos: Dictionary) -> void:
 	_lectura.text = str(reveladas.suma) + (" + ?" if reveladas.ocultas > 0 else "")
 	_explicacion.text = "%s por revelar" % reveladas.ocultas if reveladas.ocultas > 0 else ""
 
-## Cualquier acción retira el comentario anterior; si la mano acaba de resolverse, el crupier
-## puede comentar el resultado. No toca el foco ni pausa la mano.
+## El comentario vigente se retira al actuar. Solo se muestra la reacción más relevante.
 func _reaccionar(previa: Dictionary, nueva: Dictionary) -> void:
 	if not is_instance_valid(bocadillo):
 		return
 	bocadillo.ocultar()
 	if not comentarios:
 		return
-	var id := ReaccionesCrupier.disparador(previa, nueva)
-	if id.is_empty():
-		return
 	var crupier: String = campana.activa if campana != null and not campana.activa.is_empty() else "custodio"
-	var linea := REACCIONES.linea(crupier, id, str(_ultimas_reacciones.get(id, "")))
-	if linea.is_empty():
-		return
-	_ultimas_reacciones[id] = linea
-	bocadillo.mostrar(CampanaCasino.NOMBRES.get(crupier, ""), linea)
+	for id in ReaccionesCrupier.disparadores(previa, nueva):
+		if id in ["iniciar_mano", "pedir", "plantarse_pronto"] and _azar_reacciones.randf() > 0.35:
+			continue
+		var linea := REACCIONES.linea(crupier, id, str(_ultimas_reacciones.get(id, "")), _azar_reacciones)
+		if linea.is_empty():
+			continue
+		_ultimas_reacciones[id] = linea
+		var usadas := int(nueva.get("presupuesto", 0)) - int(nueva.get("campanadas", 0))
+		bocadillo.mostrar(CampanaCasino.NOMBRES.get(crupier, ""), linea.format({
+			"umbral": nueva.get("umbral_siguiente", nueva.get("umbral", 0)), "usadas": usadas,
+		}))
+		break
 
 func _pintar_vista(nueva_vista: Dictionary) -> void:
 	if not is_instance_valid(lienzo):
@@ -416,7 +428,7 @@ func alternar_patrones() -> void:
 		abrir_patrones()
 
 func abrir_patrones() -> void:
-	if vista.get("cartas", []).is_empty() or modal.visible or revelacion.activa:
+	if vista.get("cartas", []).is_empty() or modal.visible or revelacion.activa or not eleccion_llave.seleccionada.is_empty():
 		return
 	franja_patrones.abierta = true
 	franja_patrones.ocultar_por_seleccion(not eleccion_llave.seleccionada.is_empty())
@@ -659,6 +671,8 @@ func _activar_carta(carta: Dictionary, id: String) -> void:
 		mostrar_carta(carta)
 
 func _cambio_eleccion_llave(activa: bool) -> void:
+	if activa:
+		cerrar_patrones(false)
 	franja_patrones.ocultar_por_seleccion(activa)
 	_sincronizar_consulta()
 	if activa:

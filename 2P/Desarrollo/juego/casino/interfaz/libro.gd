@@ -18,6 +18,7 @@ const LIENZO_ALTO := 810.0
 const MARGEN_INFERIOR := 35.0
 var nombre: Label
 var _desplazable: ScrollContainer
+var _alto_minimo := ALTO_MINIMO
 
 static func caja(color: Color, borde: Color) -> StyleBoxFlat:
 	var estilo := StyleBoxFlat.new()
@@ -37,14 +38,15 @@ static func rotulo(texto: String, puntos: int, color: Color, titulo := false) ->
 	etiqueta.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return etiqueta
 
-func presentar(titulo: String, texto: String, retrato: String, al_cerrar: Callable) -> void:
+func presentar(titulo: String, texto: String, retrato: String, al_cerrar: Callable, alto_minimo := ALTO_MINIMO) -> void:
 	for hijo in get_children():
 		remove_child(hijo)
 		hijo.queue_free()
 	cierre = al_cerrar
 	primero = null
-	size = Vector2(ANCHO, ALTO_MINIMO)
-	position = Vector2(260, (LIENZO_ALTO - ALTO_MINIMO) * 0.5)
+	_alto_minimo = alto_minimo
+	size = Vector2(ANCHO, _alto_minimo)
+	position = Vector2(260, (LIENZO_ALTO - _alto_minimo) * 0.5)
 	add_theme_stylebox_override("panel",caja(Color("10251f"),ORO))
 	var x := 38
 	if not retrato.is_empty():
@@ -80,7 +82,7 @@ func presentar(titulo: String, texto: String, retrato: String, al_cerrar: Callab
 	var scroll := ScrollContainer.new()
 	var inicio := cuerpo.position.y + cuerpo.size.y + (18 if not texto.strip_edges().is_empty() else 0)
 	scroll.position = Vector2(x, maxf(inicio, 250.0 if not retrato.is_empty() else 0.0))
-	scroll.size = Vector2(ancho, ALTO_MINIMO - scroll.position.y - MARGEN_INFERIOR)
+	scroll.size = Vector2(ancho, _alto_minimo - scroll.position.y - MARGEN_INFERIOR)
 	scroll.follow_focus = true
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
@@ -106,7 +108,7 @@ func ajustar() -> void:
 	if _desplazable == null or lista == null:
 		return
 	var necesario := _desplazable.position.y + lista.get_combined_minimum_size().y + MARGEN_INFERIOR
-	size.y = clampf(necesario, ALTO_MINIMO, ALTO_MAXIMO)
+	size.y = clampf(necesario, _alto_minimo, ALTO_MAXIMO)
 	position.y = (LIENZO_ALTO - size.y) * 0.5
 	_desplazable.size.y = size.y - _desplazable.position.y - MARGEN_INFERIOR
 

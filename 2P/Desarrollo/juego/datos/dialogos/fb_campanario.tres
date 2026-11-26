@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {"narrador": {"nombre": ""}}
+entradas = [{"ir": "inicio"}]
+intervenciones = {
+"inicio": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_campanario", "texto": "Domingo. El tercero. Desde la torre se ve toda la ciudad, y ninguna chimenea echa humo.", "sonido": "campana", "siguiente": "paso_2"},
+"paso_2": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_campanario", "texto": "Abajo, en la plaza, dos hombres llevan una caja pequeña. Tan pequeña que podría llevarla uno solo. No quieren que la lleve uno solo.", "siguiente": "paso_3"},
+"paso_3": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_campanario", "texto": "Un toque por cada año que vivió. Siete. Los cuento en voz alta, como le enseñé a contar a él.", "siguiente": "paso_4"},
+"paso_4": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_campanario", "texto": "Al llegar a siete, la cuerda quiere seguir. Mis manos también. Si sigo tocando, quizá nadie se dé cuenta de que se ha terminado.", "siguiente": "paso_5"},
+"paso_5": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_campanario", "texto": "Toqué hasta que dejé de sentir las manos. Nadie subió a pararme. No quedaba nadie para subir.", "siguiente": "paso_6"},
+"paso_6": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_campanario", "texto": "Aquella noche dije en voz alta que daría lo que fuera por no haber tocado nunca. Alguien me oyó."}
+}
+fondos = {"fb_campanario": {"ruta": "res://historia/ilustraciones/fb_campanario.webp", "movimiento": "acercar", "descripcion": "Recuerdo del custodio."}}

@@ -93,7 +93,7 @@ func abrir(sesion: CampanaCasino) -> void:
 	confirmacion.text = ""
 	show()
 	_actualizar()
-	detalle.vaciar("Compara precios a simple vista. Elige una pieza para ver su efecto antes de comprar.")
+	detalle.vaciar()
 	selector.hide()
 	fichas[0].grab_focus()
 
@@ -104,7 +104,8 @@ func cerrar() -> void:
 func _actualizar() -> void:
 	saldo.presentar(campana.saldo)
 	for ficha in fichas:
-		ficha.presentar(not _motivo_general(ficha.id).is_empty())
+		var motivo := _motivo_general(ficha.id)
+		ficha.presentar(not motivo.is_empty(), motivo)
 
 ## Motivo legible: el saldo insuficiente indica cuánto falta.
 func _motivo(id: String, carta: CartaEnPartida) -> String:
@@ -157,7 +158,7 @@ func _confirmar() -> void:
 		return
 	var objeto := CampanaCasino.TIENDA.buscar(_producto)
 	var vendido := _producto
-	confirmacion.text = "Comprado: %s. Te quedan %s fichas." % [objeto.nombre, campana.saldo]
+	confirmacion.text = "Comprado · %s" % objeto.nombre
 	compra_realizada.emit(vendido)
 	_actualizar()
 	_volver_al_catalogo()
@@ -167,7 +168,7 @@ func _volver_al_catalogo() -> void:
 	_producto = ""
 	_carta = null
 	selector.hide()
-	detalle.vaciar("Elige otra pieza o pulsa Esc para volver al mostrador.")
+	detalle.vaciar()
 	for ficha in fichas:
 		if ficha.id == anterior:
 			ficha.grab_focus()

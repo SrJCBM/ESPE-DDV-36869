@@ -82,6 +82,22 @@ func test_abrir_la_ayuda_cierra_la_consulta() -> void:
 	mesa.cerrar_modal()
 	assert_false(mesa.franja_patrones.visible)
 
+func test_esc_cancela_la_llave_aunque_se_haya_consultado_patrones() -> void:
+	var juego = _mesa()
+	var mesa = juego.mesa
+	_cartas(juego, [["llaves", 4], ["velas", 6], ["relojes", 2]])
+	mesa.boton_iniciar_pedir.pressed.emit()
+	_tecla(mesa, KEY_T)
+	assert_true(mesa.franja_patrones.visible)
+	_tecla(mesa, KEY_L)
+	assert_false(mesa.franja_patrones.visible)
+	assert_true(mesa.eleccion_llave.visible)
+	_tecla(mesa, KEY_T)
+	assert_false(mesa.franja_patrones.visible, "La consulta espera a que termine la elección")
+	_tecla(mesa, KEY_ESCAPE)
+	assert_false(mesa.eleccion_llave.visible)
+	assert_true(mesa.vista.acciones.devolver, "No se gastó la devolución")
+
 func test_el_patron_cercano_se_lee_junto_a_la_mano() -> void:
 	var juego = _mesa()
 	var mesa = juego.mesa

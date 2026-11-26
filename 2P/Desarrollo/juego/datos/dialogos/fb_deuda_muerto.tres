@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {"narrador": {"nombre": ""}}
+entradas = [{"ir": "inicio"}]
+intervenciones = {
+"inicio": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_deuda_muerto", "texto": "Calle de los Toneleros, número nueve. Invierno. Hace ciento doce años, si el libro no miente. El libro no miente.", "siguiente": "paso_2"},
+"paso_2": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_deuda_muerto", "texto": "Anselmo Rius, tonelero, me debía cuarenta y dos reales. Murió en octubre, de una caída en el muelle. La deuda no murió con él. Las deudas no mueren con nadie.", "siguiente": "paso_3"},
+"paso_3": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_deuda_muerto", "texto": "En diciembre ejecuté la casa. La viuda y la niña se fueron con un hatillo. A la mañana siguiente, la niña estaba en mi portal.", "siguiente": "paso_4"},
+"paso_4": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_deuda_muerto", "texto": "Escribí «saldado» en la línea de la viuda. La de Anselmo quedó abierta: cuarenta y dos reales que nadie iba a pagar ya.", "siguiente": "paso_5"},
+"paso_5": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_deuda_muerto", "texto": "Pasé la noche mirando esa línea. Dije que daría lo que fuera por cobrarle a un muerto.", "siguiente": "paso_6"},
+"paso_6": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_deuda_muerto", "texto": "Al amanecer había un sobre negro encima del libro."}
+}
+fondos = {"fb_deuda_muerto": {"ruta": "res://historia/ilustraciones/fb_deuda_muerto.webp", "movimiento": "desplazar", "descripcion": "Recuerdo del recaudador."}}

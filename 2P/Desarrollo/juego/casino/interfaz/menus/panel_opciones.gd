@@ -48,7 +48,9 @@ func construir(audio: AudioCasino) -> void:
 	comentarios.add_theme_font_override("font", Libro.SANS)
 	comentarios.add_theme_font_size_override("font_size", 18)
 	comentarios.add_theme_color_override("font_color", Libro.PAPEL)
-	comentarios.toggled.connect(AjustesJuego.guardar_comentarios_crupieres)
+	comentarios.toggled.connect(func(activos: bool) -> void:
+		AjustesJuego.guardar_comentarios_crupieres(activos)
+		lectura_cambiada.emit())
 	derecha.add_child(comentarios)
 
 func _columna(padre: Container, titulo: String) -> VBoxContainer:

@@ -1,6 +1,6 @@
 # La Última Mesa · coordinación del desarrollo
 
-La campaña local abre en el vestíbulo. La iteración 3 añade respuesta visual de las manos, ajustes de balance y movimiento reducido persistente. Incluye siete espacios conectados, tienda, inventario y cuatro mesas en Godot 4.7.2. [Iteración 02 y recorrido de prueba](ITERACION_02.md).
+La Última Mesa combina una novela visual con una campaña de cartas en Godot 4.7.2. Una partida nueva abre el prólogo, lleva a la entrada del casino y continúa por cuatro mesas. Al volver a hablar con un jefe derrotado se puede conocer su historia y ver su recuerdo. [Iteración 05](ITERACION_05.md).
 
 El pulido de presentación reduce el texto permanente a una indicación contextual. Los patrones resaltan las cartas con ratón o teclado; la cuenta resuelta explica los bonos y el final ofrece resumen y Volver a jugar. El libro y el desglose conservan los detalles.
 
@@ -39,7 +39,7 @@ I1-00, I1-02, I1-04 e I1-08 están completadas. Las observaciones de jugadores y
 ## Cómo probarlo
 
 1. Abrir Godot 4.7.2 e importar `juego/project.godot`.
-2. Pulsar **F5** para explorar I2. Para el piloto original, usar el ejecutable de Ariel o abrir `principal/principal.tscn` y pulsar **F6**.
+2. Pulsar **F5** y entrar al casino para probar la campaña. Para el piloto original, usar el ejecutable de Ariel o abrir `principal/principal.tscn` y pulsar **F6**.
 3. Usar **Cómo jugar** o **H** para consultar el libro. Tab / Mayús+Tab recorre los controles; Enter o Espacio activa y Esc vuelve a la mesa.
 4. Para revisar resultados repetibles, activar **Demostración guiada** y confirmar. Es una baraja preparada, distinta de la partida normal.
 
@@ -49,12 +49,13 @@ Los comandos de pruebas y exportación están en [juego/README.md](juego/README.
 
 ## Documentos y materiales
 
+- [Documento de diseño 2.5](Diseno/Version_2_5/Documento_Diseno_La_Ultima_Mesa_v2_5.docx).
 - [Iteración 01 y criterios R01–R20](ITERACION_01.md).
 - [Iteración 02: campaña y revisión con Damián](ITERACION_02.md).
 - [Iteración 03: pulido, balance y deuda técnica](ITERACION_03.md), con el estado de cada mejora.
 - [Iteración 04 · Interfaz y recorrido del casino](ITERACION_04.md): vitrina, corredor, HUD, mesa, diálogos y menús. Cerrada en código; falta el piloto.
-- [Iteración 05 · Pasillos de los jefes](ITERACION_05.md): en curso. Primer tramo jugable (entrada, vestíbulo y pasillos del Custodio y del Recaudador), elección inicial de objeto, «Ver baraja» y la variante de la Vela de Racha ×2.
-- [Iteración 06 · Lectura y presencia narrativa](ITERACION_06.md): portada ilustrada, visitantes en el recorrido y revisión de la carga de texto.
+- [Iteración 05 · Pasillos de los jefes](ITERACION_05.md). Recorrido completo, objeto inicial, ampliación de la baraja y diálogos posvictoria.
+- [Iteración 06 · Lectura y presencia narrativa](ITERACION_06.md). Tapetes de los cuatro jefes, pantallas de consulta, visitantes, reacciones y derrota ilustrada. Queda el piloto de tres personas.
 - [Balance de la campaña y del Recaudador](BALANCE_CAMPANA.md).
 - [Revisión técnica y pendientes de cierre](Archivo/I1/REVISION_I1.md).
 - [Plan general](PLAN_DE_TRABAJO.md), [arquitectura](ARQUITECTURA_Y_PATRONES.md) y [entorno](ENTORNO_Y_HERRAMIENTAS.md).

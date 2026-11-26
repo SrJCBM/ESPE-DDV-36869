@@ -48,8 +48,13 @@ func _vencer_al_custodio(juego) -> void:
 func test_la_recompensa_deja_leer_la_frase_completa_del_custodio() -> void:
 	var juego = _casino()
 	_vencer_al_custodio(juego)
-	assert_string_contains(juego.libro.cuerpo.text, "Él no olvida")
+	assert_string_contains(juego.libro.cuerpo.text, "+10 fichas")
 	await _sin_cruces(juego, "Recompensa")
+	juego.libro.primero.pressed.emit()
+	assert_string_contains(juego.libro.cuerpo.text, "Él no olvida")
+	await _sin_cruces(juego, "Diálogo de victoria")
+	juego.libro.primero.pressed.emit()
+	assert_true(juego.campana.hay_recompensa())
 
 func test_la_recompensa_se_elige_u_omite_una_sola_vez() -> void:
 	var juego = _casino()
@@ -77,7 +82,8 @@ func test_el_inventario_con_un_sello_no_tapa_ver_baraja() -> void:
 	juego.campana.superadas = 1
 	juego.entrar("pasillo_custodio")
 	juego.inventario()
-	assert_string_contains(juego.libro.cuerpo.text, "Sello del Custodio")
+	var sello: Control = juego.libro.lista.find_child("custodio", true, false)
+	assert_eq(sello.tooltip_text, "Sello del Custodio · conseguido")
 	await _sin_cruces(juego, "Inventario")
 
 func test_la_derrota_ofrece_nuevo_intento_sin_tapar_el_parrafo() -> void:
@@ -89,10 +95,17 @@ func test_la_derrota_ofrece_nuevo_intento_sin_tapar_el_parrafo() -> void:
 	juego._presentar_jefe()
 	juego._solicitud("tomar_asiento")
 	juego._levantarse(false, 0)
-	assert_eq(juego.libro.primero.text, "Nuevo intento", "El juego vuelve a la entrada: la acción lo dice")
-	assert_string_contains(juego.libro.cuerpo.text, "Archivado")
-	await _sin_cruces(juego, "Derrota")
-	juego.libro.primero.pressed.emit()
+	var historia: Control = juego.historia
+	assert_true(juego.cinematica.activa)
+	assert_string_contains(historia.conversacion.intervencion(historia.actual).texto, "Archivado")
+	for i in range(4):
+		historia.completar()
+		historia.avanzar()
+		if i == 0:
+			assert_string_contains(historia.fondo.texture.resource_path, "/cg_derrota_manos.webp")
+	historia.completar()
+	assert_eq(historia.botones[0].text, "Nuevo intento")
+	historia.elegir(0)
 	assert_eq(juego.sala, "entrada")
 
 func test_el_coste_de_la_mesa_no_pisa_el_nombre_de_la_accion() -> void:

@@ -161,7 +161,7 @@ func test_indicador_cambia_una_vez_y_se_oculta_con_ventanas() -> void:
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
 	assert_eq(juego.indicador_objetivo.texto.text, "Encuentra la mesa del Recaudador")
 	assert_eq(juego.indicador_objetivo.cambios, 2)
-	juego.libro.primero.pressed.emit()
+	juego.libro.lista.get_child(-1).pressed.emit()
 	await get_tree().process_frame
 	assert_true(juego.indicador_objetivo.visible)
 	assert_eq(juego.indicador_objetivo.cambios, 2)

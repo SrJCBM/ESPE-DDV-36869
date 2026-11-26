@@ -13,6 +13,7 @@ const CifrasMesa := preload("res://casino/interfaz/cifras_mesa.gd")
 const DialogoNovela := preload("res://casino/dialogos/dialogo_novela.gd")
 const MenuCasino := preload("res://casino/interfaz/menus/menu_casino.gd")
 const VistaBaraja := preload("res://casino/interfaz/baraja/vista_baraja.gd")
+const InventarioCampana := preload("res://casino/interfaz/inventario_campana.gd")
 const ANFITRIONA: Conversacion = preload("res://datos/dialogos/anfitriona.tres")
 ## I5-10: el prólogo y las conversaciones de los crupieres son datos del guion v4.
 const PROLOGO: Conversacion = preload("res://datos/dialogos/prologo.tres")
@@ -23,6 +24,18 @@ const CRUPIERES := {
 	"recaudador": preload("res://datos/dialogos/recaudador.tres"),
 	"coleccionista": preload("res://datos/dialogos/coleccionista.tres"),
 	"dueno": preload("res://datos/dialogos/dueno.tres"),
+}
+const RECUERDOS := {
+	"custodio": preload("res://datos/dialogos/fb_campanario.tres"),
+	"recaudador": preload("res://datos/dialogos/fb_deuda_muerto.tres"),
+	"coleccionista": preload("res://datos/dialogos/fb_habitacion_cristal.tres"),
+	"dueno": preload("res://datos/dialogos/fb_apuesta_alba.tres"),
+}
+const DERROTA: Conversacion = preload("res://datos/dialogos/derrota_v5.tres")
+const VISITANTES := {
+	"amparo": preload("res://datos/dialogos/amparo.tres"),
+	"tobias": preload("res://datos/dialogos/tobias.tres"),
+	"benavides": preload("res://datos/dialogos/benavides.tres"),
 }
 ## Nombre del protagonista hasta que el jugador pueda elegirlo.
 const PROTAGONISTA := {"nombre": "Klein", "apellido": "Moretti"}
@@ -161,7 +174,7 @@ func _ready() -> void:
 	entrar("entrada")
 	add_child(menu)
 	menu.audio = audio
-	menu.texto_inventario = _texto_inventario
+	menu.mostrar_inventario = _mostrar_inventario
 	menu.intento_activo = _algo_se_pierde
 	menu.texto_confirmar = _aviso_volver_al_inicio
 	menu.hay_partida = func() -> bool: return guardado_activo and PartidaGuardada.existe()
@@ -290,7 +303,7 @@ func continuar() -> bool:
 		if PlanoSalas.limites(destino).has_point(punto):
 			visitante.position = punto
 	if campana.hay_recompensa():
-		_mostrar_recompensa("Tienes una carta de la casa pendiente. Puedes añadirla a tu baraja.")
+		_mostrar_recompensa("Elige una carta o continúa con tu baraja actual.", _linea_crupier("victoria"))
 	return true
 
 func _notification(que: int) -> void:
@@ -315,6 +328,7 @@ func entrar(destino: String, origen := "") -> void:
 	if not CampanaCasino.NOMBRES.has(destino) or not campana.puerta_abierta(destino):
 		return
 	sala = destino
+	audio.seleccionar_espacio(sala)
 	var nota: String = NOTAS.get(sala, [""])[0]
 	visitante.position = exploracion.montar(sala, origen, campana, nota)
 	_refrescar()
@@ -345,6 +359,8 @@ func _pista(elegido: Dictionary) -> String:
 	if elegido.tipo == "puerta":
 		var cerrada: bool = (elegido.destino == "entrada" and campana.recibida) or not campana.puerta_abierta(elegido.destino)
 		return "E · Examinar la puerta" if cerrada else "E · Entrar"
+	if elegido.tipo == "visitante" and (campana.superadas >= 3 or (elegido.destino == "tobias" and campana.cumple("historia:tobias.estado=cobrado"))):
+		return "E · Examinar la figura"
 	return "E · " + str(elegido.accion)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
@@ -387,6 +403,7 @@ func interactuar(p: Dictionary) -> void:
 		"tienda": tienda()
 		"nota": examinar()
 		"mesa": _presentar_jefe()
+		"visitante": _hablar_visitante(p.destino)
 		"salida":
 			if campana.superadas == 4:
 				audio.reproducir(&"puerta")
@@ -401,6 +418,17 @@ func interactuar(p: Dictionary) -> void:
 				entrar(p.destino,sala)
 			else:
 				_aviso_puerta(CampanaCasino.NOMBRES[p.destino], PlanoGaleria.requisito(p.destino))
+
+func _hablar_visitante(id: String) -> void:
+	var base: Conversacion = VISITANTES.get(id)
+	if base == null or dialogo.visible or cinematica.activa:
+		return
+	var encuentro: Conversacion = base.duplicate(true)
+	var etapa := mini(campana.superadas + 1, 3)
+	var personaje: Dictionary = encuentro.personajes[id]
+	personaje.retrato = "res://historia/retratos/%s_neutral_p%s.webp" % [id, etapa]
+	personaje.expresiones = "res://historia/retratos/%s_%%s_p%s.webp" % [id, etapa]
+	visitante.bloqueado = dialogo.abrir(encuentro, _condicion, AjustesJuego.movimiento_reducido())
 
 func _aviso_puerta(titulo_puerta: String, mensaje: String) -> void:
 	var aviso := Conversacion.new()
@@ -433,6 +461,10 @@ func _solicitud(id: String) -> void:
 	if id == "tomar_asiento":
 		_jugar()
 		return
+	if id == "ver_recuerdo":
+		if RECUERDOS.has(sala) and _condicion("mesa_superada"):
+			reproducir_cinematica(RECUERDOS[sala], _volver_del_recuerdo.bind(sala))
+		return
 	if campana.atender(id):
 		if not id.begins_with("historia:"):
 			audio.reproducir(&"sello")
@@ -441,7 +473,10 @@ func _solicitud(id: String) -> void:
 ## Condiciones de los diálogos: las de la campaña y «mesa_superada» para el crupier de la sala.
 func _condicion(condicion: String) -> bool:
 	if condicion == "mesa_superada":
-		return CampanaCasino.MESAS.find(sala) < campana.superadas
+		var mesa_actual := CampanaCasino.MESAS.find(sala)
+		return mesa_actual >= 0 and mesa_actual < campana.superadas
+	if condicion == "historia:lore.garantia":
+		return campana.cumple(condicion) or campana.cumple("historia:garantia")
 	return campana.cumple(condicion)
 
 ## Marcas del guion: el nombre del protagonista y las cifras de la mesa de la sala.
@@ -460,6 +495,8 @@ func _configurar_lectura() -> void:
 	var ajustes := AjustesJuego.ajustes_dialogo()
 	dialogo.configurar(ajustes)
 	historia.configurar(ajustes)
+	if is_instance_valid(mesa):
+		mesa.set("comentarios", AjustesJuego.comentarios_crupieres())
 
 func _sonar(id: String) -> void:
 	audio.reproducir(StringName(id))
@@ -511,6 +548,14 @@ func _fin_cinematica(_completa: bool) -> void:
 	if despues.is_valid():
 		despues.call()
 
+func _volver_del_recuerdo(jefe: String) -> void:
+	if sala != jefe:
+		return
+	var revisita: Conversacion = CRUPIERES[jefe].duplicate()
+	revisita.entradas = [{"ir": "pos_fin_recuerdo"}]
+	visitante.bloqueado = dialogo.abrir(revisita, _condicion, AjustesJuego.movimiento_reducido())
+	_actualizar_objetivo()
+
 ## Atajo de las pruebas y capturas: la misma solicitud que «Entregar la invitación».
 func _entregar() -> void:
 	_solicitud("entregar_invitacion")
@@ -544,45 +589,63 @@ func _jugar() -> void:
 	pagina.hide()
 	mesa = Mesa.instantiate()
 	mesa.set("campana",campana)
+	mesa.set("comentarios", AjustesJuego.comentarios_crupieres())
 	mesa.connect("salir_de_mesa",_levantarse,CONNECT_ONE_SHOT)
 	add_child(mesa)
 	mesa.activar_audio(audio)
+	audio.seleccionar_espacio(sala, true)
 	mesa.establecer_movimiento_reducido(AjustesJuego.movimiento_reducido())
-	mesa.set("comentarios", AjustesJuego.comentarios_crupieres())
 
 func _levantarse(victoria: bool, exactos: int) -> void:
 	var premio := campana.cerrar(victoria,exactos)
+	var ultima_mesa: Image
+	if not victoria and DisplayServer.get_name() != "headless":
+		ultima_mesa = get_viewport().get_texture().get_image()
 	remove_child(mesa)
 	mesa.queue_free()
 	mesa = null
 	pagina.show()
 	visitante.bloqueado = false
+	audio.seleccionar_espacio(sala)
 	_refrescar()
 	if victoria:
 		var ruta := "Dirígete al portón del norte." if campana.superadas == 4 else "La siguiente sala está abierta."
 		var dicho := _linea_crupier("victoria")
-		dicho = dicho + "\n\n" if not dicho.is_empty() else ""
 		if campana.hay_recompensa():
-			_ofrecer_recompensa(premio, dicho + ruta)
+			_mostrar_recompensa("+%s fichas · Elige una carta" % premio, dicho)
 		else:
-			_aviso("Mesa superada","%sLa casa entrega %s fichas. %s" % [dicho,premio,ruta])
+			_aviso("Mesa superada","%s\n\n+%s fichas · %s" % [dicho,premio,ruta])
 	else:
 		if guardado_activo:
 			PartidaGuardada.borrar()
-		var dicho := _linea_crupier("derrota")
-		_abrir("La casa gana",(dicho + "\n\n" if not dicho.is_empty() else "") + "La última campanada se apaga. Tu siguiente invitación abrirá un intento nuevo.","",Callable())
-		libro.opcion("Nuevo intento",_nuevo_intento)
+		_mostrar_derrota(ultima_mesa)
 
-func _ofrecer_recompensa(premio: int, ruta: String) -> void:
-	_mostrar_recompensa("Recibes %s fichas. Puedes añadir una carta a tu baraja.\n%s" % [premio, ruta])
+func _mostrar_derrota(ultima_mesa: Image) -> void:
+	var escena: Conversacion = DERROTA.duplicate(true)
+	var jefe: Conversacion = CRUPIERES[sala]
+	escena.personajes.jefe = jefe.personajes[sala].duplicate()
+	escena.intervenciones.inicio.texto = _linea_crupier("derrota")
+	escena.fondos.mesa.ruta = "res://casino/arte/%s.webp" % sala
+	if ultima_mesa != null and not ultima_mesa.is_empty():
+		escena.fondos.mesa.textura = ImageTexture.create_from_image(ultima_mesa)
+	reproducir_cinematica(escena, _nuevo_intento)
 
-func _mostrar_recompensa(mensaje: String) -> void:
+func _mostrar_recompensa(mensaje: String, dicho := "") -> void:
 	_abrir("Una carta de la casa", mensaje, "", Callable())
 	var fila := CartasRecompensa.new()
 	libro.lista.add_child(fila)
 	fila.presentar(campana.opciones_recompensa())
 	fila.elegida.connect(_resolver_recompensa)
-	libro.opcion("Continuar sin carta", _resolver_recompensa.bind(-1))
+	if not dicho.is_empty():
+		libro.opcion("Leer al crupier", _leer_victoria.bind(mensaje, dicho))
+	libro.opcion("Omitir carta", _resolver_recompensa.bind(-1))
+	if fila.get_child_count() > 0:
+		fila.get_child(0).grab_focus()
+
+func _leer_victoria(mensaje: String, dicho: String) -> void:
+	var volver := _mostrar_recompensa.bind(mensaje, dicho)
+	_abrir(CampanaCasino.NOMBRES[sala], dicho, "", volver)
+	libro.opcion("Volver a las cartas", volver)
 
 func _resolver_recompensa(indice: int) -> void:
 	if campana.resolver_recompensa(indice):
@@ -641,8 +704,9 @@ func _refrescar() -> void:
 	guardar()
 
 func inventario() -> void:
-	var datos := _texto_inventario()
-	_abrir(datos[0], datos[1], "", _cerrar)
+	_preparar_libro()
+	libro.presentar("Tus pertenencias", "", "", _cerrar, 390.0)
+	_mostrar_inventario(libro.lista)
 	if campana.recibida:
 		libro.opcion("Ver baraja", ver_baraja)
 	libro.opcion("Continuar", _cerrar)
@@ -687,13 +751,10 @@ func datos_baraja() -> Dictionary:
 		})
 	return {"cartas": cartas, "retiradas": campana.retiradas.duplicate(true), "en_mano": en_mano}
 
-func _texto_inventario() -> Array:
-	var objetos := PackedStringArray()
-	for id in campana.amuletos: objetos.append(CampanaCasino.TIENDA.buscar(id).nombre)
-	var sellos := PackedStringArray()
-	for recuadro in hud.sellos.recuadros: sellos.append(recuadro.tooltip_text)
-	var mensaje := "%s cartas   ·   %s fichas\n%s.\n%s / 2 lentes de humo. Amuletos: %s." % [campana.baraja.size(),campana.saldo,", ".join(sellos),campana.lentes,", ".join(objetos) if objetos.size() else "ninguno"]
-	return ["Tus pertenencias", mensaje if campana.recibida else "Una invitación lacrada y una ficha antigua. Enséñale la invitación a la anfitriona."]
+func _mostrar_inventario(destino: Control) -> void:
+	var panel := InventarioCampana.new()
+	panel.presentar(campana)
+	destino.add_child(panel)
 
 func tienda() -> void:
 	if not campana.recibida:

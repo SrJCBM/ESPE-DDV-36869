@@ -57,7 +57,8 @@ func test_las_puertas_del_pasillo_carecen_de_placas_y_marcas() -> void:
 	juego.entrar("pasillo_custodio", "vestibulo")
 	assert_null(juego.capa_superior.get_node_or_null("Placas"))
 	for punto: Dictionary in juego.exploracion.puntos:
-		assert_null(punto.marca)
+		if punto.tipo == "puerta":
+			assert_null(punto.marca)
 	await get_tree().process_frame
 	await get_tree().process_frame
 

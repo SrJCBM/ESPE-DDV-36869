@@ -551,8 +551,10 @@ func _poner_fondo(id: String) -> void:
 	fondo_actual = id
 	var datos := conversacion.fondo(id) if not id.is_empty() else {}
 	var ruta := str(datos.get("ruta", ""))
-	var con_imagen := not ruta.is_empty() and ResourceLoader.exists(ruta)
-	var imagen: Texture2D = load(ruta) if con_imagen else null
+	var imagen: Texture2D = datos.get("textura")
+	if imagen == null and not ruta.is_empty() and ResourceLoader.exists(ruta):
+		imagen = load(ruta)
+	var con_imagen := imagen != null
 	# Fundido cruzado: la imagen anterior queda debajo mientras aparece la nueva.
 	var fundir := permitir_saltar and not reducido and is_inside_tree() and (fondo.visible or pendiente.visible)
 	fondo_previo.texture = fondo.texture

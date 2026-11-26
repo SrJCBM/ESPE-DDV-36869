@@ -21,10 +21,11 @@ func _mesa(sala := "", reducido := true):
 	mesa.establecer_movimiento_reducido(reducido)
 	return mesa
 
-func test_el_custodio_usa_el_tapete_ilustrado_y_las_demas_mesas_no() -> void:
+func test_cada_mesa_usa_su_propio_tapete_ilustrado() -> void:
 	assert_not_null(_mesa().tapete, "Mesa suelta del Custodio")
-	assert_not_null(_mesa("custodio").tapete)
-	assert_null(_mesa("recaudador").tapete)
+	for id in CampanaCasino.MESAS:
+		var mesa = _mesa(id)
+		assert_string_contains(mesa.tapete.texture.resource_path, "/tapete_" + id)
 
 func test_acciones_apiladas_bajo_el_boleto_con_el_mismo_ancho() -> void:
 	var mesa = _mesa()

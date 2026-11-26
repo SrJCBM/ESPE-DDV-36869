@@ -44,7 +44,7 @@ func _recorrer() -> void:
 	AjustesJuego.ruta = "user://ajustes_qa_i6.cfg"
 	juego.historia.reducido = true
 	juego.dialogo.reducido = true
-	# 1 · Victoria del Custodio con su frase completa y la recompensa.
+	# 1 · Recompensa del Custodio y su diálogo de victoria.
 	juego._entregar()
 	juego._cerrar()
 	juego.entrar("custodio")
@@ -59,11 +59,23 @@ func _recorrer() -> void:
 	for i in range(20): await process_frame
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
 	await _foto("recompensa")
+	juego.libro.primero.pressed.emit()
+	await _foto("victoria")
 	juego._resolver_recompensa(-1)
-	# 2 · Inventario con un sello.
+	# 2 · Inventario con un sello, baraja y vitrina.
+	juego.campana.lentes = 1
+	juego.campana.amuletos.append("moneda")
 	juego.entrar("pasillo_custodio")
 	juego.inventario()
 	await _foto("inventario")
+	juego.ver_baraja()
+	juego.vista_baraja.cartas[0].grab_focus()
+	await _foto("baraja")
+	juego.vista_baraja.cerrar()
+	juego._cerrar()
+	juego.entrar("tienda")
+	juego.tienda()
+	await _foto("vitrina")
 	juego._cerrar()
 	# 3 · Mesa del Recaudador: iniciar y pedir.
 	juego.entrar("pasillo_recaudador", "pasillo_custodio")
@@ -78,8 +90,12 @@ func _recorrer() -> void:
 	await _foto("mesa_pedir")
 	# 4 · Derrota del Recaudador.
 	juego._levantarse(false, 0)
+	juego.historia.completar()
+	juego.historia.avanzar()
+	juego.historia.completar()
+	await create_timer(0.8).timeout
 	await _foto("derrota")
-	juego._cerrar()
+	juego.historia.cerrar()
 	# 5 · La toma de Ignacio en el prólogo.
 	juego.iniciar_prologo()
 	var h = juego.historia
@@ -91,4 +107,6 @@ func _recorrer() -> void:
 	h.completar()
 	await create_timer(0.8).timeout # Termina el fundido de entrada de la cinemática.
 	await _foto("ignacio")
+	juego.queue_free()
+	await process_frame
 	quit()

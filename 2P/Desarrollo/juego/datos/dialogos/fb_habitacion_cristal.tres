@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {"narrador": {"nombre": ""}}
+entradas = [{"ir": "inicio"}]
+intervenciones = {
+"inicio": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_habitacion_cristal", "texto": "Lyon. O París. Ya confundo las ciudades; las piezas, nunca.", "siguiente": "paso_2"},
+"paso_2": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_habitacion_cristal", "texto": "Aurore tenía seis años y la piel más fina que he tocado. Mandé hacerle una habitación con paredes de vitrina para que ni el polvo la alcanzara.", "siguiente": "paso_3"},
+"paso_3": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_habitacion_cristal", "texto": "Dibujaba en el vaho del cristal. Caballos, casas, a mí con guantes. Yo copiaba sus dibujos por fuera, con el dedo.", "siguiente": "paso_4"},
+"paso_4": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_habitacion_cristal", "texto": "En febrero el vaho se volvió espeso. Tenía fiebre. El médico pidió entrar y le dije que el cristal la protegía mejor que él.", "siguiente": "paso_5"},
+"paso_5": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_habitacion_cristal", "texto": "Seguí visitándola un año. Seguí copiando sus dibujos, aunque ya no los hacía nadie."}
+}
+fondos = {"fb_habitacion_cristal": {"ruta": "res://historia/ilustraciones/fb_habitacion_cristal.webp", "movimiento": "acercar", "descripcion": "Recuerdo del coleccionista."}}

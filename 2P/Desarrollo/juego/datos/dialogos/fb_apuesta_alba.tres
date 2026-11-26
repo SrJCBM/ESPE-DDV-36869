@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {"narrador": {"nombre": ""}}
+entradas = [{"ir": "inicio"}]
+intervenciones = {
+"inicio": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_apuesta_alba", "texto": "El médico cerró su maletín sin mirarme. «Hasta el amanecer», dijo, como quien da una hora de visita.", "sonido": "naipe", "siguiente": "paso_2"},
+"paso_2": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_apuesta_alba", "texto": "Bajé a la sala de juego con lo único que me quedaba: la noche entera.", "siguiente": "paso_3"},
+"paso_3": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_apuesta_alba", "texto": "No había crupier. Al otro lado de la mesa, una silla vacía y, detrás, la ventana. El cristal empezaba a ponerse gris.", "siguiente": "paso_4"},
+"paso_4": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_apuesta_alba", "texto": "Cada mano que ganaba, el gris retrocedía un dedo. Pedí una carta más que el amanecer. Siempre una más.", "siguiente": "paso_5"},
+"paso_5": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_apuesta_alba", "texto": "Cuando gané, la ventana volvía a estar negra. Arriba, ella seguía tosiendo. Subí corriendo a decírselo.", "siguiente": "paso_6"},
+"paso_6": {"personaje": "narrador", "modo": "nvl", "fondo": "fb_apuesta_alba", "texto": "No recuerdo qué cara puse. Ella sí. Nunca me lo ha contado."}
+}
+fondos = {"fb_apuesta_alba": {"ruta": "res://historia/ilustraciones/fb_apuesta_alba.webp", "movimiento": "acercar", "descripcion": "Recuerdo del Dueño."}}

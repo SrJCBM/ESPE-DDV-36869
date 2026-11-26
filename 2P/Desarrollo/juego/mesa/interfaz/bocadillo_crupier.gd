@@ -38,7 +38,7 @@ func mostrar(quien: String, linea: String) -> void:
 	nombre.text = quien.to_upper()
 	texto.size = Vector2(ANCHO - 28, 0)
 	texto.text = linea
-	var alto := ceilf(texto.get_theme_font("font").get_multiline_string_size(linea, HORIZONTAL_ALIGNMENT_LEFT, ANCHO - 28, texto.get_theme_font_size("font_size")).y)
+	var alto := float(texto.get_line_count() * texto.get_line_height() + 4)
 	texto.size.y = alto
 	size = Vector2(ANCHO, 26 + alto + 12)
 	_fondo.size = size

@@ -1,6 +1,6 @@
 # Iteración 05 · Pasillos de los jefes
 
-**Estado general:** en curso. Nueve de las once tareas están implementadas, incluida la entrada ilustrada y los cuatro pasillos en los cambios locales. Quedan el sonido por jefe y los diálogos posvictoria ([avance](#avance)). El primer tramo, la oferta inicial, «Ver baraja», la variante de la Vela y el guardado se integraron en `main` el 24 de noviembre de 2026 junto con I4 (PR #4, commit `07d4fe6`). I5-06 e I5-10 se integraron el 25 de noviembre de 2026. **Base:** I4 con sus correcciones, commit `d9c82b7`.
+**Estado general.** Las once tareas están implementadas. Los recuerdos de los jefes, la validación de balance y la entrega de audio están en la copia de trabajo. La campaña sigue pendiente de observación con tres jugadores en el piloto de I6. [Documento de diseño 2.5](Diseno/Version_2_5/Documento_Diseno_La_Ultima_Mesa_v2_5.docx).
 
 **Objetivo:** que el avance por la campaña se recorra. Cada sello abre una puerta física hacia el pasillo del jefe siguiente, y cada pasillo anuncia con su arte y su sonido a quién se va a enfrentar el jugador.
 
@@ -13,14 +13,14 @@
 | I5-01 | Oferta inicial de la anfitriona | **Completado** · `23ced9f` | Baraja, diez fichas y un objeto a elegir en una sola operación |
 | I5-02 | Entrada y pasillos por jefe | **Implementado en local** | Entrada, vestíbulo y cuatro pasillos jugables. El del Dueño requiere tres sellos |
 | I5-03 | Recompensa verificada y «Ver baraja» | **Completado** · `23ced9f` | Desde el inventario en exploración y desde la pausa, también a mitad de una mano |
-| I5-04 | Variante · Vela de Racha ×2 | **Completado** · `86aed51` | Activada por defecto; el balance queda para Julio |
+| I5-04 | Variante · Vela de Racha ×2 | **Implementada y comparada en simulación** | Se mantiene activa. Resultados con las mismas 1.000 semillas en [validación de balance](#validación-de-balance). |
 | I5-05 | Guardado automático de la partida | **Completado** · `8a4368b` | 16 pruebas en `test_guardado.gd`; «Continuar» y «Nueva partida» en el inicio |
 | I5-06 | Correcciones de la revisión del 25 de noviembre | **Completado** · `83f12aa` | Cierre sin fugas, franja de patrones, menú de inicio, colisiones y respuestas duplicadas del diálogo. Integrado en `main` |
 | I5-07 | Arte de la entrada y de los pasillos | **Implementado en local** | Fachada ilustrada y cuatro fondos propios con los accesos del plano |
-| I5-08 | Sonido por jefe | **Pendiente** | Los buses y los controles de volumen de I4-07 ya existen |
+| I5-08 | Sonido por jefe | **Implementado** | Cuatro ambientes de pasillo y cuatro temas de mesa, con fundido al cambiar de pista. |
 | I5-09 | Guion narrativo y documentos de la rúbrica | **Completado** · `ac08646` | [Guion v4](Diseno/GUION_PROLOGO_Y_DIALOGOS.md), [ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md), navegación, catálogo y presentación |
 | I5-10 | Novela visual en el juego: cinemáticas, conversaciones, accesibilidad y créditos | **Completado** · `b420ab3`, en `main` | Prólogo y llegada como cinemáticas; anfitriona y crupieres con el guion v4; Historial, Auto y Saltar; opciones de lectura; créditos; efectos, personajes en escena, «examinar» ilustrado y un recorrido hacia delante desde el vestíbulo. 285 pruebas |
-| I5-11 | Menús posvictoria de los jefes | **Guion escrito · Kenned** | Guion versión 5: tres preguntas por jefe y cuatro recuerdos opcionales ([§8](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes)). Faltan su conexión en Godot y el arte de los recuerdos, encargado a Julio |
+| I5-11 | Menús posvictoria de los jefes | **Implementado** | Tres preguntas por jefe y cuatro recuerdos ilustrados del [guion v5](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes), accesibles en la revisita. Las preguntas ligadas a futuros eventos siguen en el guion. |
 
 ## Avance
 
@@ -32,7 +32,7 @@
 | [I4](ITERACION_04.md) | Interfaz y recorrido del casino | 8 de 8 implementadas; falta el piloto de I4-08 | 221 |
 | **I5** | **Pasillos de los jefes** | **7 de 10, una parcial** | **285** |
 
-Con I5, la campaña se juega de principio a fin: entrada, vestíbulo, cuatro pasillos, cuatro mesas, tienda, objeto inicial y salida. La partida se guarda entre encuentros y la historia empieza con un prólogo de novela visual. El [inventario de ilustraciones](Diseno/ILUSTRACIONES_PENDIENTES.md) registra el arte del guion v4. Quedan el sonido por jefe (I5-08), los menús posvictoria y sus futuros recuerdos (I5-11) y la puesta en escena de los eventos y finales.
+Con I5, la campaña se juega de principio a fin. La partida se guarda entre encuentros y la historia empieza con un prólogo de novela visual. Al sentarse cambia el tema de la mesa. Al volver después de ganar se puede conocer la historia del jefe y abrir su recuerdo. Los eventos y finales se desarrollarán en iteraciones posteriores. [Inventario de ilustraciones](Diseno/ILUSTRACIONES_PENDIENTES.md).
 
 ## Mapa
 
@@ -127,6 +127,18 @@ Lecturas para Julio:
 - **Comprar Corona y Sello sigue rompiendo al Dueño**, como ya se vio en I2, aunque ahora las compras empiecen en el Recaudador.
 - **Efecto de la variante de la Vela.** Con `--recompensas`, la simulación toma la carta de menor valor efectivo. Con la variante activa, las campañas ganadas sin objeto pasan del 35 % al 40 %, y con el Sello del 49 % al 55 %. La estrategia no busca Racha a propósito: parte de la diferencia viene de que cambia la tercera carta de la oferta.
 
+### Validación de balance
+
+Se compararon 1.000 semillas por escenario con margen 6. Cuando se aceptaron recompensas, la estrategia eligió la carta de menor valor efectivo.
+
+| Estrategia | Omitir recompensa | Aceptar, Vela desactivada | Aceptar, Vela activa |
+| --- | ---: | ---: | ---: |
+| Sin objeto ni compras | 25,3 % | 31,6 % | 36,6 % |
+| Sello del prudente inicial | 37,9 % | 45,3 % | 52,3 % |
+| Lente inicial, luego Corona y Sello | 87,1 % | 89,0 % | 88,1 % |
+
+**Decisión.** Mantener la Vela ×2 y las reglas actuales de los amuletos para el piloto. El Sello inicial mejora la tasa bajo esta política de juego. La combinación de Corona y Sello sigue siendo fuerte. La política no busca Racha deliberadamente ni modela la comprensión, las preferencias o las compras alternativas del jugador. Que el piloto observe si esas opciones eclipsan a las demás antes de cambiar precios, efectos o metas.
+
 ## I5-05 · Guardado automático de la partida
 
 **Estado:** completado por Kenned el 24 de noviembre de 2026, a pedido de Julio. Antes, cerrar el juego reiniciaba el intento y solo se conservaban los ajustes.
@@ -182,7 +194,7 @@ Lecturas para Julio:
 
 ## I5-08 · Sonido por jefe
 
-**Estado:** pendiente. Un ambiente propio para cada pasillo y para cada mesa. Los buses y el control de volumen de I4-07 ya existen, así que basta con añadir los recursos y elegirlos al entrar en cada espacio.
+**Estado.** Implementado. Cada pasillo usa un ambiente de 24 s y cada mesa tiene un tema instrumental de 96 s. Los ajustes independientes de Música y Ambiente siguen activos. El fundido de 0,7 s acompaña los cambios de sector y el paso de exploración a mesa. [Recursos y uso](juego/audio/README.md).
 
 ## I5-09 · Guion narrativo y documentos de la rúbrica
 
@@ -266,13 +278,13 @@ Lecturas para Julio:
 
 ## I5-11 · Menús posvictoria de los jefes
 
-**Responsable.** Kenned. Empezar por el [encargo narrativo en la sección 8 del guion](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes) y después conectar las preguntas en los cuatro recursos de `juego/datos/dialogos/`.
+Kenned escribió la versión 5. Las doce preguntas del recorrido actual están conectadas en los cuatro recursos de `juego/datos/dialogos/`. El juego registra las respuestas vistas en la partida y, al terminar o saltar un recuerdo, regresa al jefe y a las preguntas pendientes. [Sección 8 del guion](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes).
 
 - Reutilizar la condición `mesa_superada`. Antes del encuentro se conserva el menú de presentación. Al volver después de la victoria, `revisita → preguntas_revisita` abre preguntas y respuestas propias. Cada respuesta regresa a ese menú o permite volver a la sala.
 - Escribir al menos tres preguntas nuevas por jefe. En conjunto deben ampliar su historia personal, el origen o las reglas de la Casa, la relación con el Dueño y algún detalle del mundo exterior. Las revelaciones deben respetar los hechos, el momento narrativo y las condiciones del guion vigente.
 - Algunas preguntas pueden ofrecer un **flashback opcional**. Reutilizar la cinemática de I5-10. Terminarlo o saltarlo devuelve al menú posvictoria. Por cada imagen que pida el guion, anotar su identificador, escena, descripción y prioridad en [Ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md#ilustraciones-de-novela-visual-cg).
 
-**Criterio de cierre.** Probar los cuatro jefes antes y después de vencerlos. En la revisita no aparecen las preguntas de presentación, las cifras de la mesa ni «Tomar asiento». Las respuestas y los flashbacks permiten volver a la revisita sin volver a combatir ni cobrar otra recompensa. El Dueño puede hablar antes de cruzar la salida. Registrar la prueba después de guardar y continuar, y qué recuerdos requieren arte.
+**Cómo probar.** Después de ganar una mesa, resuelve su recompensa si la hay y vuelve a hablar con el jefe. Elige la pregunta que abre el recuerdo, recórrelo y comprueba que puedes seguir conversando. En el Dueño se puede hacer antes de cruzar la salida. Las preguntas adicionales de la Coleccionista y el Dueño dependen de decisiones futuras del guion.
 
 ## Para después
 

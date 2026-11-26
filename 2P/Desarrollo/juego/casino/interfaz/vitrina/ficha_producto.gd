@@ -5,6 +5,7 @@ const Libro := preload("res://casino/interfaz/libro.gd")
 const FICHA := preload("res://recursos/hud/ficha_casino.png")
 
 var id := ""
+var _titulo_accesible := ""
 var imagen := TextureRect.new()
 var nombre: Label
 var precio: Label
@@ -17,6 +18,7 @@ func configurar(objeto: ObjetoTienda, arte: Texture2D, glifo := "") -> void:
 	focus_mode = Control.FOCUS_ALL
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	tooltip_text = "%s · %s fichas" % [objeto.nombre, objeto.precio]
+	_titulo_accesible = tooltip_text
 	var normal := Libro.caja(Color(0.96, 0.88, 0.7, 0.07), Color("6b5634"))
 	var foco := Libro.caja(Color(0.96, 0.88, 0.7, 0.16), Color("e2c27e"))
 	foco.set_border_width_all(2)
@@ -69,6 +71,8 @@ func configurar(objeto: ObjetoTienda, arte: Texture2D, glifo := "") -> void:
 	add_child(marca_bloqueo)
 
 ## Un producto bloqueado sigue siendo consultable; solo se atenúa y lleva un aviso breve.
-func presentar(bloqueado: bool) -> void:
+func presentar(bloqueado: bool, motivo := "") -> void:
 	imagen.modulate.a = 0.45 if bloqueado else 1.0
 	marca_bloqueo.text = "No disponible" if bloqueado else ""
+	tooltip_text = _titulo_accesible + (" · " + motivo if bloqueado else "")
+	accessibility_name = tooltip_text

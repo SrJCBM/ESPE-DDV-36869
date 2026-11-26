@@ -18,11 +18,11 @@ func after_each() -> void:
 func _vista(fase: String, puntos: int, mano := {}, meta := 200) -> Dictionary:
 	return {"fase": fase, "puntos": puntos, "meta": meta, "ultima_mano": mano}
 
-func test_el_disparador_solo_aparece_al_resolver_la_mano() -> void:
+func test_el_disparador_corresponde_a_la_accion() -> void:
 	var exacta := {"quiebra": false, "patrones": ["Punto exacto"]}
 	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 0), _vista("preparado", 50, exacta)), "punto_exacto")
-	assert_eq(ReaccionesCrupier.disparador(_vista("preparado", 0), _vista("decision", 0)), "", "Iniciar la mano no comenta en este tramo")
-	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 0), _vista("decision", 0)), "", "Pedir tampoco")
+	assert_eq(ReaccionesCrupier.disparador(_vista("preparado", 0), _vista("decision", 0)), "iniciar_mano")
+	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 0), _vista("decision", 0)), "", "Sin cambios no se repite")
 
 func test_quiebra_al_filo_y_meta_cerca() -> void:
 	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 0), _vista("preparado", 0, {"quiebra": true, "patrones": []})), "quiebra")
@@ -31,8 +31,9 @@ func test_quiebra_al_filo_y_meta_cerca() -> void:
 	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 150), _vista("preparado", 175, normal)), "meta_cerca", "Falta menos del 15 %")
 	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 175), _vista("preparado", 180, normal)), "", "Solo al cruzar el umbral del 85 %")
 	var con_victoria := _vista("preparado", 205, normal)
+	con_victoria.terminado = true
 	con_victoria.victoria = true
-	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 150), con_victoria), "", "La victoria tiene su propio cierre")
+	assert_eq(ReaccionesCrupier.disparador(_vista("decision", 150), con_victoria), "victoria")
 
 func test_si_coinciden_gana_la_mayor_prioridad() -> void:
 	var exacta := {"quiebra": false, "patrones": ["Punto exacto"]}
@@ -41,11 +42,12 @@ func test_si_coinciden_gana_la_mayor_prioridad() -> void:
 	var empate := ReaccionesCrupier.disparador(_vista("decision", 150), _vista("preparado", 175, filo))
 	assert_eq(empate, "al_filo", "Con la misma prioridad, el primero del guion")
 
-func test_las_lineas_del_custodio_caben_y_no_se_repiten_seguidas() -> void:
+func test_las_lineas_de_los_cuatro_jefes_caben_y_no_se_repiten_seguidas() -> void:
 	var reacciones: ReaccionesCrupier = load("res://datos/reacciones/reacciones.tres")
 	assert_eq(reacciones.largas(), PackedStringArray(), "Todas caben en 90 caracteres")
-	for id in ["punto_exacto", "al_filo", "quiebra", "meta_cerca"]:
-		assert_false(reacciones.linea("custodio", id).is_empty(), id)
+	for jefe in CampanaCasino.MESAS:
+		for id in ["punto_exacto", "al_filo", "quiebra", "meta_cerca", "sentarse", "victoria", "derrota"]:
+			assert_false(reacciones.linea(jefe, id).is_empty(), "%s · %s" % [jefe, id])
 	var azar := RandomNumberGenerator.new()
 	azar.seed = 4
 	var anterior := reacciones.linea("custodio", "quiebra", "", azar)
@@ -78,7 +80,6 @@ func test_punto_exacto_en_la_mesa_comenta_sin_quitar_el_foco() -> void:
 	var mesa = juego.mesa
 	_cartas(juego, [["llaves", 10], ["velas", 7]])
 	mesa.boton_iniciar_pedir.pressed.emit()
-	assert_false(mesa.bocadillo.visible, "Durante la decisión, nada")
 	mesa.boton_plantarse.grab_focus()
 	mesa.boton_plantarse.pressed.emit()
 	await get_tree().process_frame
@@ -100,7 +101,7 @@ func test_quiebra_en_la_mesa_y_se_retira_al_actuar() -> void:
 	assert_true(mesa.bocadillo.visible)
 	assert_true(mesa.bocadillo.texto.text.contains("Quiebra") or mesa.bocadillo.texto.text.contains("Te pasaste"))
 	mesa.boton_iniciar_pedir.pressed.emit()
-	assert_false(mesa.bocadillo.visible, "La siguiente acción retira el comentario")
+	assert_false(mesa.bocadillo.visible and (mesa.bocadillo.texto.text.contains("Quiebra") or mesa.bocadillo.texto.text.contains("Te pasaste")), "La siguiente acción retira la quiebra")
 
 func test_el_comentario_desaparece_a_los_tres_segundos() -> void:
 	var juego = _mesa_del_custodio()
@@ -112,13 +113,17 @@ func test_el_comentario_desaparece_a_los_tres_segundos() -> void:
 	mesa.bocadillo._process(1.1)
 	assert_false(mesa.bocadillo.visible)
 
-func test_con_una_mascara_oculta_no_hay_comentario_antes_de_plantarse() -> void:
+func test_al_pedir_la_reaccion_usa_solo_el_intervalo_publico() -> void:
 	var juego = _mesa_del_custodio()
 	var mesa = juego.mesa
 	_cartas(juego, [["mascaras", 9], ["velas", 8], ["llaves", 2]])
 	mesa.boton_iniciar_pedir.pressed.emit()
+	var antes: Dictionary = mesa.vista.duplicate(true)
 	mesa.boton_iniciar_pedir.pressed.emit()
-	assert_false(mesa.bocadillo.visible, "Pedir con una Máscara oculta no comenta: no puede anticipar su valor")
+	var despues: Dictionary = mesa.vista
+	assert_eq(despues.intervalo.ocultas, 1)
+	assert_eq(despues.cartas[0].valor, null)
+	assert_eq(ReaccionesCrupier.disparadores(antes, despues), ["pedir"])
 
 func test_los_comentarios_se_pueden_desactivar() -> void:
 	AjustesJuego.guardar_comentarios_crupieres(false)
@@ -139,3 +144,20 @@ func test_el_ajuste_esta_en_opciones() -> void:
 	assert_true(panel.comentarios.button_pressed, "Activados por defecto")
 	panel.comentarios.button_pressed = false
 	assert_false(AjustesJuego.comentarios_crupieres())
+
+func test_el_cambio_de_opciones_calla_la_mesa_en_curso() -> void:
+	var juego = _mesa_del_custodio()
+	juego.mesa.bocadillo.mostrar("Custodio", "«¿Sigues ahí?»")
+	juego.pausar()
+	juego.menu.abrir("opciones")
+	juego.menu._contenido.get_child(1).comentarios.button_pressed = false
+	assert_false(juego.mesa.comentarios)
+	assert_false(juego.mesa.bocadillo.visible)
+
+func test_el_bocadillo_contiene_la_ultima_linea_al_ajustar_el_texto() -> void:
+	var juego = _mesa_del_custodio()
+	var bocadillo: Control = juego.mesa.bocadillo
+	bocadillo.mostrar("La Coleccionista", "«Otra cara. Todas me pertenecen al final, y sé cuándo se le acaba el tiempo a cada una.»")
+	await get_tree().process_frame
+	var linea: Label = bocadillo.texto
+	assert_gte(linea.size.y + 0.01, float(linea.get_line_count() * linea.get_line_height()))

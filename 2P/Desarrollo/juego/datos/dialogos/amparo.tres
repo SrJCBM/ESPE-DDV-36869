@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {"amparo": {"nombre": "Doña Amparo"}, "narrador": {"nombre": ""}}
+entradas = [{"si": "sellos>=3", "ir": "porcelana"}, {"ir": "saludo"}]
+intervenciones = {"respuesta_1": {"personaje": "amparo", "texto": "«Con Velas, querido. Cada Vela sube el multiplicador, ¿sabe? Pedía y pedía buscando otra Vela, otra más… Las velas se apagan si soplas demasiado fuerte. Yo soplé.»", "siguiente": "preguntas"}, "respuesta_2": {"personaje": "amparo", "texto": "«Llegué la noche del estreno de una ópera de Rossini. Tenía una hija de cinco años esperándome despierta.»\n\n«¿Cree que sigue esperando?»", "siguiente": "preguntas"}, "respuesta_3": {"personaje": "amparo", "texto": "«Ya no las siento. Es lo bueno. El frío dura poco. Luego ya no duele nada.»", "siguiente": "preguntas", "expresion": "triste"}, "saludo": {"personaje": "amparo", "texto": "«¿Oye la música? No, claro. Dejó de sonar cuando perdí mi última mano. Sigo tocando por si vuelve. No vuelve.»", "opciones": [{"texto": "¿Cómo perdió?", "ir": "respuesta_1"}, {"texto": "¿Cuánto tiempo lleva aquí?", "ir": "respuesta_2"}, {"texto": "Sus manos…", "ir": "respuesta_3"}, {"texto": "Volver al recorrido", "ir": ""}]}, "preguntas": {"personaje": "amparo", "texto": "¿Quieres preguntar algo más?", "opciones": [{"texto": "¿Cómo perdió?", "ir": "respuesta_1"}, {"texto": "¿Cuánto tiempo lleva aquí?", "ir": "respuesta_2"}, {"texto": "Sus manos…", "ir": "respuesta_3"}, {"texto": "Volver al recorrido", "ir": ""}]}, "porcelana": {"personaje": "narrador", "texto": "La pianista tiene la quietud de la porcelana. Sus manos siguen sobre las teclas."}}

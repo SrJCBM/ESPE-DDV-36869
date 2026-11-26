@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Conversacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://casino/dialogos/conversacion.gd" id="1_conv"]
+
+[resource]
+script = ExtResource("1_conv")
+personajes = {"narrador": {"nombre": ""}, "anfitriona": {"nombre": "La Anfitriona"}, "jefe": {"nombre": ""}}
+entradas = [{"ir": "inicio"}]
+intervenciones = {
+"inicio": {"personaje": "jefe", "texto": "{ultima_linea}", "fondo": "mesa", "siguiente": "campanada"},
+"campanada": {"personaje": "narrador", "modo": "nvl", "texto": "La última campanada se apaga dentro de mi pecho.", "sonido": "quiebra", "fondo": "cg_derrota_manos", "siguiente": "manos"},
+"manos": {"personaje": "narrador", "modo": "nvl", "texto": "Las manos se me quedan frías. Lisas. Intento cerrar el puño y no hay puño que cerrar. El frío sube por los brazos, por el cuello, por la mandíbula. Quiero gritar el nombre de Ignacio, o el mío, y la boca ya no se abre.", "sonido": "porcelana", "fondo": "cg_derrota_manos", "siguiente": "vitrina"},
+"vitrina": {"personaje": "narrador", "modo": "nvl", "texto": "Lo último que veo es una vitrina vacía. Tiene mi nombre en la etiqueta.", "fondo": "cg_derrota_manos", "siguiente": "invitacion"},
+"invitacion": {"personaje": "anfitriona", "texto": "«Ya la estoy escribiendo, señor.»", "sonido": "campana", "fondo": "", "opciones": [{"texto": "Nuevo intento", "ir": ""}]}
+}
+fondos = {"mesa": {"ruta": "", "descripcion": "La sala del crupier."}, "cg_derrota_manos": {"ruta": "res://historia/ilustraciones/cg_derrota_manos.webp", "movimiento": "acercar", "descripcion": "Las manos de Klein se vuelven porcelana sobre el tapete."}}

@@ -15,16 +15,16 @@ const FIGURAS := {
 	"vestibulo": [
 		{"id": "anfitriona", "pies": Vector2(990, 231), "alto": 84.0, "sombra": 0.0},
 		# El piano, contra el muro norte y bajo el aplique, con Amparo sentada al teclado.
-		{"id": "amparo", "pies": Vector2(300, 262), "alto": 112.0, "sombra": 0.85},
+		{"id": "amparo", "pies": Vector2(300, 262), "alto": 112.0, "sombra": 0.85, "nombre": "Doña Amparo"},
 		# La mesa de los jugadores, en el lateral oeste junto a la lámpara de pie.
 		{"id": "jugador_porcelana", "pies": Vector2(210, 430), "alto": 118.0, "sombra": 0.72},
 	],
 	"pasillo_custodio": [
-		{"id": "tobias", "pies": Vector2(475, 366), "alto": 96.0, "sombra": 0.9},
+		{"id": "tobias", "pies": Vector2(475, 366), "alto": 96.0, "sombra": 0.9, "nombre": "Tobías"},
 	],
 	"pasillo_recaudador": [
 		# El banco, contra el muro bajo la caja fuerte, con sitio para las piernas.
-		{"id": "benavides", "pies": Vector2(960, 318), "alto": 96.0, "sombra": 0.9},
+		{"id": "benavides", "pies": Vector2(960, 318), "alto": 96.0, "sombra": 0.9, "nombre": "Benavides"},
 	],
 	"tienda": [
 		{"id": "anfitriona", "pies": Vector2(650, 174), "alto": 84.0, "sombra": 0.0},
@@ -119,6 +119,8 @@ static func figuras(sala: String) -> Array:
 func _figuras(sala: String) -> void:
 	for datos in figuras(sala):
 		_figura(datos.id, datos.pies, datos.alto, datos.sombra)
+		if datos.has("nombre"):
+			_punto("visitante", datos.pies + Vector2(0, 32), "Hablar con " + datos.nombre, datos.id)
 
 ## Rectángulo de la parte opaca de un recorte. Ignora el halo casi transparente del borde
 ## (alfa < 0,16), que `get_used_rect` sí cuenta. Se mide una vez por textura.
@@ -174,6 +176,8 @@ func _punto(tipo: String, pos: Vector2, accion: String, destino := "") -> void:
 		marca.add_theme_color_override("font_outline_color", Color("15231e"))
 		marca.position = pos - Vector2(10, 25)
 		_marcas.add_child(marca)
+		if tipo == "visitante":
+			marca.hide()
 	puntos.append({"tipo": tipo, "pos": pos, "accion": accion, "destino": destino, "marca": marca})
 
 func cercano(posicion: Vector2) -> Dictionary:
@@ -189,4 +193,6 @@ func cercano(posicion: Vector2) -> Dictionary:
 func marcar(elegido: Dictionary) -> void:
 	for punto in puntos:
 		if punto.marca != null:
+			if punto.tipo == "visitante":
+				punto.marca.visible = punto == elegido
 			punto.marca.text = "◆" if punto == elegido else "◇"

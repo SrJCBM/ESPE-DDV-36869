@@ -36,8 +36,8 @@ const GUIA_RAPIDA := [
 ]
 
 var audio: AudioCasino
-## Devuelve [título, texto] de las pertenencias del intento.
-var texto_inventario: Callable
+## Añade las pertenencias de la campaña al contenedor de la página.
+var mostrar_inventario: Callable
 ## Devuelve si hay algo que se perdería al volver al inicio.
 var intento_activo: Callable
 ## Devuelve el aviso de lo que se pierde al volver al inicio (opcional).
@@ -191,10 +191,10 @@ func abrir(nombre: String) -> void:
 			_nota("I · Pertenencias     H · Reglas de la mesa     V · Sonido     Esc · Pausa")
 			_boton("Volver", abrir.bind(_raiz))
 		"inventario":
-			var datos: Array = texto_inventario.call() if texto_inventario.is_valid() else ["Tus pertenencias", ""]
-			_marco(Rect2(370, 180, 700, 450))
-			_titulo(str(datos[0]), 40)
-			_texto(str(datos[1]))
+			_marco(Rect2(370, 140, 700, 530))
+			_titulo("Tus pertenencias", 40)
+			if mostrar_inventario.is_valid():
+				mostrar_inventario.call(_contenido)
 			if intento_activo.is_valid() and intento_activo.call():
 				_boton("Ver baraja", ver_baraja.emit)
 			_boton("Volver", abrir.bind(_raiz))

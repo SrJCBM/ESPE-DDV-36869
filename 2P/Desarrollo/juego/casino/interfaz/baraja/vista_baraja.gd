@@ -14,8 +14,8 @@ const Carta := preload("res://cartas/carta.tscn")
 const ARTE := preload("res://cartas/carta_ui.gd").ARTE
 const BASE := Vector2(1440, 810)
 const MARCO := Rect2(60, 50, 1320, 710)
-const FILAS := Rect2(520, 150, 830, 520) ## Zona de las cuatro filas de cartas.
-const CARTA := Vector2(96, 112)
+const FILAS := Rect2(520, 153, 810, 520) ## Zona de las cuatro filas de cartas.
+const CARTA := Vector2(96, 102)
 const ALTO_FILA := 130.0
 const MUTED := Color("b9ad91")
 const VERDE := Color("9fc7a2")
@@ -25,6 +25,8 @@ var titulo: Label
 var total: Label
 var resumen: VBoxContainer
 var valores: VBoxContainer
+var detalle: Label
+var _tiras: Array[ScrollContainer] = []
 var filas: Array[HBoxContainer] = []
 var boton_volver: Button
 var cartas: Array[Button] = []
@@ -48,7 +50,7 @@ func _ready() -> void:
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_theme_stylebox_override("panel", Libro.caja(Color(0.06, 0.145, 0.12, 0.98), Libro.ORO))
 	lienzo.add_child(panel)
-	# Pestaña del título, como el rótulo «Baraja completa» de la referencia.
+	# Pestaña sobre el lomo del álbum.
 	var pestana := Panel.new()
 	pestana.position = Vector2(560, 28)
 	pestana.size = Vector2(320, 56)
@@ -77,6 +79,12 @@ func _ready() -> void:
 	resumen.size = Vector2(caja.size.x - 44, caja.size.y - 80)
 	resumen.add_theme_constant_override("separation", 6)
 	lienzo.add_child(resumen)
+	detalle = Libro.rotulo("", 16, Libro.PAPEL)
+	detalle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detalle.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	detalle.position = caja.position + Vector2(22, 427)
+	detalle.size = Vector2(266, 112)
+	lienzo.add_child(detalle)
 	# Columna de valores: cuántas cartas hay de cada valor impreso.
 	valores = VBoxContainer.new()
 	valores.position = Vector2(420, 112)
@@ -84,17 +92,28 @@ func _ready() -> void:
 	valores.add_theme_constant_override("separation", 1)
 	lienzo.add_child(valores)
 	var fondo_filas := Panel.new()
-	fondo_filas.position = FILAS.position - Vector2(12, 40)
-	fondo_filas.size = FILAS.size + Vector2(24, 52)
+	fondo_filas.position = FILAS.position - Vector2(12, 43)
+	fondo_filas.size = Vector2(FILAS.size.x + 30, 560)
 	fondo_filas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	fondo_filas.add_theme_stylebox_override("panel", Libro.caja(Color("0b1c17"), Color("645c44")))
 	lienzo.add_child(fondo_filas)
 	for indice in Palos.TODOS.size():
+		var posicion := FILAS.position + Vector2(0, indice * ALTO_FILA)
+		var nombre_palo := Libro.rotulo(Palos.NOMBRES[Palos.TODOS[indice]].to_upper(), 13, Libro.ORO)
+		nombre_palo.position = posicion - Vector2(0, 23)
+		lienzo.add_child(nombre_palo)
+		var tira := ScrollContainer.new()
+		tira.position = posicion
+		tira.size = Vector2(FILAS.size.x, CARTA.y + 5)
+		tira.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+		tira.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		tira.follow_focus = true
+		lienzo.add_child(tira)
+		_tiras.append(tira)
 		var fila := HBoxContainer.new()
-		fila.position = FILAS.position + Vector2(0, indice * ALTO_FILA)
-		fila.size = Vector2(FILAS.size.x, CARTA.y)
+		fila.add_theme_constant_override("separation", 8)
 		fila.theme = preload("res://temas/mesa.tres")
-		lienzo.add_child(fila)
+		tira.add_child(fila)
 		filas.append(fila)
 	boton_volver = Button.new()
 	boton_volver.text = "Volver"
@@ -124,6 +143,7 @@ func presentar(datos: Dictionary) -> void:
 	var lista: Array = datos.get("cartas", [])
 	var retiradas: Array = datos.get("retiradas", [])
 	total.text = "%s cartas" % lista.size()
+	detalle.text = "Elige una carta para ver su detalle."
 	_limpiar(resumen)
 	_limpiar(valores)
 	for carta in cartas:
@@ -150,22 +170,24 @@ func presentar(datos: Dictionary) -> void:
 	resumen.add_child(_linea("Ganadas como recompensa: %s" % ganadas, VERDE if ganadas else MUTED))
 	resumen.add_child(_linea("Con el valor ajustado: %s" % ajustadas, Libro.ORO if ajustadas else MUTED))
 	if dobles:
-		resumen.add_child(_linea("Velas de Racha ×2: %s · cuentan como dos cartas para Racha" % dobles, Libro.ORO))
+		resumen.add_child(_linea("Velas de Racha ×2: %s" % dobles, Libro.ORO))
 	var texto_retiros := "Retiradas en la tienda: %s" % retiradas.size()
-	if not retiradas.is_empty():
-		var nombres := PackedStringArray()
-		for retirada: Dictionary in retiradas:
-			nombres.append("%s de %s" % [retirada.valor, Palos.NOMBRES.get(retirada.palo, "")])
-		texto_retiros += "\n" + ", ".join(nombres)
-	resumen.add_child(_linea(texto_retiros, MUTED))
+	var rotulo_retiros := _linea(texto_retiros, MUTED)
+	var nombres := PackedStringArray()
+	for retirada: Dictionary in retiradas:
+		nombres.append("%s de %s" % [retirada.valor, Palos.NOMBRES.get(retirada.palo, "")])
+	rotulo_retiros.tooltip_text = ", ".join(nombres)
+	rotulo_retiros.mouse_filter = Control.MOUSE_FILTER_PASS
+	resumen.add_child(rotulo_retiros)
 	if datos.get("en_mano", false):
 		resumen.add_child(_separador())
-		resumen.add_child(_linea("Mano en curso: las Máscaras se muestran boca abajo y la baraja no sigue el orden del mazo.", MUTED))
+		resumen.add_child(_linea("Las Máscaras quedan boca abajo durante la mano.", MUTED))
 	for valor in range(10, 0, -1):
 		valores.add_child(_cuenta(str(valor), int(por_valor.get(valor, 0))))
 	if ocultas:
 		valores.add_child(_cuenta("?", ocultas))
 	for indice in Palos.TODOS.size():
+		_tiras[indice].set_deferred("scroll_horizontal", 0)
 		_llenar_fila(filas[indice], por_palo[Palos.TODOS[indice]])
 
 func abrir(datos: Dictionary) -> void:
@@ -179,24 +201,39 @@ func cerrar() -> void:
 	hide()
 	cerrada.emit()
 
-## Una fila por palo, de menor a mayor valor. Si no caben, las cartas se solapan.
+## Se desplaza con el foco cuando la baraja gana más cartas de las que caben en la fila.
 func _llenar_fila(fila: HBoxContainer, lista: Array) -> void:
 	lista.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		if a.get("oculta", false) != b.get("oculta", false): return b.get("oculta", false)
 		if a.get("oculta", false): return false
 		return int(a.valor) < int(b.valor))
-	var n := lista.size()
-	var separacion := 8.0 if n < 2 else minf(8.0, (FILAS.size.x - n * CARTA.x) / (n - 1))
-	fila.add_theme_constant_override("separation", int(separacion))
 	for datos_carta: Dictionary in lista:
 		var carta := Carta.instantiate() as Button
 		carta.custom_minimum_size = CARTA
-		carta.focus_mode = Control.FOCUS_NONE
 		fila.add_child(carta)
 		carta.establecer_movimiento_reducido(true)
 		carta.presentar(datos_carta)
 		carta.set_meta("datos", datos_carta)
+		var descripcion := _detalle_carta(datos_carta)
+		carta.tooltip_text = descripcion
+		var consultar := func() -> void: detalle.text = descripcion
+		carta.focus_entered.connect(consultar)
+		carta.mouse_entered.connect(consultar)
+		carta.pressed.connect(consultar)
 		cartas.append(carta)
+
+func _detalle_carta(datos: Dictionary) -> String:
+	var palo: String = Palos.NOMBRES[datos.palo]
+	if datos.get("oculta", false):
+		return "%s\nValor oculto mientras juegas una mano." % palo
+	var lineas := PackedStringArray(["%s · %s" % [palo, datos.valor]])
+	if datos.valor != datos.valor_efectivo:
+		lineas.append("Para el umbral cuenta como %s." % datos.valor_efectivo)
+	if datos.get("rasgo") == CartaEnPartida.RASGO_RACHA_DOBLE:
+		lineas.append("Cuenta como dos cartas para Racha.")
+	if not str(datos.get("nota", "")).is_empty():
+		lineas.append(datos.nota)
+	return "\n".join(lineas)
 
 func _fila_palo(palo: String, cantidad: int) -> HBoxContainer:
 	var fila := HBoxContainer.new()

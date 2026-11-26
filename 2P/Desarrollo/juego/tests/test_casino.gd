@@ -257,7 +257,11 @@ func test_colision_del_mostrador_y_derrota_sin_premio() -> void:
 	assert_true(juego.campana.derrota)
 	assert_false(juego.campana.puerta_abierta("recaudador"))
 	assert_eq(juego.campana.saldo,10)
-	juego.libro.primero.pressed.emit()
+	var historia: Control = juego.historia
+	for i in range(5):
+		historia.completar()
+		historia.avanzar()
+	historia.elegir(0)
 	assert_eq(juego.campana.saldo,0)
 	assert_eq(juego.sala,"entrada")
 	await get_tree().process_frame
@@ -301,7 +305,7 @@ func test_campana_completa_con_baraja_normal_y_recompensas_unicas() -> void:
 		assert_true(m.obtener_vista().victoria)
 		juego.mesa.boton_iniciar_pedir.pressed.emit()
 		assert_eq(c.superadas,nivel+1)
-		juego.libro.primero.pressed.emit()
+		juego.libro.lista.get_child(-1).pressed.emit()
 	juego.visitante.position=Vector2(640,194)
 	juego.interactuar(juego.cercano())
 	assert_eq(juego.libro.primero.text,"Comenzar otro viaje")

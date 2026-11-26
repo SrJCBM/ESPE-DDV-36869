@@ -6,7 +6,7 @@ const MARFIL := Color("f1e4c9")
 const MUTED := Color("b9c4a8")
 const TINTA := Color("263a2b")
 ## Iconos de la ficha de coste de las acciones (I6-04).
-const ICONO_CAMPANADA := "res://casino/dialogos/arte/campana_adv.webp"
+const ICONO_CAMPANADA := "res://mesa/arte/icono_campanada.webp"
 const ICONO_FICHA := "res://recursos/hud/ficha_casino.png"
 const ANCHO_FICHA := 54.0
 

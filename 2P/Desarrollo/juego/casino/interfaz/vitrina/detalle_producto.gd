@@ -45,9 +45,9 @@ func _init() -> void:
 	boton_comprar.pressed.connect(compra_confirmada.emit)
 	contenedor.add_child(boton_comprar)
 
-func vaciar(texto: String) -> void:
+func vaciar() -> void:
 	titulo.text = "Elige una pieza"
-	efecto.text = texto
+	efecto.text = ""
 	aviso.text = ""
 	resto.text = ""
 	boton_comprar.hide()
