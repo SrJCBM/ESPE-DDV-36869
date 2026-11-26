@@ -1,6 +1,6 @@
 # La Última Mesa · Prólogo y diálogos en formato de novela visual
 
-**Estado:** borrador para revisión de Julio, escrito por Kenned. **Versión 4.1**, del 25 de noviembre de 2026; los cambios entre versiones están en el [historial](#17-historial-de-versiones). No forma parte de ninguna iteración.
+**Estado:** borrador para revisión de Julio, escrito por Kenned. **Versión 5**, del 26 de noviembre de 2026; los cambios entre versiones están en el [historial](#17-historial-de-versiones). No forma parte de ninguna iteración.
 
 **Protagonista:** masculino. El nombre lo elegirá el jugador en una iteración futura; en el texto aparece como `{nombre}` (por defecto **Klein**) y `{apellido}` (por defecto **Moretti**). Los diálogos del protagonista en las opciones funcionan con cualquier nombre.
 
@@ -89,6 +89,7 @@ La presentación imita a las novelas visuales del estilo de Fate. Las **cinemát
 | `[MÚSICA: pieza]` / `[SONIDO: efecto]` | Pistas del documento de diseño o efectos del banco actual (`campana`, `naipe`, `paso`, `puerta`, `quiebra`, `sello`, `interfaz`). Los nuevos se marcan con *(nuevo)*. |
 | `[ACCIÓN: …]` | Lo que ocurre en pantalla: movimientos, gestos, temblores, fundidos. |
 | `[TRANSICIÓN: …]` | Paso entre escenas: fundido a negro, barrido de humo o corte. |
+| `[RECUERDO: id]` … `[FIN DEL RECUERDO]` | Recuerdo opcional de un jefe (I5-11). Se abre como cinemática sobre su CG, con fundido a negro. La narración `[NVL]` es la voz del jefe, no la de Klein, y no hay retratos en escena. «Saltar» o Esc lo cierran en cualquier momento y devuelven al menú posvictoria. |
 | `[OPCIÓN]` | Elección del jugador. Cada respuesta indica su efecto y la variable que guarda. |
 | `{nombre}` | Nombre del protagonista. `{apellido}` es su apellido. |
 
@@ -729,16 +730,18 @@ Líneas cortas de la anfitriona en la vitrina, una al azar al abrirla, sin repet
 
 Cada jefe tiene cuatro momentos: **presentación** (antes de sentarse, con «Tomar asiento»), **preguntas previas** (menú opcional antes de jugar), **victoria y derrota**, y **revisita** (hablar después de vencerlo). Las reacciones durante la partida están en [Reacciones](#9-reacciones-de-los-jefes-durante-la-partida).
 
-**Revisitas posvictoria · I5-11, pendiente de escritura por Kenned.** Al ganar, las preguntas previas ceden su lugar a un menú propio del jefe vencido. Escribir al menos tres preguntas nuevas por jefe, con respuestas que profundicen en lo que acaba de cambiar y en lo que ese personaje puede saber. Las líneas actuales de revisita sirven como saludo.
+**Revisitas posvictoria (I5-11).** Al hablar de nuevo con un jefe vencido, su línea de revisita sirve de saludo y abre un menú **«Preguntar…»** propio. Ese menú **sustituye** a las preguntas previas: ya no aparecen la presentación, las cifras de la mesa ni «Tomar asiento». Cada pregunta desaparece al responderse y «Nada más» devuelve a la sala. Las respuestas revelan lo que ese jefe sabe de sí mismo, de la Casa, del Dueño o de Corvera, y no adelantan lo que corresponde a los eventos, las decisiones o los finales.
 
-| Jefe | Preguntas para desarrollar |
-| --- | --- |
-| Custodio | Qué perdió antes de convertirse en quien cuenta las campanadas, qué recuerda de la primera noche y qué queda de esa época fuera de la Casa. |
-| Recaudador | Cómo aprendió a llevar el libro, quién convirtió el tiempo en deuda y cómo se relacionan las garantías del casino con las deudas de Corvera. |
-| Coleccionista | Qué conserva por voluntad propia, qué significa guardar un rostro y qué relación tienen sus vitrinas con las concesiones del Dueño. |
-| Dueño | Qué cambia al perder, qué recuerda del trato con el amanecer y qué sabe de lo que espera en Corvera al otro lado de la verja. Mantener las revelaciones propias de los desenlaces en su momento. |
+**Recuerdos opcionales.** Algunas respuestas terminan en una `[OPCIÓN]` con dos salidas: la que abre el recuerdo y **«Otra pregunta.»**, que vuelve al menú. El recuerdo es una cinemática breve (`[RECUERDO: id]`) sobre una CG nueva, narrada en `[NVL]` con la voz del jefe y sin retratos en escena. Al terminar, o al saltarlo con «Saltar» o Esc, se funde a negro y se vuelve a la sala del jefe: él dice una línea de cierre y se abre de nuevo el menú posvictoria, con la pregunta ya respondida. Verlo o saltarlo fija `historia:recuerdo_<jefe>`; no cambia reglas, fichas ni recompensas, y no se vuelve a ofrecer en el mismo intento.
 
-Una respuesta puede abrir un **flashback breve y opcional**. Marcar su entrada, las líneas y los fondos con las convenciones del guion. Indicar desde qué pregunta se abre y a qué menú vuelve al terminar o saltarlo. Para las imágenes nuevas, registrar cada `[FONDO: id]` o CG en [Ilustraciones pendientes](ILUSTRACIONES_PENDIENTES.md#ilustraciones-de-novela-visual-cg) cuando el recuerdo esté escrito.
+| Jefe | Preguntas posvictoria | Recuerdo y pregunta que lo abre |
+| --- | --- | --- |
+| Custodio | 3 | `fb_campanario` · «¿Qué perdió antes de llegar aquí?» |
+| Recaudador | 3 | `fb_deuda_muerto` · «¿Hay más garantías de Corvera en su libro?» |
+| Coleccionista | 3 y una según `ignacio.destino` | `fb_habitacion_cristal` · «¿Guarda algo porque quiere?» |
+| Dueño | 3 y una tras la línea de M4 | `fb_apuesta_alba` · «¿Cómo fue la noche de la apuesta?» |
+
+El arte de los cuatro recuerdos está encargado en [Ilustraciones pendientes](ILUSTRACIONES_PENDIENTES.md#recuerdos-de-los-jefes-i5-11-guion-v5).
 
 ### 8.1 El Custodio
 
@@ -782,6 +785,43 @@ Una respuesta puede abrir un **flashback breve y opcional**. Marcar su entrada, 
 **Revisita:**
 
 **Custodio:** «La mesa está cerrada, pero el péndulo te recuerda. Te quedan años, relojero. No los malgastes preguntándome.» → menú posvictoria del Custodio.
+
+**Preguntas posvictoria al Custodio** (I5-11):
+
+| Pregunta | Respuesta |
+| --- | --- |
+| **«¿Qué perdió antes de llegar aquí?»** | `[RETRATO: Custodio · recuerdo]` «Tres hijos. Andrés, Tomás y Gil, el pequeño. Toqué a muerto por los tres, un domingo cada uno. El obispo pagaba cada toque.» *(pausa)* «Con lo de Gil compré pan. Esa es la parte que no me perdono.» `[OPCIÓN]` **«¿Cómo fue aquel último toque?»** abre el [recuerdo de la cuerda de Gil](#recuerdo--la-cuerda-de-gil) · **«Otra pregunta.»** |
+| **«¿Qué recuerda de su primera noche aquí?»** | «Que el minutero del vestíbulo todavía temblaba, como un perro que quiere salir. Fui de los primeros. La anfitriona apenas tosía y el Dueño todavía se reía.» *(pausa)* «Hace mucho que nadie se ríe en esta Casa. Tú lo intentas. Se agradece.» |
+| **«¿Queda algo de su ciudad allá fuera?»** | «Un visitante me contó que la catedral ardió poco después de que yo entrara. La campana mayor se fundió y con el bronce acuñaron monedas.» *(pausa)* «Alguna habrá llegado a Corvera. Si oyes una moneda que suena más grave que las demás, no la gastes. Es de las mías.» |
+
+#### Recuerdo · La cuerda de Gil
+
+`[RECUERDO: fb_campanario]` *(desde «¿Cómo fue aquel último toque?»)*
+`[TRANSICIÓN: las campanas del halo del Custodio dejan de sonar; fundido a negro.]`
+`[CG: fb_campanario]` *(acercamiento lento hacia la cuerda)*
+`[SONIDO: viento; una campana lejana, sin eco]`
+`[NVL]` *(voz del Custodio)*
+
+> Domingo. El tercero. Desde la torre se ve toda la ciudad, y ninguna chimenea echa humo.
+>
+> Abajo, en la plaza, dos hombres llevan una caja pequeña. Tan pequeña que podría llevarla uno solo. No quieren que la lleve uno solo.
+
+`[SONIDO: campana]` `[EFECTO: temblor]`
+
+> Un toque por cada año que vivió. Siete. Los cuento en voz alta, como le enseñé a contar a él.
+>
+> Al llegar a siete, la cuerda quiere seguir. Mis manos también. Si sigo tocando, quizá nadie se dé cuenta de que se ha terminado.
+
+`[SONIDO: campana, un octavo toque más débil]`
+
+> Toqué hasta que dejé de sentir las manos. Nadie subió a pararme. No quedaba nadie para subir.
+>
+> Aquella noche dije en voz alta que daría lo que fuera por no haber tocado nunca. Alguien me oyó.
+
+`[TRANSICIÓN: fundido a negro; vuelve la sala del Custodio.]`
+`[FIN DEL RECUERDO]`
+`[RETRATO: Custodio · duelo]`
+**Custodio:** «Ya está. Pregunta otra cosa, si quieres. O ve a vivir un poco.» → menú posvictoria del Custodio.
 
 ### 8.2 El Recaudador
 
@@ -846,6 +886,42 @@ Después de la página de Ignacio, el Recaudador ofrece la **[decisión M1](#m1-
 **Revisita:**
 
 **Recaudador:** «Su página sigue abierta. Pregunte, si quiere. Las respuestas también se anotan. Las preguntas tontas, en rojo.» → menú posvictoria del Recaudador.
+
+**Preguntas posvictoria al Recaudador** (I5-11):
+
+| Pregunta | Respuesta |
+| --- | --- |
+| **«¿Quién le enseñó a llevar un libro así?»** | «Mi padre. Llevaba las cuentas de un convento de Corvera. Me enseñó que una deuda no es dinero: es una promesa que alguien todavía no puede cumplir.» *(pausa)* «Luego descubrí que también es poder. Arranqué la página donde lo había escrito.» |
+| **«¿Quién convirtió el tiempo en deuda?»** | `[RETRATO: Recaudador · impaciente]` «Nadie lo decidió. El Dueño apostó una noche entera y no tenía con qué cubrirla. La Casa le fió el amanecer, y nosotros cobramos los intereses.» *(da un golpecito con la pluma)* «Usted no paga su deuda, {apellido}. Paga la de él.» |
+| **«¿Hay más garantías de Corvera en su libro?»** | «Cuarenta y una páginas con dirección de Corvera. El muelle, la calle de los Toneleros, el barrio del hospicio. Padres que ofrecieron a sus hijos, socios que ofrecieron a sus socios.» *(pausa)* «En su puerto hay prestamistas que hacen lo mismo con papel sellado y sin Casa. Yo fui uno. La única diferencia es que aquí se anota todo.» `[OPCIÓN]` **«Usted también tiene una página de Corvera.»** abre el [recuerdo de la deuda del muerto](#recuerdo--la-deuda-del-muerto) · **«Otra pregunta.»** |
+
+#### Recuerdo · La deuda del muerto
+
+`[RECUERDO: fb_deuda_muerto]` *(desde «Usted también tiene una página de Corvera.»)*
+`[ACCIÓN: el Recaudador cierra el libro. Es la primera vez que lo cierra delante de Klein.]`
+`[TRANSICIÓN: fundido a negro.]`
+`[CG: fb_deuda_muerto]` *(desplazamiento lento del libro hacia la ventana)*
+`[SONIDO: pluma sobre papel; viento contra un cristal]`
+`[NVL]` *(voz del Recaudador)*
+
+> Calle de los Toneleros, número nueve. Invierno. Hace ciento doce años, si el libro no miente. El libro no miente.
+>
+> Anselmo Rius, tonelero, me debía cuarenta y dos reales. Murió en octubre, de una caída en el muelle. La deuda no murió con él. Las deudas no mueren con nadie.
+
+> En diciembre ejecuté la casa. La viuda y la niña se fueron con un hatillo. A la mañana siguiente, la niña estaba en mi portal.
+>
+> Escribí «saldado» en la línea de la viuda. La de Anselmo quedó abierta: cuarenta y dos reales que nadie iba a pagar ya.
+
+`[EFECTO: destello]`
+
+> Pasé la noche mirando esa línea. Dije que daría lo que fuera por cobrarle a un muerto.
+>
+> Al amanecer había un sobre negro encima del libro.
+
+`[TRANSICIÓN: fundido a negro; vuelve la sala del Recaudador.]`
+`[FIN DEL RECUERDO]`
+`[RETRATO: Recaudador · neutral]`
+**Recaudador:** «Sigue abierta. Es la única línea de este libro que no he podido cerrar.» *(vuelve a abrirlo)* «Continúe.» → menú posvictoria del Recaudador.
 
 ### 8.3 La Coleccionista
 
@@ -923,6 +999,42 @@ Tras la victoria, la Coleccionista ofrece la **[decisión M3](#m3--la-máscara-d
 
 **Coleccionista:** «¿Vuelves a mirarlo? Puedes. Mirar todavía es gratis.» → menú posvictoria de la Coleccionista.
 
+**Preguntas posvictoria a la Coleccionista** (I5-11):
+
+| Pregunta | Respuesta |
+| --- | --- |
+| **«¿Guarda algo porque quiere?»** | «Todo lo demás me lo entrega la Casa. Solo traje una cosa.» `[ACCIÓN: señala la vitrina vacía del tamaño de una niña.]` «Esa. Está vacía porque la fiebre no deja nada que conservar. La limpio cada noche.» `[OPCIÓN]` **«¿Cómo se llamaba?»** abre el [recuerdo de la habitación de cristal](#recuerdo--la-habitación-de-cristal) · **«Otra pregunta.»** |
+| **«¿Qué significa guardar un rostro?»** | «Que deje de cambiar. Las caras envejecen, se olvidan, se van. La porcelana no.» *(pausa)* «La tuya ya no es la que traías. La mía tampoco. Las de mis vitrinas sí.» |
+| **«¿Quién le da las Máscaras?»** | «El Dueño. Cada cara que gana la Casa pasa antes por su mano. Las que no soporta mirar me las cede.» `[RETRATO: Coleccionista · codicia]` «Eso es una vitrina, relojero: lo que un hombre sin cara no quiere ver.» |
+| **«¿Qué hará con el sitio de Ferrer?»** *(después de M3)* | Según `ignacio.destino`. `vitrina`: «Mirarlo llorar. Lo elegiste tú.» · `liberado`: `[RETRATO: Coleccionista · hastio]` «Ahora tengo dos vitrinas vacías. Gracias por la compañía.» · `en_la_baraja`: «Esperar. Las Máscaras de una baraja vuelven a mí cuando su dueño pierde. Juega bien. Por él.» |
+
+#### Recuerdo · La habitación de cristal
+
+`[RECUERDO: fb_habitacion_cristal]` *(desde «¿Cómo se llamaba?»)*
+`[RETRATO: Coleccionista · madre]`
+**Coleccionista:** «Aurore.»
+`[TRANSICIÓN: fundido a negro.]`
+`[CG: fb_habitacion_cristal]` *(acercamiento lento hacia el guante sobre el cristal)*
+`[SONIDO: lluvia fina; un dedo que roza un cristal]`
+`[NVL]` *(voz de la Coleccionista)*
+
+> Lyon. O París. Ya confundo las ciudades; las piezas, nunca.
+>
+> Aurore tenía seis años y la piel más fina que he tocado. Mandé hacerle una habitación con paredes de vitrina para que ni el polvo la alcanzara.
+
+> Dibujaba en el vaho del cristal. Caballos, casas, a mí con guantes. Yo copiaba sus dibujos por fuera, con el dedo.
+>
+> En febrero el vaho se volvió espeso. Tenía fiebre. El médico pidió entrar y le dije que el cristal la protegía mejor que él.
+
+`[EFECTO: temblor]`
+
+> Seguí visitándola un año. Seguí copiando sus dibujos, aunque ya no los hacía nadie.
+
+`[TRANSICIÓN: fundido a negro; vuelve la sala de la Coleccionista.]`
+`[FIN DEL RECUERDO]`
+`[RETRATO: Coleccionista · madre]`
+**Coleccionista:** «Los vecinos rompieron la puerta. Yo nunca rompí el cristal.» *(se ajusta la semimáscara)* `[RETRATO: Coleccionista · neutral]` «No vuelvas a preguntarme por ella.» → menú posvictoria de la Coleccionista.
+
 ### 8.4 El Dueño de la Casa
 
 `[FONDO: dueno]` *(arte actual)*
@@ -978,7 +1090,46 @@ Si `lore.garantia`: «Ya sabes cómo llegaste. Bien. Odio tener que explicarlo.�
 
 → Ver [fin del intento](#144-fin-del-intento--la-casa-gana).
 
-**Revisita:** al hablarle de nuevo después de ganar y antes de cruzar la verja, se abre su menú posvictoria. Escribir el saludo y las preguntas en I5-11.
+**Revisita:** después de [M4](#m4--la-oferta-del-dueño), en las tres variantes del final A, hablar de nuevo con el Dueño antes de cruzar la verja abre su menú posvictoria. Con «Tomaré su lugar» se pasa directamente al final B y no hay revisita.
+
+`[RETRATO: Dueño · cansancio · centro]`
+**Dueño de la Casa:** «Sigues aquí. La verja no se cerrará por esperar un poco. Ya no.» → menú posvictoria del Dueño.
+
+**Preguntas posvictoria al Dueño** (I5-11):
+
+| Pregunta | Respuesta |
+| --- | --- |
+| **«¿Qué siente ahora que ha perdido?»** | «Frío. Hacía siglos que la Casa no me dejaba sentir la hora. Ahora sé que son las doce y tres minutos. Noto cada uno.» *(pausa)* «Es como volver a tener pulso. No sé si me gusta.» |
+| **«¿Cómo fue la noche de la apuesta?»** | `[RETRATO: Dueño · cansancio]` «La recuerdo mejor que mi nombre. Ella tosía arriba y yo bajé a jugar con lo único que me quedaba.» `[OPCIÓN]` **«¿Contra quién jugó?»** abre el [recuerdo de la apuesta contra el alba](#recuerdo--la-apuesta-contra-el-alba) · **«Otra pregunta.»** |
+| **«¿Qué me espera en Corvera?»** | Según `final.fichas`. `propias`: «La misma noche. Tu taller sin pagar, tus vecinos dormidos. Nadie sabrá dónde estuviste. Tú sí, y eso pesa más que una deuda.» · `todas`: `[RETRATO: Dueño · interes]` «Una vida larga. Verás irse a todos los que conoces. Acostúmbrate pronto; yo nunca lo conseguí.» · `ninguna`: «No lo sé. Pasaron allí los años que te cobré. Quizá tu taller ya no exista. Mira primero el mar: eso no cambia.» |
+| **«¿Por qué no se despide usted de ella?»** *(después de su línea «Dile adiós a Leonor»)* | *(silencio)* «Porque me preguntaría si valió la pena. Y todavía no tengo respuesta.» |
+
+#### Recuerdo · La apuesta contra el alba
+
+`[RECUERDO: fb_apuesta_alba]` *(desde «¿Contra quién jugó?»)*
+`[TRANSICIÓN: la luz blanca de la verja se apaga; fundido a negro.]`
+`[CG: fb_apuesta_alba]` *(acercamiento lento hacia la ventana)*
+`[SONIDO: una tos, arriba, amortiguada por el techo; naipe]`
+`[NVL]` *(voz del Dueño)*
+
+> El médico cerró su maletín sin mirarme. «Hasta el amanecer», dijo, como quien da una hora de visita.
+>
+> Bajé a la sala de juego con lo único que me quedaba: la noche entera.
+
+> No había crupier. Al otro lado de la mesa, una silla vacía y, detrás, la ventana. El cristal empezaba a ponerse gris.
+>
+> Cada mano que ganaba, el gris retrocedía un dedo. Pedí una carta más que el amanecer. Siempre una más.
+
+`[SONIDO: naipe]` `[EFECTO: destello]`
+
+> Cuando gané, la ventana volvía a estar negra. Arriba, ella seguía tosiendo. Subí corriendo a decírselo.
+>
+> No recuerdo qué cara puse. Ella sí. Nunca me lo ha contado.
+
+`[TRANSICIÓN: fundido a negro; vuelve la sala del Dueño con la verja abierta.]`
+`[FIN DEL RECUERDO]`
+`[RETRATO: Dueño · cansancio]`
+**Dueño de la Casa:** «Esa es la noche que acabas de ganarme. Cuídala mejor que yo.» → menú posvictoria del Dueño.
 
 ---
 
@@ -1016,6 +1167,8 @@ Si `lore.garantia`: «Ya sabes cómo llegaste. Bien. Odio tener que explicarlo.�
 | `especial` | Regla propia del jefe (ver cada tabla) | 7 |
 | `victoria` · `derrota` | Al terminar el encuentro | 10 |
 
+**Primer tramo en el juego (I6-10).** El Custodio usa primero los cuatro disparadores que solo pueden darse al resolver la mano, cuando ya no queda ninguna Máscara oculta: `punto_exacto` y `quiebra` (prioridad 8), y `al_filo` y `meta_cerca` (prioridad 6). En la tabla 9.1 llevan la marca *(I6-10)*. Son dos variantes por disparador, sin repetir la última. Un empate de prioridad lo gana el primero que aparece en la tabla de disparadores. `meta_cerca` solo salta al cruzar el 85 % de la meta, y no lo hace cuando la mano da la victoria. El segundo tramo conecta `sentarse`, `iniciar_mano`, `pedir`, `pedir_arriesgado`, `plantarse_pronto`, las campanadas, los patrones y los objetos, con el 35 % para los disparadores comunes, y después a los otros tres jefes. La línea de `derrota` abre la [secuencia de fin del intento](#144-fin-del-intento--la-casa-gana).
+
 ### 9.1 El Custodio: el campanero fúnebre
 
 | Disparador | Variantes |
@@ -1025,9 +1178,9 @@ Si `lore.garantia`: «Ya sabes cómo llegaste. Bien. Odio tener que explicarlo.�
 | `pedir` | «Otra carta. Ojalá sepas por qué.» · «Mira la suma, no la carta.» |
 | `pedir_arriesgado` | «Cerca del borde. Así empezaron todos.» · «El diecisiete no perdona.» |
 | `plantarse_pronto` | «Prudente. Vivirás más.» · «Pocos puntos, pero tuyos.» |
-| `quiebra` | «Te pasaste. La mano se pierde; el año, también.» · «Quiebra. Escucha cómo suena.» |
-| `punto_exacto` | «Diecisiete justos. Así suena un mecanismo bien ajustado.» · «Exacto. Ni un diente de más.» |
-| `al_filo` | «Uno por debajo. Al filo, como un buen escape.» |
+| `quiebra` *(I6-10)* | «Te pasaste. La mano se pierde; el año, también.» · «Quiebra. Escucha cómo suena.» |
+| `punto_exacto` *(I6-10)* | «Diecisiete justos. Así suena un mecanismo bien ajustado.» · «Exacto. Ni un diente de más.» |
+| `al_filo` *(I6-10)* | «Uno por debajo. Al filo, como un buen escape.» · «Al filo. Un diente menos y no engrana.» |
 | `racha` | «Tres del mismo palo. La Casa lo premia, por ahora.» |
 | `ascenso` | «Subiendo, carta a carta. Como las horas que ya no tienes.» |
 | `mano_larga` | «Cinco cartas sin pasarte. Paciencia de relojero.» |
@@ -1037,7 +1190,7 @@ Si `lore.garantia`: «Ya sabes cómo llegaste. Bien. Odio tener que explicarlo.�
 | `prudente` | «Un año devuelto. El único que la Casa devuelve.» |
 | `campanadas_bajas` | «Dos campanadas. Ahora cada una pesa como una lápida.» |
 | `ultima_campanada` | «La décima. Escúchala bien. Puede ser la tuya.» |
-| `meta_cerca` | «Ya casi. No corras ahora.» |
+| `meta_cerca` *(I6-10)* | «Ya casi. No corras ahora.» · «Te falta poco. Cuéntalo despacio.» |
 | `victoria` | «Doscientos. Sigues vivo. Sigue así.» |
 | `derrota` | «La décima. La contaré con cuidado.» |
 
@@ -1683,6 +1836,21 @@ Según `ignacio.destino`:
 
 ### 14.4 Fin del intento · La Casa gana
 
+**Secuencia en el juego (I6-11).** Sustituye al panel genérico «La Casa gana». Sirve para cualquiera de las cuatro mesas, porque muestra a Klein y no la sala. Con movimiento reducido no hay acercamiento ni temblor, y el texto aparece completo.
+
+| Paso | Qué se ve | Qué se oye o se lee |
+| --- | --- | --- |
+| **1 · Última línea del jefe** | La mesa con la última mano. El bocadillo de reacciones se retira. El cuadro ADV muestra al jefe con la expresión de su derrota | Su línea de **Derrota** de la [sección 8](#8-los-jefes). El Custodio dice: «La décima campanada. Lo siento. Contaré la tuya con cuidado.» |
+| **2 · Corte** | Fundido a negro de 0,6 s. Desaparece la interfaz de la mesa | `[SONIDO: quiebra]` |
+| **3 · Las manos** | `[CG: cg_derrota_manos]` con un acercamiento lento hacia las manos de Klein | `[SONIDO: porcelana que cruje]` *(nuevo: «porcelana»)*. Los dos párrafos `[NVL]`: «La última campanada…» y «Las manos se me quedan frías…» |
+| **4 · La vitrina** | La misma CG. El movimiento termina sobre la vitrina vacía del fondo, y Godot escribe `{apellido}` en la etiqueta | «Lo último que veo es una vitrina vacía…». Con `moral.sombra ≥ 2`, la variante de la Coleccionista sobre `cg_derrota_coleccionista` |
+| **5 · La anfitriona** | Fundido al cuadro ADV sobre negro, solo con la placa: ella está fuera de cuadro | **Anfitriona:** «Ya la estoy escribiendo, señor.» `[SONIDO: campana, con eco]` |
+| **6 · Nuevo intento** | Sobre negro, una sola acción, **Nuevo intento**, con el foco puesto | Clic, Enter o E. Hoy lleva a la entrada, con las mismas reglas que el reinicio actual. El paso por el taller y el `[NVL]` de `intentos ≥ 1` se montan cuando exista la progresión persistente |
+
+**Encuadre de `cg_derrota_manos`.** Plano cenital a tres cuartos, desde los ojos de Klein. Sus dos manos están sobre un tapete oscuro neutro, y la porcelana sube desde la punta de los dedos: un nudillo agrietado y las muñecas todavía de carne. La mano derecha intenta cerrarse y no puede. Junto a la izquierda quedan la última mano boca arriba y la ficha de marfil, sin ninguna Máscara boca abajo. Al fondo, desenfocada, una vitrina vacía con la etiqueta en blanco. El tercio inferior queda libre para el texto. El encargo completo está en [Ilustraciones pendientes](ILUSTRACIONES_PENDIENTES.md#cg_derrota_manos--fin-del-intento-i6-11-guion-144).
+
+**Texto de la secuencia:**
+
 `[SONIDO: quiebra; después, porcelana que cruje; después, campana con eco]`
 `[NVL]`
 
@@ -1718,13 +1886,14 @@ Para cuando el equipo elija pasar del guion al juego:
 
 1. **Prólogo como conversaciones.** Cada escena (P0 a P6) se guarda como un `Conversacion` (`.tres`) en `datos/dialogos/prologo/`. Hace falta ampliar el recurso con tres campos opcionales por intervención: `modo` (`nvl` o `adv`), `fondo` y `cg`. La escena `DialogoNovela` gana un modo NVL que acumula párrafos a pantalla completa.
 2. **Variables.** Las elecciones ya emiten `solicitud`. Bastaría con solicitudes del tipo `fijar:prologo.motivo=ignacio` que la campaña guarde en un diccionario, y condiciones como `prologo.motivo==ignacio` en `cumple`. `prologo.visto` va en un archivo de progreso persistente, no en el intento.
-3. **Reacciones de los jefes.** Un recurso `ReaccionesCrupier` por jefe (`datos/dialogos/reacciones/*.tres`) con `disparador → [variantes]` y su prioridad. `ControladorMesa` ya emite la vista tras cada acción; un componente `BocadilloCrupier` en la mesa compara la vista anterior con la nueva para detectar los disparadores, elige la variante y la muestra. Así la mesa no conoce los textos y las reacciones respetan la vista pública.
+3. **Reacciones de los jefes.** Implementado para el Custodio en I6-10: el recurso `ReaccionesCrupier` (`datos/reacciones/reacciones.tres`) guarda `crupier → disparador → [variantes]`, y `BocadilloCrupier` (`mesa/interfaz/`) muestra la línea. La mesa compara la vista pública anterior con la nueva que emite `ControladorMesa.vista_actualizada`, así que no conoce los textos y las reacciones respetan lo que el jugador ve. Los demás jefes y disparadores se añaden como datos.
 4. **Preguntas de lore.** Encajan en la estructura actual de `Conversacion`: una intervención con opciones condicionadas (`si: "sellos>=2"`, `si: "lore.garantia"`) que vuelven al menú.
 5. **Porcelana y edad.** Tres versiones de cada retrato de visitante, elegidas según `campana.superadas`, y cinco etapas de edad de Klein (cuatro para los espejos y una para el final A robado).
 6. **Eventos y decisiones morales.** Cada evento (E1 a E5) es una `Conversacion` que el casino abre al volver de una mesa con victoria o al entrar en una sala. Las decisiones fijan variables con solicitudes (`fijar:moral.sombra+1`). M2 y M3 tienen efecto de juego opcional (una campanada extra, una Máscara de 10 en la baraja): si Julio lo aprueba, `CampanaCasino.atender` lo aplica como cualquier otra solicitud.
 7. **Puerta del vestíbulo y final C.** El vestíbulo necesita una puerta de vuelta a la entrada mientras `campana.recibida` sea falso (hoy solo tiene la salida al pasillo del Custodio). En la entrada, un punto «Volver a casa» en la acera abre la confirmación del final C. Al entregar la invitación, esa puerta se sustituye por la pared de mármol.
 8. **Fichas del Dueño.** `final.fichas = "propias"` necesita saber cuántas campanadas gastó Klein en todo el intento: basta con un contador en `CampanaCasino`.
 9. **Sistemas de lectura.** Saltar leído e historial necesitan identificadores estables por línea (el id de la intervención basta) y un registro persistente de líneas vistas.
+10. **Revisitas y recuerdos (I5-11).** Las preguntas posvictoria sustituyen a las opciones de `preguntas_revisita` en cada recurso de jefe. Cada recuerdo es una `Conversacion` en `datos/dialogos/recuerdos/<jefe>.tres`, que el casino abre con `reproducir_cinematica`. Al terminar, o al saltarlo, se reabre la conversación del jefe en su línea de cierre. La opción que lo abre lleva la condición `no:historia:recuerdo_<jefe>`, y la cinemática fija esa clave al empezar.
 
 ---
 
@@ -1740,7 +1909,7 @@ Para cuando el equipo elija pasar del guion al juego:
 | Efectos de juego de M2 y M3 | M2 da una campanada extra en la mesa siguiente; M3 puede añadir una Máscara de 10 a la baraja. Hay que probar el balance | Julio |
 | Umbral de la ruta de sombra | `moral.sombra ≥ 2` para la ruta de sombra y para la oferta de tomar el lugar del Dueño. Antes de M4 el máximo posible es 3, así que hay margen de una decisión | Julio |
 | Final verdadero | Liberar a Ignacio y salir con `moral.sombra = 0` da la variante «con clemencia» del final A; un final verdadero completo queda para después | Equipo |
-| Reacciones en la mesa | Bocadillo junto al retrato, desactivable en Opciones | Julio y Ariel |
+| Reacciones en la mesa | Bocadillo junto al retrato, desactivable en Opciones. **Implementado** para el Custodio en I6-10 | Julio y Ariel |
 | Diseño de Klein | Aspecto victoriano **propio** (levita, sombrero de copa bajo, bastón con empuñadura de engranaje, guantes con dedos cortados). No se copian rasgos concretos del personaje de la novela: con el nombre ya igual, copiar también el diseño puede leerse como plagio en un proyecto evaluado | Julio |
 | Final C | Se puede alcanzar en los primeros minutos. Conviene que la anfitriona lo insinúe (ya lo hace) sin decirlo como una opción de menú | Julio |
 | Límite del tono | Horror contenido, sin sangre ni violencia explícita; revisar si el docente pide alguna clasificación | Equipo |
@@ -1755,5 +1924,20 @@ Para cuando el equipo elija pasar del guion al juego:
 | **1** | 23 nov 2026 | Primera propuesta (mezcla de las ideas B y A): apertura con Ignacio, taller, invitación, anfitriona, jefes con preguntas de lore y reacciones en partida. |
 | **2** | 23 nov 2026 | Más sombría: Ignacio vende a su aprendiz como garantía, cada campanada es un año, las Máscaras siguen conscientes, el vestíbulo se vuelve porcelana, la repetición de la noche y la Máscara de Ignacio en la vitrina. |
 | **3** | 24 nov 2026 | Klein Moretti. Ilustraciones en documento aparte. Trasfondos oscuros, el tiempo que deforma a la gente, eventos de novela visual por sello y ruta, decisiones morales y dos finales. |
-| **4.1** | 25 nov 2026 | Marcas de escena para las cinemáticas: `[ENTRA]`, `[SALE]` y `[EFECTO]`; la narración `[NVL]` avanza párrafo a párrafo sobre la ilustración. Aplicadas en P0 y P4 y en el juego (I5-10). |
 | **4** | 24 nov 2026 | Las fichas del Dueño en el final A (joven, robado o viejo), el final C por no entregar la invitación, la puerta del vestíbulo que se cierra al entregarla, humor ligero, ecos concretos de la repetición, nuevo diseño victoriano de Klein y una revisión completa de coherencia. |
+| **4.1** | 25 nov 2026 | Marcas de escena para las cinemáticas: `[ENTRA]`, `[SALE]` y `[EFECTO]`; la narración `[NVL]` avanza párrafo a párrafo sobre la ilustración. Aplicadas en P0 y P4 y en el juego (I5-10). |
+| **5** | 26 nov 2026 | Revisitas posvictoria de los cuatro jefes (I5-11): tres preguntas nuevas por jefe, que sustituyen a las previas, y cuatro recuerdos opcionales con la marca `[RECUERDO]`. Primer tramo de reacciones del Custodio (I6-10), con una variante nueva para Al filo y otra para la cercanía a la meta. Secuencia concreta del fin del intento (I6-11) con el encuadre de `cg_derrota_manos` y la acción «Nuevo intento». |
+
+### Pendiente de la versión 5
+
+| Escena | Ilustración | Implementación en Godot |
+| --- | --- | --- |
+| Preguntas posvictoria de los cuatro jefes (§8) | No hace falta: usan los retratos y fondos actuales | Sustituir las opciones de `preguntas_revisita` en `custodio.tres`, `recaudador.tres`, `coleccionista.tres` y `dueno.tres`. Las preguntas que dependen de `ignacio.destino` y `final.fichas` se ocultan hasta que existan M3 y M4 |
+| Revisita del Dueño (§8.4) | No | Permitir hablar con él después de vencerlo y antes de cruzar la verja |
+| Recuerdo · La cuerda de Gil | `fb_campanario` | Cinemática en `datos/dialogos/recuerdos/` que vuelve al menú del Custodio |
+| Recuerdo · La deuda del muerto | `fb_deuda_muerto` | Igual, con vuelta al menú del Recaudador |
+| Recuerdo · La habitación de cristal | `fb_habitacion_cristal` | Igual, con vuelta al menú de la Coleccionista |
+| Recuerdo · La apuesta contra el alba | `fb_apuesta_alba` | Igual, con vuelta al menú del Dueño |
+| Reacciones del Custodio, primer tramo (§9) | No | **Hecho** en la rama `kenned/i6-reacciones`. Se añaden las dos variantes nuevas |
+| Reacciones restantes (§9) | No | Segundo tramo del Custodio y los otros tres jefes |
+| Fin del intento (§14.4) | `cg_derrota_manos` y, más adelante, `cg_derrota_coleccionista` | Secuencia de I6-11 y efecto de sonido nuevo «porcelana» |

@@ -20,7 +20,7 @@
 | I5-08 | Sonido por jefe | **Pendiente** | Los buses y los controles de volumen de I4-07 ya existen |
 | I5-09 | Guion narrativo y documentos de la rúbrica | **Completado** · `ac08646` | [Guion v4](Diseno/GUION_PROLOGO_Y_DIALOGOS.md), [ilustraciones pendientes](Diseno/ILUSTRACIONES_PENDIENTES.md), navegación, catálogo y presentación |
 | I5-10 | Novela visual en el juego: cinemáticas, conversaciones, accesibilidad y créditos | **Completado** · `b420ab3`, en `main` | Prólogo y llegada como cinemáticas; anfitriona y crupieres con el guion v4; Historial, Auto y Saltar; opciones de lectura; créditos; efectos, personajes en escena, «examinar» ilustrado y un recorrido hacia delante desde el vestíbulo. 285 pruebas |
-| I5-11 | Menús posvictoria de los jefes | **Pendiente · Kenned** | Preguntas nuevas para cada jefe vencido, con recuerdos opcionales y su encargo de ilustraciones |
+| I5-11 | Menús posvictoria de los jefes | **Guion escrito · Kenned** | Guion versión 5: tres preguntas por jefe y cuatro recuerdos opcionales ([§8](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes)). Faltan su conexión en Godot y el arte de los recuerdos, encargado a Julio |
 
 ## Avance
 

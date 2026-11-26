@@ -1,6 +1,6 @@
 # La Última Mesa · Inventario de ilustraciones
 
-**Estado al 25 de noviembre de 2026.** El arte definido en el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md) está hecho. En Godot ya se ven las diez notas jugables, las CG del Custodio, el Recaudador y la Coleccionista, las figuras del recorrido y la placa de diálogo. El arte de los eventos, los finales y los tres puntos de examen futuros está disponible por id. Los recuerdos de I5-11 se encargarán con el guion de Kenned.
+**Estado al 26 de noviembre de 2026.** El arte definido en el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md) está hecho. En Godot ya se ven las diez notas jugables, las CG del Custodio, el Recaudador y la Coleccionista, las figuras del recorrido y la placa de diálogo. El arte de los eventos, los finales y los tres puntos de examen futuros está disponible por id. Con el guion versión 5 quedan por generar los cuatro [recuerdos de los jefes](#recuerdos-de-los-jefes-i5-11-guion-v5) y la [derrota ilustrada](#cg_derrota_manos--fin-del-intento-i6-11-guion-144).
 
 **Estilo:** el de la [dirección artística](DIRECCION_ARTISTICA.md). Grabado de libro antiguo de finales del siglo XIX, líneas finas, sombreado por tramado. Paleta de verde profundo `#0B2119`, latón `#D5B578` y marfil `#F1E4C9`. Para la novela visual se pide **más contraste, más negro y menos dorado**. Sin texto incrustado: rótulos, cartas y etiquetas se escriben en Godot para poder traducirlos. **Nada de sangre ni heridas:** el horror es frío, porcelana y silencio.
 
@@ -89,7 +89,7 @@ Prioridad: **1** = necesario para el prólogo; **2** = eventos y decisiones; **3
 
 Ilustraciones a pantalla completa para la novela visual. Las escenas ya implementadas las cargan por id desde `juego/historia/ilustraciones/<id>.webp` y muestran «Ilustración pendiente» cuando falta el archivo. Las CG de eventos y finales se incorporarán al montar esas escenas. La galería se reserva para un lote posterior.
 
-**Recuerdos de los jefes · I5-11.** Las preguntas posvictoria podrán abrir flashbacks. El encargo de arte se añade cuando Kenned escriba cada escena. Registrar el id del fondo o CG, el jefe y la pregunta que la activa, la acción que se ve y su prioridad. Los totales de este documento se actualizan al definir esas piezas. [Tarea I5-11](../ITERACION_05.md#i5-11--menús-posvictoria-de-los-jefes)
+**Recuerdos de los jefes · I5-11.** Las preguntas posvictoria del guion versión 5 abren cuatro recuerdos. Su encargo, con id, pregunta, contenido y encuadre, está en [Recuerdos de los jefes](#recuerdos-de-los-jefes-i5-11-guion-v5). [Tarea I5-11](../ITERACION_05.md#i5-11--menús-posvictoria-de-los-jefes)
 
 | Id | Prioridad | Escena | Descripción |
 | --- | :---: | --- | --- |
@@ -127,6 +127,17 @@ Ilustraciones a pantalla completa para la novela visual. Las escenas ya implemen
 | `klein_dueno` | 3 | Final B | **Archivo disponible.** Klein sentado en la silla del Dueño, con la máscara negra puesta y el abrigo oscuro. A su lado, la anfitriona escribe con una pluma sobre un sobre negro. La verja cerrada detrás; ninguna luz. |
 
 ---
+
+### Recuerdos de los jefes (I5-11, guion v5)
+
+Encargo para Julio. Cada recuerdo de [la sección 8 del guion](GUION_PROLOGO_Y_DIALOGOS.md#8-los-jefes) se monta sobre una sola CG, con acercamiento lento y narración NVL en el tercio inferior. **No hacen falta retratos nuevos:** en los recuerdos no hay personajes en escena. Para separarlos del presente se pide el mismo grabado con **menos contraste, tono sepia frío y bordes ligeramente desvanecidos**. Ninguna cara del pasado debe verse de frente con detalle. Formato de CG: 1920 × 1080, `juego/historia/ilustraciones/<id>.webp`.
+
+| Id | Prioridad | Jefe y pregunta que lo abre | Qué se ve | Encuadre |
+| --- | :---: | --- | --- | --- |
+| `fb_campanario` | 2 | Custodio · «¿Qué perdió antes de llegar aquí?» → «¿Cómo fue aquel último toque?» | Interior del campanario de una catedral en tiempos de peste. Mateo, de unos 35 años, sin máscara ni halo de campanas, con ropa de campanero de su época, tira de la cuerda de la campana mayor con las dos manos. Por la tronera, abajo y pequeña, la plaza vacía con dos hombres que llevan un ataúd infantil cubierto con una tela clara. Ninguna chimenea echa humo. | Contrapicado desde el suelo de tablas. La cuerda vertical divide la imagen; la campana, arriba, queda cortada por el borde. Mateo de perfil y en sombra en el tercio derecho; la tronera con la plaza, arriba a la izquierda. Tercio inferior: tablas en penumbra. |
+| `fb_deuda_muerto` | 2 | Recaudador · «¿Hay más garantías de Corvera en su libro?» → «Usted también tiene una página de Corvera.» | Despacho estrecho de prestamista en la calle de los Toneleros, de noche, en invierno. Un libro mayor abierto bajo una vela, con una línea sin cerrar (sin texto legible). La mano todavía joven de Ezequiel sostiene la pluma sobre esa línea. Encima del libro, recién aparecido, un sobre negro con el lacre del sol tras la verja. Por la ventana escarchada se ve un portal nevado con un farol, sin nadie. | Cenital cercano sobre el escritorio, como si se mirase por encima de su hombro: el libro y el sobre en el centro, la mano entrando por la derecha y la ventana arriba a la izquierda. Tercio inferior: borde del escritorio en penumbra. |
+| `fb_habitacion_cristal` | 2 | Coleccionista · «¿Guarda algo porque quiere?» → «¿Cómo se llamaba?» | Habitación infantil de una casa burguesa, encerrada entre paredes de vitrina con marcos de latón. Dentro, desenfocadas tras el cristal empañado, una cama pequeña y una niña de seis años sentada de espaldas. En el vaho, dibujos infantiles hechos con el dedo: un caballo y una casa. Fuera, en primer plano, la mano enguantada de Céleste joven repasa el caballo por el otro lado del cristal. Luz gris de invierno. | Plano medio desde fuera de la vitrina, a la altura de la niña: el guante en primer plano a la izquierda, la niña al fondo a la derecha, sin cara visible. Tercio inferior: zócalo de madera y el pie de la vitrina. |
+| `fb_apuesta_alba` | 2 | Dueño · «¿Cómo fue la noche de la apuesta?» → «¿Contra quién jugó?» | Sala de juego más antigua que la Casa actual, con candelabros casi consumidos. El Dueño joven, de espaldas y con levita de otro siglo, sentado ante una mesa de tapete. Enfrente, una silla vacía; detrás de ella, una ventana alta cuyo cristal empieza a ponerse gris por el alba. Cartas sobre la mesa. A la izquierda, por la escalera, baja la luz de una vela desde el piso de arriba. | Plano general desde detrás del Dueño, a la altura del hombro. Su silueta oscura ocupa el tercio izquierdo, sin rostro; la silla vacía y la ventana, en el centro, son el punto de fuga. Tercio inferior: el borde del tapete y sus manos sobre las cartas. |
 
 ### `cg_derrota_manos` · Fin del intento (I6-11, guion §14.4)
 
@@ -356,6 +367,7 @@ Las cuatro figuras secundarias son poses estáticas con alfa. Amparo y los jugad
 | **1 · Prólogo jugable** | Integrado | Fondos, 14 CG, retratos y marco de narración. |
 | **2 · Jefes y eventos** | Arte completo | Hospicio, CG de encuentros y eventos, 13 notas, cuadro ADV y cuatro figuras del recorrido. |
 | **3 · Finales** | Arte completo | Tres fondos, CG de los desenlaces A–C y miniatura para la galería. |
+| **4 · Guion v5** | Pendiente · Julio | Cuatro recuerdos (`fb_campanario`, `fb_deuda_muerto`, `fb_habitacion_cristal` y `fb_apuesta_alba`) y `cg_derrota_manos`. Más adelante, `cg_derrota_coleccionista`. |
 
 **Lote final.** 42 recursos: cuatro fondos, 18 CG, 13 notas, cinco figuras contando al farolero y dos piezas de interfaz. Las CG de los eventos y finales, los tres puntos de examen adicionales, el farolero de exploración y la galería esperan su puesta en escena.
 
