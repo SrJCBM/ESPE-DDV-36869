@@ -15,7 +15,12 @@ signal ver_baraja
 
 const Libro := preload("res://casino/interfaz/libro.gd")
 const PanelOpciones := preload("res://casino/interfaz/menus/panel_opciones.gd")
-const FONDO_INICIO := preload("res://casino/arte/vestibulo.webp")
+const PORTADAS := [
+	preload("res://casino/interfaz/menus/arte/portada_invitacion.webp"),
+	preload("res://casino/interfaz/menus/arte/portada_corvera.webp"),
+]
+const INTERVALO_PORTADA := 14.0
+const FUNDIDO_PORTADA := 1.4
 const BASE := Vector2(1440, 810)
 const MUTED := Color("b9ad91")
 ## Créditos (I5-10): el equipo y su parte, como en la exposición.
@@ -24,7 +29,11 @@ const CREDITOS := [
 	["Ariel", "Cartas, mecánicas, objetos y personajes"],
 	["Kenned", "Programación, navegación, experiencia de usuario y narrativa"],
 ]
-const COMO_JUGAR := "Recorre el casino con WASD o las flechas y pulsa E para hablar, entrar o examinar. La anfitriona te entrega la baraja, diez fichas y un objeto a elegir.\n\nVence al Custodio, al Recaudador y a la Coleccionista para reunir tres sellos; cada sello abre la puerta del pasillo siguiente y el tercero, la del Dueño. La tienda está junto al Recaudador.\n\nEn la mesa, pide cartas sin pasarte del umbral y plántate para sumar puntos. Cada mano nueva gasta una campanada.\n\nAtajos: M plano del casino · I pertenencias · H reglas de la mesa · V sonido · Esc pausa."
+const GUIA_RAPIDA := [
+	["Moverte", "WASD o flechas para caminar. E para hablar, entrar o examinar."],
+	["Jugar una mano", "Iniciar cuesta una campanada. Pide cartas sin pasar el umbral. Plántate para revelar las Máscaras y puntuar."],
+	["Salir del casino", "Gana tres sellos y derrota al Dueño. Abre el plano con M. La tienda está junto al Recaudador."],
+]
 
 var audio: AudioCasino
 ## Devuelve [título, texto] de las pertenencias del intento.
@@ -40,6 +49,11 @@ var botones: Array[Button] = []
 var _raiz := "inicio"
 var _lienzo := Control.new()
 var _fondo: TextureRect
+var _fondo_siguiente: TextureRect
+var _sombra_portada: TextureRect
+var _tempo_portada: Timer
+var _fundido_portada: Tween
+var _indice_portada := 0
 var _velo := ColorRect.new()
 var _panel := Panel.new()
 var _contenido := VBoxContainer.new()
@@ -57,14 +71,24 @@ func _ready() -> void:
 	negro.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(negro)
 	move_child(negro, 0)
-	_fondo = TextureRect.new()
-	_fondo.texture = FONDO_INICIO
-	_fondo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_fondo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	_fondo.size = BASE
-	_fondo.modulate = Color(0.42, 0.42, 0.42)
-	_fondo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_lienzo.add_child(_fondo)
+	_fondo = _capa_portada()
+	_fondo.texture = PORTADAS[0]
+	_fondo_siguiente = _capa_portada()
+	_fondo_siguiente.hide()
+	_sombra_portada = _capa_portada()
+	_sombra_portada.stretch_mode = TextureRect.STRETCH_SCALE
+	var degradado := Gradient.new()
+	degradado.offsets = PackedFloat32Array([0.0, 0.34, 0.57, 1.0])
+	degradado.colors = PackedColorArray([Color(0.01, 0.02, 0.018, 0.78), Color(0.01, 0.02, 0.018, 0.57), Color(0.01, 0.02, 0.018, 0.08), Color.TRANSPARENT])
+	var sombra := GradientTexture2D.new()
+	sombra.gradient = degradado
+	sombra.width = 256
+	sombra.height = 1
+	_sombra_portada.texture = sombra
+	_tempo_portada = Timer.new()
+	_tempo_portada.wait_time = INTERVALO_PORTADA
+	_tempo_portada.timeout.connect(_rotar_portada)
+	add_child(_tempo_portada)
 	_velo.size = BASE
 	_velo.color = Color(0.015, 0.035, 0.026, 0.72)
 	_velo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -91,7 +115,14 @@ func abrir(nombre: String) -> void:
 	pantalla = nombre
 	show()
 	var en_inicio := _raiz == "inicio"
+	var portada := nombre == "inicio"
+	_detener_portada()
 	_fondo.visible = en_inicio
+	_sombra_portada.visible = portada
+	_velo.visible = not portada
+	if portada and not AjustesJuego.movimiento_reducido():
+		_tempo_portada.start()
+	_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if portada else Libro.caja(Color(0.06, 0.145, 0.12, 0.97), Libro.ORO))
 	negro_visible(en_inicio)
 	for hijo in _contenido.get_children():
 		_contenido.remove_child(hijo)
@@ -99,9 +130,16 @@ func abrir(nombre: String) -> void:
 	botones.clear()
 	match nombre:
 		"inicio":
-			_marco(Rect2(150, 250, 470, 400))
-			_titulo("La Última Mesa", 54)
-			_nota("Una noche en la casa de los tres sellos.")
+			_marco(Rect2(70, 92, 540, 612))
+			var titulo := Libro.rotulo("La Última\nMesa", 80, Libro.PAPEL, true)
+			titulo.add_theme_constant_override("line_spacing", -12)
+			_contenido.add_child(titulo)
+			var filete := ColorRect.new()
+			filete.color = Libro.ORO.darkened(0.2)
+			filete.custom_minimum_size = Vector2(94, 1)
+			filete.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+			filete.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_contenido.add_child(filete)
 			_separador()
 			if hay_partida.is_valid() and hay_partida.call():
 				_boton("Continuar", continuar.emit)
@@ -144,9 +182,13 @@ func abrir(nombre: String) -> void:
 			_nota("Hecho con Godot 4.7 y GUT. Letras: Cormorant Garamond y DM Sans.")
 			_boton("Volver", abrir.bind(_raiz))
 		"como_jugar":
-			_marco(Rect2(300, 110, 840, 590))
+			_marco(Rect2(300, 144, 840, 510))
 			_titulo("Cómo jugar", 40)
-			_texto(COMO_JUGAR)
+			for fila: Array in GUIA_RAPIDA:
+				_contenido.add_child(Libro.rotulo(fila[0], 22, Libro.ORO, true))
+				_texto(fila[1], false)
+			_separador()
+			_nota("I · Pertenencias     H · Reglas de la mesa     V · Sonido     Esc · Pausa")
 			_boton("Volver", abrir.bind(_raiz))
 		"inventario":
 			var datos: Array = texto_inventario.call() if texto_inventario.is_valid() else ["Tus pertenencias", ""]
@@ -170,10 +212,40 @@ func abrir(nombre: String) -> void:
 			_boton("Empezar de nuevo", entrar.emit)
 	_ajustar_marco()
 
+func _capa_portada() -> TextureRect:
+	var capa := TextureRect.new()
+	capa.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	capa.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	capa.size = BASE
+	capa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lienzo.add_child(capa)
+	return capa
+
+func _rotar_portada() -> void:
+	if _tempo_portada.is_stopped() or not visible:
+		return
+	var siguiente := (_indice_portada + 1) % PORTADAS.size()
+	_fondo_siguiente.texture = PORTADAS[siguiente]
+	_fondo_siguiente.modulate.a = 0.0
+	_fondo_siguiente.show()
+	_fundido_portada = create_tween()
+	_fundido_portada.tween_property(_fondo_siguiente, "modulate:a", 1.0, FUNDIDO_PORTADA)
+	_fundido_portada.tween_callback(func() -> void:
+		_indice_portada = siguiente
+		_fondo.texture = _fondo_siguiente.texture
+		_fondo_siguiente.hide())
+
+func _detener_portada() -> void:
+	_tempo_portada.stop()
+	if _fundido_portada != null and _fundido_portada.is_valid():
+		_fundido_portada.kill()
+	_fondo_siguiente.hide()
+
 func negro_visible(visible_negro: bool) -> void:
 	get_child(0).visible = visible_negro
 
 func cerrar() -> void:
+	_detener_portada()
 	pantalla = ""
 	hide()
 
@@ -206,11 +278,12 @@ func _titulo(texto: String, puntos: int) -> void:
 func _nota(texto: String) -> void:
 	_contenido.add_child(Libro.rotulo(texto, 17, MUTED))
 
-func _texto(texto: String) -> void:
+func _texto(texto: String, expandir := true) -> void:
 	var etiqueta := Libro.rotulo(texto, 18, Libro.PAPEL)
 	etiqueta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	etiqueta.custom_minimum_size.x = _contenido.size.x
-	etiqueta.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	if expandir:
+		etiqueta.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_contenido.add_child(etiqueta)
 
 func _separador() -> void:
@@ -229,6 +302,17 @@ func _boton(texto: String, accion: Callable) -> void:
 	boton.add_theme_stylebox_override("normal", Libro.caja(Color("19392f"), Color("645c44")))
 	boton.add_theme_stylebox_override("hover", Libro.caja(Color("2c493b"), Libro.ORO))
 	boton.add_theme_stylebox_override("focus", Libro.caja(Color("2c493b"), Libro.PAPEL))
+	if pantalla == "inicio":
+		boton.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		boton.custom_minimum_size = Vector2(304, 42)
+		boton.add_theme_stylebox_override("normal", Libro.caja(Color(0.05, 0.085, 0.07, 0.78), Color(0.62, 0.52, 0.36, 0.55)))
+		if botones.is_empty():
+			boton.add_theme_color_override("font_color", Color("17211a"))
+			boton.add_theme_color_override("font_focus_color", Color("17211a"))
+			boton.add_theme_color_override("font_hover_color", Color("17211a"))
+			boton.add_theme_stylebox_override("normal", Libro.caja(Color("dcc391"), Libro.ORO))
+			boton.add_theme_stylebox_override("hover", Libro.caja(Libro.PAPEL, Libro.ORO))
+			boton.add_theme_stylebox_override("focus", Libro.caja(Color("edd8ad"), Libro.PAPEL))
 	boton.pressed.connect(accion)
 	_contenido.add_child(boton)
 	botones.append(boton)

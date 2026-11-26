@@ -182,17 +182,25 @@ func _ready() -> void:
 	_caja.position = CAJA.position
 	_caja.size = CAJA.size
 	_caja.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_caja.add_theme_stylebox_override("panel", Libro.caja(Color(0.04, 0.11, 0.09, 0.96), Libro.ORO))
+	_caja.add_theme_stylebox_override("panel", Libro.caja(Color(0.025, 0.065, 0.052, opacidad), Color("92754c")))
 	add_child(_caja)
 	_placa = Panel.new()
 	_placa.position = CAJA.position + Vector2(30, -24)
 	_placa.size = Vector2(280, 46)
 	_placa.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_placa.add_theme_stylebox_override("panel", Libro.caja(Color("19392f"), Libro.ORO))
+	_placa.add_theme_stylebox_override("panel", Libro.caja(Color("13251e"), Color("a88b5d")))
 	add_child(_placa)
+	var campana := TextureRect.new()
+	campana.texture = preload("res://casino/dialogos/arte/campana_adv.webp")
+	campana.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	campana.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	campana.position = Vector2(13, 11)
+	campana.size = Vector2(24, 24)
+	campana.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_placa.add_child(campana)
 	nombre = Libro.rotulo("", 27, Libro.PAPEL, true)
-	nombre.position = _placa.position + Vector2(18, 4)
-	nombre.size = Vector2(250, 38)
+	nombre.position = _placa.position + Vector2(48, 4)
+	nombre.size = Vector2(219, 38)
 	add_child(nombre)
 	cara = TextureRect.new()
 	cara.position = CAJA.position + Vector2(30, 40)
@@ -345,8 +353,12 @@ func configurar(ajustes: Dictionary) -> void:
 	if texto == null:
 		return
 	texto.add_theme_font_size_override("font_size", roundi(22 * escala_texto))
-	_caja.add_theme_stylebox_override("panel", Libro.caja(Color(0.04, 0.11, 0.09, opacidad), Libro.ORO))
+	_caja.add_theme_stylebox_override("panel", Libro.caja(Color(0.025, 0.065, 0.052, opacidad), Color("92754c")))
 	_aplicar_modo()
+	if visible:
+		_ajustar_texto()
+		if not botones.is_empty():
+			_colocar_respuestas()
 
 ## Abre la conversación en la entrada que corresponda al progreso. false si no hay ninguna.
 func abrir(datos: Conversacion, condicion: Callable, movimiento_reducido := false, descripcion := Callable(), barra_lectura := true) -> bool:
@@ -386,7 +398,7 @@ func poner_anexo(control: Control) -> void:
 	_anexo = control
 	if control == null:
 		return
-	control.position = CAJA.position + Vector2(340, -78)
+	control.position = _caja.position + Vector2(340, -78)
 	add_child(control)
 	move_child(control, _caja.get_index())
 	control.visible = modo == "adv"
@@ -433,6 +445,7 @@ func _mostrar(id: String) -> void:
 		_mostrar_cara("")
 		texto_nvl.text = frase
 		_desde = 0
+	_ajustar_texto()
 	_resaltar(str(linea.get("personaje", "")) if modo == "adv" else "")
 	_opciones = conversacion.opciones(id, evaluar)
 	_quitar_respuestas()
@@ -497,6 +510,34 @@ func _aplicar_modo() -> void:
 	if barra != null:
 		barra.reset_size()
 		barra.position = Vector2(CAJA.position.x + 30, CAJA.end.y - 40)
+
+## Reserva el pie para los controles y conserva el tamaño elegido en Opciones.
+func _ajustar_texto() -> void:
+	if modo == "tarjeta":
+		return
+	var adv := modo == "adv"
+	var etiqueta := _activa()
+	var origen := CAJA.position.y + 38 if adv else PAGINA.position.y
+	var limite := barra.position.y - 8
+	var visibles := etiqueta.visible_characters
+	etiqueta.visible_characters = -1
+	var alto := float(etiqueta.get_line_count() * etiqueta.get_line_height())
+	etiqueta.visible_characters = visibles
+	var extra := maxf(0.0, alto - (limite - origen))
+	etiqueta.position.y = origen - extra
+	etiqueta.size.y = limite - etiqueta.position.y
+	if adv:
+		_caja.position.y = CAJA.position.y - extra
+		_caja.size.y = CAJA.size.y + extra
+		_placa.position.y = _caja.position.y - 24
+		nombre.position.y = _placa.position.y + 4
+		cara.position.y = _caja.position.y + 40
+		retrato.position.y = _caja.position.y - retrato.size.y
+		if is_instance_valid(_anexo):
+			_anexo.position.y = _caja.position.y - 78
+	else:
+		franja.position.y = BASE.y - 300 - extra
+		franja.size.y = 300 + extra
 
 ## Cambia el fondo si la intervención trae otro. Sin archivo, dibuja la ilustración pendiente.
 func _poner_fondo(id: String) -> void:
@@ -692,10 +733,13 @@ func completar() -> void:
 		respuestas.add_child(boton)
 		botones.append(boton)
 	respuestas.reset_size()
-	var tope := CAJA.position.y - 34 if modo == "adv" else PAGINA.position.y - 30
+	_colocar_respuestas()
 	respuestas.position.x = (BASE.x - ancho) * 0.5 if junto_a_personajes else CAJA.end.x - ancho
-	respuestas.position.y = tope - respuestas.size.y
 	botones[0].grab_focus()
+
+func _colocar_respuestas() -> void:
+	var tope := _caja.position.y - 34 if modo == "adv" else texto_nvl.position.y - 30
+	respuestas.position.y = tope - respuestas.size.y
 
 func _quitar_respuestas() -> void:
 	for boton in botones:

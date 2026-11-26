@@ -54,6 +54,7 @@ Los comandos de pruebas y exportación están en [juego/README.md](juego/README.
 - [Iteración 03: pulido, balance y deuda técnica](ITERACION_03.md), con el estado de cada mejora.
 - [Iteración 04 · Interfaz y recorrido del casino](ITERACION_04.md): vitrina, corredor, HUD, mesa, diálogos y menús. Cerrada en código; falta el piloto.
 - [Iteración 05 · Pasillos de los jefes](ITERACION_05.md): en curso. Primer tramo jugable (entrada, vestíbulo y pasillos del Custodio y del Recaudador), elección inicial de objeto, «Ver baraja» y la variante de la Vela de Racha ×2.
+- [Iteración 06 · Lectura y presencia narrativa](ITERACION_06.md): portada ilustrada, visitantes en el recorrido y revisión de la carga de texto.
 - [Balance de la campaña y del Recaudador](BALANCE_CAMPANA.md).
 - [Revisión técnica y pendientes de cierre](Archivo/I1/REVISION_I1.md).
 - [Plan general](PLAN_DE_TRABAJO.md), [arquitectura](ARQUITECTURA_Y_PATRONES.md) y [entorno](ENTORNO_Y_HERRAMIENTAS.md).

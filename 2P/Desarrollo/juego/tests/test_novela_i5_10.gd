@@ -31,6 +31,21 @@ func test_los_dialogos_del_guion_no_tienen_referencias_rotas() -> void:
 		var conversacion: Conversacion = load("res://datos/dialogos/%s.tres" % nombre)
 		assert_eq(conversacion.errores(), PackedStringArray(), nombre)
 
+func test_las_intervenciones_largas_dejan_libre_la_barra_al_ciento_cuarenta_por_ciento() -> void:
+	var novela = load("res://casino/dialogos/dialogo_novela.gd").new()
+	add_child_autofree(novela)
+	novela.configurar({"escala_texto": 1.4})
+	var dueno: Conversacion = load("res://datos/dialogos/dueno.tres")
+	for caso in [[PROLOGO, "p2_ventana"], [dueno, "respuesta_0_1"]]:
+		novela.abrir(caso[0], func(_condicion): return true, true)
+		novela._mostrar(caso[1])
+		await get_tree().process_frame
+		var etiqueta: Label = novela._activa()
+		var fin := etiqueta.position.y + etiqueta.get_line_height() * etiqueta.get_line_count()
+		assert_gte(etiqueta.get_line_count(), 3, caso[1])
+		assert_lte(fin, novela.barra.position.y - 8, caso[1])
+		novela.cerrar()
+
 func test_el_prologo_se_recorre_entero_y_guarda_las_elecciones() -> void:
 	var juego = _casino()
 	juego.historia.reducido = true
@@ -293,19 +308,20 @@ func test_examinar_abre_una_escena_con_la_ilustracion_y_la_descripcion() -> void
 	assert_eq(h.modo, "nvl")
 	h.completar()
 	assert_string_contains(h.texto_nvl.text, "El reloj detenido")
-	assert_true(h.pendiente.visible, "Mientras falte la ilustración, se muestra como pendiente")
-	assert_string_contains(h._texto_pendiente.text, "nota_vestibulo")
-	assert_string_contains(h._texto_pendiente.text, "tres ranuras vacías")
+	assert_false(h.pendiente.visible, "La nota muestra el grabado del reloj")
+	assert_eq(h.fondo_actual, "nota_vestibulo")
 	h.avanzar()
 	assert_false(juego.cinematica.activa)
 	assert_false(juego.visitante.bloqueado, "Al cerrar se vuelve a explorar")
 
-func test_cada_nota_tiene_su_ilustracion_descrita() -> void:
+func test_cada_nota_jugable_tiene_una_ilustracion_importada() -> void:
 	var Casino := load("res://casino/casino.gd")
 	for sala: String in Casino.NOTAS:
 		assert_true(Casino.ILUSTRACIONES_NOTAS.has("nota_" + sala), sala)
+		assert_true(ResourceLoader.exists("res://historia/ilustraciones/nota_%s.webp" % sala, "Texture2D"), sala)
 	for variante: String in Casino.NOTAS_VARIANTES:
 		assert_true(Casino.ILUSTRACIONES_NOTAS.has("nota_" + variante), variante)
+		assert_true(ResourceLoader.exists("res://historia/ilustraciones/nota_%s.webp" % variante, "Texture2D"), variante)
 	var conversacion: Conversacion = Casino.conversacion_nota("nota_tienda", "La vitrina de humo", "Texto")
 	assert_eq(conversacion.errores(), PackedStringArray())
 

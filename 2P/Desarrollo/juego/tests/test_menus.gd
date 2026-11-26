@@ -43,6 +43,24 @@ func test_el_inicio_ofrece_sus_cuatro_opciones_y_entrar_devuelve_el_control() ->
 	assert_false(juego.menu.visible)
 	assert_eq(juego.pagina.process_mode, Node.PROCESS_MODE_INHERIT)
 
+func test_la_portada_cambia_sin_robar_foco_y_respeta_movimiento_reducido() -> void:
+	var juego = _casino()
+	juego.abrir_inicio()
+	var menu = juego.menu
+	var inicial: Texture2D = menu._fondo.texture
+	var accion: Button = menu.botones[0]
+	assert_false(menu._tempo_portada.is_stopped())
+	menu._tempo_portada.timeout.emit()
+	await menu._fundido_portada.finished
+	assert_ne(menu._fondo.texture, inicial)
+	assert_eq(juego.get_viewport().gui_get_focus_owner(), accion)
+	menu.abrir("opciones")
+	assert_true(menu._tempo_portada.is_stopped())
+	AjustesJuego.guardar_movimiento_reducido(true)
+	menu.abrir("inicio")
+	assert_true(menu._tempo_portada.is_stopped())
+	assert_false(menu._fondo_siguiente.visible)
+
 func test_esc_abre_la_pausa_y_otra_pulsacion_reanuda() -> void:
 	var juego = _casino()
 	_esc(juego)

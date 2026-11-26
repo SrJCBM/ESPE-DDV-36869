@@ -32,7 +32,7 @@
 | [I4](ITERACION_04.md) | Interfaz y recorrido del casino | 8 de 8 implementadas; falta el piloto de I4-08 | 221 |
 | **I5** | **Pasillos de los jefes** | **7 de 10, una parcial** | **285** |
 
-Con I5, la campaña se juega de principio a fin: entrada, vestíbulo, cuatro pasillos, cuatro mesas, tienda, objeto inicial y salida. La partida se guarda entre encuentros y la historia empieza con un prólogo de novela visual. Quedan el sonido por jefe (I5-08), los menús posvictoria (I5-11) y las escenas y piezas narrativas del [encargo de ilustraciones](Diseno/ILUSTRACIONES_PENDIENTES.md).
+Con I5, la campaña se juega de principio a fin: entrada, vestíbulo, cuatro pasillos, cuatro mesas, tienda, objeto inicial y salida. La partida se guarda entre encuentros y la historia empieza con un prólogo de novela visual. El [inventario de ilustraciones](Diseno/ILUSTRACIONES_PENDIENTES.md) registra el arte del guion v4. Quedan el sonido por jefe (I5-08), los menús posvictoria y sus futuros recuerdos (I5-11) y la puesta en escena de los eventos y finales.
 
 ## Mapa
 
@@ -219,7 +219,7 @@ Lecturas para Julio:
 | **Barra de lectura** | Historial (o rueda hacia arriba; Esc lo cierra primero), Auto y Saltar, que adelanta hasta la próxima elección (o manteniendo Ctrl) |
 | **Opciones** | Dos columnas: Sonido, y Lectura y accesibilidad: velocidad del texto (hasta instantáneo), espera del modo Auto, tamaño del texto, opacidad del cuadro y movimiento reducido. Se guardan en `user://ajustes.cfg` |
 | **Créditos** | Nueva entrada del menú de inicio con Julio, Ariel y Kenned y la parte de cada uno |
-| **Examinar** | Las notas de cada sala se abren como una escena con su ilustración y el texto de la sección 11 del guion, con sus variantes: la farola según lo que se habló con el farolero y el reloj del vestíbulo según los sellos. Las diez ilustraciones de notas están descritas en el encargo y se muestran como pendientes |
+| **Examinar** | Las diez variantes jugables ya muestran la ilustración y el texto de la sección 11 del guion. La farola cambia según lo que se habló con el farolero y el reloj del vestíbulo según los sellos |
 | **Una ilustración por momento** | Cada momento clave del guion tiene su CG conectada: los relojes parados, la ventana, el reloj helado, la invitación que no arde, el reverso de la tarjeta, el farolero, el camino de farolas, la ficha que late, la calle que desaparece, los jugadores de porcelana, el reloj de las tres ranuras, la puerta grabada y la cadena del Custodio. Están descritas en [ILUSTRACIONES_PENDIENTES.md](Diseno/ILUSTRACIONES_PENDIENTES.md), que también pide **todos los personajes recortados sobre fondo transparente** |
 | **Recorrido** | Desde el vestíbulo ya no hay que volver atrás: se entra por la puerta de la calle y se sale al pasillo por la puerta del este, y el pasillo del Custodio recibe por el oeste. El recorrido avanza de oeste a este |
 | **Historia en la partida** | `CampanaCasino.historia` guarda las elecciones y descubrimientos (motivo, tono, farolero, página de la garantía, vitrina vista…) y viaja con la partida guardada. Los diálogos los consultan con `historia:clave=valor` y `no:` |
@@ -231,11 +231,12 @@ Lecturas para Julio:
 - `DialogoNovela` añade los modos NVL y tarjeta, sonidos y solicitudes por línea, un anexo para las cifras, la barra y el historial.
 - Las ilustraciones que faltan se muestran como «Ilustración pendiente» con su id y su descripción. Basta con guardar el archivo en `juego/historia/` ([instrucciones](juego/historia/README.md)).
 - `{nombre}` y `{apellido}` usan Klein Moretti hasta que el jugador pueda elegirlos.
+- Las CG de la cadena del Custodio, el libro mayor y la vitrina de Ignacio se cargan desde las conversaciones existentes. El recorrido muestra a Amparo, Tobías, Benavides y los jugadores en las ubicaciones descritas en [I06](ITERACION_06.md). La placa ADV usa una campana y un borde de latón envejecido.
 
 **Límites.**
 
 - Todavía no se implementan los eventos E1–E5, las decisiones morales M1–M4 ni los finales del guion.
-- Faltan las ilustraciones y las hojas de expresiones. Para el escenario, los personajes necesitan figuras recortadas sobre fondo transparente; hoy se usan los retratos, que traen fondo, e Ignacio y el farolero no aparecen porque no tienen imagen.
+- El arte de los eventos y finales, tres notas adicionales, la figura del farolero para el mapa y la miniatura de la galería están preparados para integrarse en sus escenas.
 - Las preguntas ya respondidas siguen en el menú.
 - No hay guardado ni carga a mitad de una cinemática.
 
@@ -248,7 +249,7 @@ Lecturas para Julio:
 - la narración avanza un párrafo por clic en la franja inferior;
 - los efectos no se aplican con movimiento reducido;
 - los personajes entran y salen, y se resalta al que habla;
-- examinar abre una escena con la ilustración pendiente y el texto del guion, cada nota tiene su ilustración descrita y las variantes cambian con la historia;
+- examinar muestra el grabado y el texto del guion, las diez variantes jugables tienen una textura importada y la historia determina cuál aparece;
 - las cifras y las marcas se sustituyen, y se puede preguntar al crupier y volver a la mesa;
 - después de la victoria aparecen la revisita y la línea de victoria;
 - la historia se guarda con la partida y el saludo depende del tono;
@@ -277,7 +278,6 @@ Lecturas para Julio:
 
 - **LAN.** Queda para una iteración futura, por decisión de Julio. No se ha empezado.
 - **Eventos, decisiones morales y finales** del guion (E1–E5, M1–M4, finales A–C) sobre las cinemáticas de I5-10.
-- **Nodos huérfanos de `test_interfaz.gd`.** GUT sigue atribuyéndole 28. Es un pendiente aparte de I4; no viene de los cambios de I5.
 - **Piloto de I4-08 con tres personas.** Comprobar si se orientan con el minimapa y si entienden los requisitos al intentar pasar por una puerta.
 
 ## Verificación
@@ -289,4 +289,4 @@ Lecturas para Julio:
 & $GodotExe --headless --path '2P/Desarrollo/juego' --script res://tests/qa_limites.gd -- --sala=vestibulo
 ```
 
-I5 pasa **285 pruebas y 2.607 aserciones** en Godot 4.7.2. Las capturas de I5-10 se generan con `tests/qa_novela.gd` y `tests/qa_recorrido.gd`. `test_recorrido.gd` comprueba la salida del vestíbulo hacia delante y la puerta de la calle que se cierra. La integración en `main` del 24 de noviembre se comprobó además con la simulación de campaña y una exportación para Windows.
+I5 pasa **285 pruebas y 2.640 aserciones** en Godot 4.7.2, sin avisos de nodos huérfanos en GUT. El caso del diálogo de la mesa quedó registrado en las [correcciones de I4](ITERACION_04.md#correcciones-de-la-revisión). Las capturas de I5-10 se generan con `tests/qa_novela.gd` y `tests/qa_recorrido.gd`. `test_recorrido.gd` comprueba la salida del vestíbulo hacia delante y la puerta de la calle que se cierra. La integración en `main` del 24 de noviembre se comprobó además con la simulación de campaña y una exportación para Windows.

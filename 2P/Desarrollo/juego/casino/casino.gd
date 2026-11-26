@@ -44,8 +44,7 @@ const NOTAS_VARIANTES := {
 	"entrada_ignacio": "Bajo la luz hay un reloj de bolsillo aplastado, adelantado tres minutos. En la tapa: I. F. Dentro, un retrato tuyo de niño.",
 	"vestibulo_sellos": "Hay {n} sellos en las ranuras. Si acercas el oído, oyes un tic cada mucho tiempo. Cada tic suena como un hueso.",
 }
-## Ilustración de cada nota (I5-10), descrita en ILUSTRACIONES_PENDIENTES.md. Hasta que exista
-## `historia/ilustraciones/<id>.webp`, la escena la muestra como ilustración pendiente.
+## Descripción de cada nota ilustrada. El fondo se carga por id en historia/ilustraciones.
 const ILUSTRACIONES_NOTAS := {
 	"nota_entrada": "La farola encendida sobre el empedrado vacío, sin calle alrededor: solo niebla y un halo que no proyecta sombra.",
 	"nota_entrada_escucho": "El empedrado bajo la farola, con unas palabras grabadas a uña en la piedra.",

@@ -1,6 +1,6 @@
-# La Última Mesa · Ilustraciones pendientes
+# La Última Mesa · Inventario de ilustraciones
 
-**Estado al 25 de noviembre de 2026.** El proyecto local incluye los retratos del elenco, la caminata de Klein, la fachada jugable, los cuatro pasillos y el arte de apertura del prólogo. El arte del prólogo está completo hasta P6. Los encargos siguientes son las notas examinables, los eventos y los finales. Los identificadores siguen el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md).
+**Estado al 25 de noviembre de 2026.** El arte definido en el [guion versión 4](GUION_PROLOGO_Y_DIALOGOS.md) está hecho. En Godot ya se ven las diez notas jugables, las CG del Custodio, el Recaudador y la Coleccionista, las figuras del recorrido y la placa de diálogo. El arte de los eventos, los finales y los tres puntos de examen futuros está disponible por id. Los recuerdos de I5-11 se encargarán con el guion de Kenned.
 
 **Estilo:** el de la [dirección artística](DIRECCION_ARTISTICA.md). Grabado de libro antiguo de finales del siglo XIX, líneas finas, sombreado por tramado. Paleta de verde profundo `#0B2119`, latón `#D5B578` y marfil `#F1E4C9`. Para la novela visual se pide **más contraste, más negro y menos dorado**. Sin texto incrustado: rótulos, cartas y etiquetas se escriben en Godot para poder traducirlos. **Nada de sangre ni heridas:** el horror es frío, porcelana y silencio.
 
@@ -25,10 +25,10 @@
 
 | Tipo | Tamaño | Formato | Notas |
 | --- | --- | --- | --- |
-| Fondo de sala o escena | 1672 × 941 | `.webp` | Igual que los fondos actuales (`casino/arte/*.webp`). Las salas jugables necesitan el suelo libre en la zona caminable. |
+| Fondo de exploración | 1672 × 941 o equivalente 16:9 | `.webp` | Los fondos jugables (`casino/arte/*.webp`) necesitan el suelo libre en la zona caminable. |
 | CG de novela visual | 1920 × 1080 | `.webp` | Se escala al lienzo de 1440 × 810. Dejar libre el tercio inferior: ahí va el cuadro de texto. |
 | Retrato de expresión | 900 × 1200, **fondo transparente** | `.webp` o `.png` con alfa | Busto en proporción 3:4. Se usa en escena (unos 600 px de alto en el lienzo de 1440 × 810) y como cara en el cuadro de texto. **Todas las expresiones de un personaje con el mismo encuadre y la misma escala**, para poder cambiarlas sin que el personaje salte. Recorte limpio del pelo y la ropa, sin halo claro alrededor; la figura llega hasta el borde inferior de la imagen. La cara en el tercio superior, centrada. |
-| Figura de exploración | 175 de ancho, alto según la figura | `.webp` con alfa | Igual que `figura_*.webp`. Pies en el borde inferior. |
+| Figura de exploración | Hasta 175 px de ancho para figuras individuales y 340 px para grupos o muebles | `.webp` con alfa | Pies en el borde inferior y escala en Godot según el espacio. |
 | Tarjeta de capítulo | 1920 × 1080 | `.webp` | Fondo de título; el texto lo pone el juego. |
 
 Rutas que ya lee el juego (I5-10): **`juego/historia/ilustraciones/<id>.webp`** para fondos, CG y tarjetas, y **`juego/historia/retratos/<personaje>_<expresion>.webp`** para las expresiones (por ejemplo `anfitriona_seria.webp` o `dueno_interes.webp`). Basta con guardar el archivo con su id para que aparezca; mientras falte, el juego muestra «Ilustración pendiente» o el retrato general. Ids de personaje: `klein`, `anfitriona`, `custodio`, `recaudador`, `coleccionista`, `dueno`, `ignacio` y `farolero`.
@@ -74,14 +74,14 @@ Prioridad: **1** = necesario para el prólogo; **2** = eventos y decisiones; **3
 | `taller_ferrer` | 1 | P2–P3 | **Disponible y verificado en Godot.** Relojería estrecha de puerto, de noche. Mostrador de nogal rayado con una lámpara de aceite de pantalla verde sobre piezas desmontadas. Pared entera de relojes de péndulo, cucús y de mesa, **todos a las doce menos un minuto**. Banco con lupa articulada y pinzas. Estanterías medio vacías: faltan los relojes buenos. En la vitrina, un papel de embargo clavado (sin texto legible). Catre deshecho y maleta pequeña en un rincón. Ventana con niebla y halo de farola. Rótulo de la tienda visto del revés (sin letras: solo la forma del cartel). |
 | `calle_niebla` | 1 | P4 | **Disponible.** Calle empedrada del puerto de Corvera con niebla a la cintura. Fachadas estrechas con balcones de hierro; tras algunas ventanas, siluetas inmóviles que miran. Al fondo, el mástil de un velero. Farola de gas con un halo enorme y, a sus pies, charcos que reflejan una luz dorada de interior que no corresponde, como si bajo el agua hubiera otro salón. Gris azulado y verde muy oscuro; el único punto cálido es la farola. |
 | `fachada_casa` | 1 | P5 y sala de entrada | **Disponible.** Fachada neoclásica de piedra oscura, demasiado grande para la calle, entre dos almacenes que parecen de juguete. Cuatro pilastras con capiteles de latón; cornisa con espacio para el rótulo (lo pone el juego). **Sin ventanas:** marcos tapiados con mármol verde y, en relieve suave, rostros con los ojos cerrados. Puerta doble de nogal con luz dorada por la rendija, escalinata de tres peldaños, reloj a la medianoche exacta y dos farolas. La niebla rodea el edificio sin tocarlo. **Debe servir como sala jugable:** acera libre desde la mitad inferior. La entrada jugable comparte este fondo con el prólogo. |
-| `sueno_hospicio` | 2 | E2 | Patio del hospicio de Santa Úrsula en un recuerdo. Muros grises, ropa tendida rígida por la escarcha, una fila de doce niños con batas grandes, una monja de espaldas. Todo desenfocado en los bordes, como una fotografía vieja; las caras de los niños sin rasgos. Tramado gris; ningún color salvo un toque verde en el fondo, donde está la levita de Ignacio. |
+| `sueno_hospicio` | 2 | E2 | **Archivo disponible.** Patio del hospicio de Santa Úrsula en un recuerdo. Muros grises, ropa tendida rígida por la escarcha, una fila de doce niños con batas grandes, una monja de espaldas. Todo desenfocado en los bordes, como una fotografía vieja; las caras de los niños sin rasgos. Tramado gris; ningún color salvo un toque verde en el fondo, donde está la levita de Ignacio. |
 | `pasillo_custodio` | 2 | Exploración · primer sello | **Disponible.** Relojes, péndulos y placas de latón. Dejar a la vista el acceso oeste desde el vestíbulo, la mesa al norte y la salida al este. |
 | `pasillo_recaudador` | 2 | E2, M2 | **Disponible.** Arte definitivo del pasillo (I5): granate, libros mayores, balanzas y una **caja fuerte empotrada con cristal** en la pared, donde Klein se ve reflejado. Banco de madera junto a la pared. |
 | `pasillo_coleccionista` | 2 | E4 | **Disponible.** Arte definitivo del pasillo (I5): violeta, vitrinas con piezas expuestas y **una vitrina grande con cristal limpio** donde aparecen los reflejos del evento. Una rendija en el muro de piedra por la que puede entrar luz. |
 | `pasillo_dueno` | 2 | Exploración · tres sellos | **Disponible.** Mármol oscuro, latón y una primera línea de amanecer tras la verja. La pantalla jugable se abre con tres sellos y solo conecta con la Coleccionista y la mesa del Dueño. |
-| `vestibulo_amanecer` | 3 | Final A | El vestíbulo actual con luz blanca entrando por todas las rendijas del mármol. Los jugadores de porcelana deshaciéndose en polvo blanco. El reloj marca las seis. |
-| `dormitorio_klein_viejo` | 3 | Final C | Dormitorio pequeño y ordenado de un relojero viejo: cama de hierro, una cómoda con los cajones entreabiertos llenos de sobres negros, relojes en todas las paredes, una ventana con niebla. Sirve de fondo antes del CG final. |
-| `verja_alba` | 3 | Final A | La verja del alba abierta, vista desde dentro. Al otro lado, el puerto de Corvera al amanecer: muelle, mástiles y un cielo pálido, casi blanco, que entra en la sala y borra el tramado del mármol. En la oscuridad de la sala, las Máscaras de las paredes con los ojos abiertos. |
+| `vestibulo_amanecer` | 3 | Final A | **Archivo disponible.** El vestíbulo actual con luz blanca entrando por todas las rendijas del mármol. Los jugadores de porcelana deshaciéndose en polvo blanco. El reloj marca las seis. |
+| `dormitorio_klein_viejo` | 3 | Final C | **Archivo disponible.** Dormitorio pequeño y ordenado de un relojero viejo: cama de hierro, una cómoda con los cajones entreabiertos llenos de sobres negros, relojes en todas las paredes, una ventana con niebla. Sirve de fondo antes del CG final. |
+| `verja_alba` | 3 | Final A | **Archivo disponible.** La verja del alba abierta, vista desde dentro. Al otro lado, el puerto de Corvera al amanecer: muelle, mástiles y un cielo pálido, casi blanco, que entra en la sala y borra el tramado del mármol. En la oscuridad de la sala, las Máscaras de las paredes con los ojos abiertos. |
 
 ---
 
@@ -95,22 +95,22 @@ Ilustraciones a pantalla completa para la novela visual. Las escenas ya implemen
 | --- | :---: | --- | --- |
 | `cg_ignacio_mascara` | 1 | P0 | **Disponible.** Una mano envejecida y temblorosa sobre el tapete negro. Tres cartas abiertas: una Llave de 2, un Reloj de 7 y una Máscara recién volteada. El rostro de Ignacio se representa en porcelana grabada con la cinta granate y la filigrana del palo de Máscaras. Las llamas de los candelabros se inclinan hacia la carta. En el dorso de la mano, la piel se vuelve porcelana desde la punta de los dedos. |
 | `cg_invitacion` | 1 | P3 | **Disponible.** Primer plano de dos manos manchadas de aceite que sostienen un sobre negro de papel grueso con el lacre del sol tras la verja. Sobre la palma, una ficha de marfil ennegrecido con una campana grabada. Detrás, desenfocado, el halo de la farola en la niebla. |
-| `cg_libro_mayor` | 2 | Recaudador | Libro mayor abierto bajo una lámpara de pantalla granate. Columnas de tinta negra y roja con letra de contable (ilegible salvo una línea subrayada, que el juego superpone). Sello negro de la Casa al margen. La sombra de las gafas del Recaudador y la mano de Klein abierta, sin tocar el papel. |
-| `cg_vitrina_ignacio` | 2 | Coleccionista | Vitrina de cristal biselado con marco de latón y terciopelo violeta. En el centro, sobre un atril, la Máscara de Ignacio con barba y cicatriz, los ojos cerrados y una grieta bajo el ojo derecho por la que baja una gota. Otras Máscaras alrededor con etiquetas en blanco. En el cristal, el reflejo tenue de Klein con la lupa al cuello. |
-| `espejo_klein_35` | 2 | E1 | Klein reflejado en el cristal de la esfera del reloj del vestíbulo. Canas en las sienes. El minutero detrás de su reflejo. |
-| `sueno_ignacio_elige` | 2 | E2 | Ignacio joven, de unos 40 años, agachado frente a un niño de nueve años en el patio del hospicio. Le sostiene las manos para mirarle los dedos. **La cara de Ignacio es de porcelana**; la del niño, en sombra. |
-| `espejo_klein_45` | 2 | E2 | Klein reflejado en el cristal de la caja fuerte del pasillo. Unos 45 años: arrugas marcadas, ojeras, pelo gris. |
-| `reflejo_dueno` | 2 | E4 sombra | Klein frente a una vitrina. En el reflejo, el Dueño detrás de él con una mano en su hombro, y sobre la cara de Klein **la máscara negra con la franja de luz**. Fuera del reflejo, Klein está solo. |
-| `espejo_klein_60` | 2 | E5 | Klein reflejado en la plata de un candelabro, deformado por la curva: un hombre de 60 años con el chaleco y la lupa. |
-| `mascara_rota` | 2 | M3 | Las manos de Klein con fragmentos de porcelana que se deshacen en polvo blanco. Un trozo con la cicatriz de la ceja todavía reconocible. |
-| `fichas_dueno` | 3 | M4 | Montón de fichas de marfil sobre el tapete negro del Dueño, a la luz blanca de la verja abierta. En cada ficha, grabada, una cara diminuta. Algunas fichas con las iniciales *K. M.* La mano enguantada del Dueño empujándolas. |
-| `amanecer_joven` | 3 | Final A devuelto | Klein con 27 años, con la levita y el sombrero de copa, en la calle del puerto todavía de noche, a punto de amanecer. Se mira las manos jóvenes. Al fondo, el farolero apagando su farola. Alivio, no alegría. |
-| `amanecer_robado` | 3 | Final A robado | Klein con 20 años ante el escaparate del taller, de noche. Los bolsillos de la levita abultados de fichas que asoman. En el reflejo del cristal, sobre su cara, una franja de luz como la del Dueño. |
-| `amanecer_muelle` | 3 | Final A sin fichas | Klein envejecido en el muelle, de espaldas, frente al sol que sale sobre el mar. Vetas grises bajo el sombrero; mira sus manos de viejo. A sus pies, la ficha antigua rajada por la mitad. Farolas eléctricas en el muelle: ha pasado mucho tiempo. |
-| `farolero_ve` | 3 | Final A con clemencia | Al final del muelle, el farolero con su pértiga levanta la cabeza: sus ojos, por primera vez, no son blancos. Luz del amanecer en la cara. |
-| `mascara_negra` | 3 | Final B | El Dueño, sin máscara (solo una franja de luz donde estaría la cara), tiende la máscara negra a Klein por encima del tapete. |
-| `sobres_en_los_umbrales` | 3 | Final C | Montaje en tres paneles verticales: el mismo sobre negro en tres umbrales distintos (la puerta del taller, una pensión de otra ciudad, una casa con jardín). Klein envejece de un panel a otro, siempre con la mano en el picaporte sin abrir. |
-| `anfitriona_en_el_lecho` | 3 | Final C | Dormitorio modesto de noche. Klein con 81 años en la cama, mirando a la silla de al lado, donde la anfitriona, igual que siempre, sostiene un sobre negro en el regazo. Todos los relojes de la pared parados a las doce menos un minuto. |
+| `cg_libro_mayor` | 2 | Recaudador | **Integrada.** Libro mayor abierto bajo una lámpara de pantalla granate. Columnas de tinta negra y roja con letra de contable (ilegible salvo una línea subrayada, que el juego superpone). Sello negro de la Casa al margen. La sombra de las gafas del Recaudador y la mano de Klein abierta, sin tocar el papel. |
+| `cg_vitrina_ignacio` | 2 | Coleccionista | **Integrada.** Vitrina de cristal biselado con marco de latón y terciopelo violeta. En el centro, sobre un atril, la Máscara de Ignacio con barba y cicatriz, los ojos cerrados y una grieta bajo el ojo derecho por la que baja una gota. Otras Máscaras alrededor con etiquetas en blanco. En el cristal, el reflejo tenue de Klein con la lupa al cuello. |
+| `espejo_klein_35` | 2 | E1 | **Archivo disponible.** Klein reflejado en el cristal de la esfera del reloj del vestíbulo. Canas en las sienes. El minutero detrás de su reflejo. |
+| `sueno_ignacio_elige` | 2 | E2 | **Archivo disponible.** Ignacio joven, de unos 40 años, agachado frente a un niño de nueve años en el patio del hospicio. Le sostiene las manos para mirarle los dedos. **La cara de Ignacio es de porcelana**; la del niño, en sombra. |
+| `espejo_klein_45` | 2 | E2 | **Archivo disponible.** Klein reflejado en el cristal de la caja fuerte del pasillo. Unos 45 años: arrugas marcadas, ojeras, pelo gris. |
+| `reflejo_dueno` | 2 | E4 sombra | **Archivo disponible.** Klein frente a una vitrina. En el reflejo, el Dueño detrás de él con una mano en su hombro, y sobre la cara de Klein **la máscara negra con la franja de luz**. Fuera del reflejo, Klein está solo. |
+| `espejo_klein_60` | 2 | E5 | **Archivo disponible.** Klein reflejado en la plata de un candelabro, deformado por la curva: un hombre de 60 años con el chaleco y la lupa. |
+| `mascara_rota` | 2 | M3 | **Archivo disponible.** Las manos de Klein con fragmentos de porcelana que se deshacen en polvo blanco. Un trozo con la cicatriz de la ceja todavía reconocible. |
+| `fichas_dueno` | 3 | M4 | **Archivo disponible.** Montón de fichas de marfil sobre el tapete negro del Dueño, a la luz blanca de la verja abierta. En cada ficha, grabada, una cara diminuta. Algunas fichas con las iniciales *K. M.* La mano enguantada del Dueño empujándolas. |
+| `amanecer_joven` | 3 | Final A devuelto | **Archivo disponible.** Klein con 27 años, con la levita y el sombrero de copa, en la calle del puerto todavía de noche, a punto de amanecer. Se mira las manos jóvenes. Al fondo, el farolero apagando su farola. Alivio, no alegría. |
+| `amanecer_robado` | 3 | Final A robado | **Archivo disponible.** Klein con 20 años ante el escaparate del taller, de noche. Los bolsillos de la levita abultados de fichas que asoman. En el reflejo del cristal, sobre su cara, una franja de luz como la del Dueño. |
+| `amanecer_muelle` | 3 | Final A sin fichas | **Archivo disponible.** Klein envejecido en el muelle, de espaldas, frente al sol que sale sobre el mar. Vetas grises bajo el sombrero; mira sus manos de viejo. A sus pies, la ficha antigua rajada por la mitad. Farolas eléctricas en el muelle: ha pasado mucho tiempo. |
+| `farolero_ve` | 3 | Final A con clemencia | **Archivo disponible.** Al final del muelle, el farolero con su pértiga levanta la cabeza: sus ojos, por primera vez, no son blancos. Luz del amanecer en la cara. |
+| `mascara_negra` | 3 | Final B | **Archivo disponible.** El Dueño, sin máscara (solo una franja de luz donde estaría la cara), tiende la máscara negra a Klein por encima del tapete. |
+| `sobres_en_los_umbrales` | 3 | Final C | **Archivo disponible.** Montaje en tres paneles verticales: el mismo sobre negro en tres umbrales distintos (la puerta del taller, una pensión de otra ciudad, una casa con jardín). Klein envejece de un panel a otro, siempre con la mano en el picaporte sin abrir. |
+| `anfitriona_en_el_lecho` | 3 | Final C | **Archivo disponible.** Dormitorio modesto de noche. Klein con 81 años en la cama, mirando a la silla de al lado, donde la anfitriona, igual que siempre, sostiene un sobre negro en el regazo. Todos los relojes de la pared parados a las doce menos un minuto. |
 | `cg_relojes_parados` | 1 | P2 | **Disponible.** La pared de treinta y dos relojes del taller, todos a las doce menos un minuto; los péndulos detenidos a mitad de recorrido. Lámpara de pantalla verde en primer plano. |
 | `cg_ventana_farola` | 1 | P2 · mirar por la ventana | **Disponible.** Ventana empañada del taller. Fuera, la farola encendida sin farolero y, bajo su halo, un hombre con levita verde que no tiene cara. Solo una silueta. |
 | `cg_reloj_helado` | 1 | P2 · comprobar los relojes | **Disponible.** Las manos de Klein, manchadas de aceite, abren un reloj de bolsillo: el volante quieto, una escarcha fina sobre el metal y el vaho de su aliento. |
@@ -123,14 +123,14 @@ Ilustraciones a pantalla completa para la novela visual. Las escenas ya implemen
 | `cg_jugadores_porcelana` | 1 | P6 | **Disponible.** Primer plano de manos que barajan en una mesa pequeña del vestíbulo: dedos blancos y lisos como loza; en una mano la porcelana llega a la muñeca. |
 | `cg_reloj_ranuras` | 1 | P6 | **Disponible.** El gran reloj del vestíbulo parado a la medianoche, con tres ranuras vacías bajo el cristal del tamaño de un sello. |
 | `cg_puerta_grabada` | 1 | Vestíbulo · al entregar la invitación | **Disponible.** Donde estaba la puerta, una pared de mármol verde con el contorno de una puerta grabado, sin picaporte ni bisagras. |
-| `cg_cadena_custodio` | 2 | Custodio · «¿Puede levantarse de esa silla?» | Bajo la mesa del Custodio, una cadena de hierro le sujeta los tobillos a las patas de la silla; eslabones gastados de tanto tirar. Solo se ven sus pies, la cadena y el borde del tapete. |
-| `klein_dueno` | 3 | Final B | Klein sentado en la silla del Dueño, con la máscara negra puesta y el abrigo oscuro. A su lado, la anfitriona escribe con una pluma sobre un sobre negro. La verja cerrada detrás; ninguna luz. |
+| `cg_cadena_custodio` | 2 | Custodio · «¿Puede levantarse de esa silla?» | **Integrada.** Bajo la mesa del Custodio, una cadena de hierro le sujeta los tobillos a las patas de la silla; eslabones gastados de tanto tirar. Solo se ven sus pies, la cadena y el borde del tapete. |
+| `klein_dueno` | 3 | Final B | **Archivo disponible.** Klein sentado en la silla del Dueño, con la máscara negra puesta y el abrigo oscuro. A su lado, la anfitriona escribe con una pluma sobre un sobre negro. La verja cerrada detrás; ninguna luz. |
 
 ---
 
 ## Notas examinables
 
-Al examinar un elemento de una sala con **E**, se abre una escena con su ilustración y la nota del [guion](GUION_PROLOGO_Y_DIALOGOS.md#11-notas-examinables) (I5-10). Mientras falte el archivo, la escena muestra el recuadro de «Ilustración pendiente» con la descripción de esta tabla. Formato de CG: 1920 × 1080, sin texto, en `juego/historia/ilustraciones/<id>.webp`. Prioridad 2.
+Al examinar un elemento de una sala con **E**, se abre una escena con su ilustración y la nota del [guion](GUION_PROLOGO_Y_DIALOGOS.md#11-notas-examinables) (I5-10). Las diez variantes de la primera tabla están integradas. Los archivos WebP de 1920 × 1080 están en `juego/historia/ilustraciones/`. El texto lo dibuja Godot.
 
 Algunas notas cambian con la historia y por eso tienen más de una ilustración.
 
@@ -140,14 +140,14 @@ Algunas notas cambian con la historia y por eso tienen más de una ilustración.
 | `nota_entrada_escucho` | Entrada · La farola | Si se escuchó al farolero (`prologo.farolero = escucho`) | «…en el empedrado, alguien grabó con una uña: levántate a tiempo.» | Primer plano del empedrado bajo la farola, con unas palabras arañadas en la piedra (sin letras legibles; el texto lo pone el juego). Una uña rota junto a ellas. |
 | `nota_entrada_ignacio` | Entrada · La farola | Si se preguntó por Ignacio (`pregunto_ignacio`) | «…un reloj de bolsillo aplastado, adelantado tres minutos. En la tapa: I. F. Dentro, un retrato tuyo de niño.» | Un reloj de bolsillo aplastado bajo la farola, con la tapa abierta: iniciales grabadas, las agujas tres minutos adelantadas y, dentro, el retrato de un niño de nueve años. |
 | `nota_vestibulo` | Vestíbulo · El reloj detenido | Sin sellos | «Todas las agujas señalan la hora a la que llegaste. Bajo el cristal alguien grabó tres ranuras del tamaño de un sello.» | La esfera del reloj del vestíbulo de cerca: todas las agujas en la misma hora y tres ranuras vacías bajo el cristal. |
-| `nota_vestibulo_sellos` | Vestíbulo · El reloj detenido | Con uno o más sellos | «Hay {n} sellos en las ranuras. Si acercas el oído, oyes un tic cada mucho tiempo. Cada tic suena como un hueso.» | La misma esfera con sellos encajados en las ranuras; el segundero tiembla, a punto de moverse. Idealmente tres variantes (`_1`, `_2`, `_3`) con uno, dos y tres sellos. |
+| `nota_vestibulo_sellos` | Vestíbulo · El reloj detenido | Con uno o más sellos | «Hay {n} sellos en las ranuras. Si acercas el oído, oyes un tic cada mucho tiempo. Cada tic suena como un hueso.» | La esfera vista en ángulo, con una luz bajo el vidrio y las ranuras en sombra. El texto muestra cuántos sellos hay. Las tres variantes visuales por cantidad son opcionales. |
 | `nota_tienda` | Tienda · La vitrina de humo | Siempre | «La lámpara atraviesa la lente y dibuja dos rostros en el terciopelo. Uno desaparece cuando la luz toca el cristal. El otro sigue mirándote cuando apagas la lámpara.» | La lente de humo bajo la lámpara del Gabinete: dos rostros proyectados en el terciopelo; uno se deshace en humo y el otro mira al espectador. |
 | `nota_custodio` | Custodio · El péndulo | Siempre | «Hay diez muescas en la caja. El péndulo solo avanza cuando alguien empieza una mano. Bajo cada muesca hay un nombre rayado.» | La caja del péndulo del Custodio con diez muescas talladas y, bajo cada una, un nombre rayado a punta de navaja (ilegible). El péndulo, quieto junto a la última. |
 | `nota_recaudador` | Recaudador · El libro mayor | Siempre | «…Junto a cada petición posterior aparece una ficha de tinta roja. Una página tiene tu nombre en el encabezado y, debajo, otro nombre tachado.» | Una página del libro mayor bajo la lámpara granate: columnas de tinta negra, fichas dibujadas en rojo y un encabezado con un nombre tachado debajo de otro (sin letras legibles). |
 | `nota_coleccionista` | Coleccionista · El expositor | Siempre | «…Hay una vitrina vacía, limpia, con una etiqueta en blanco.» | El estante superior del expositor con etiquetas fechadas y, al lado, una vitrina vacía y recién limpiada con la etiqueta en blanco, esperando. |
 | `nota_dueno` | Dueño · La inscripción | Siempre | «El sol está tallado en el suelo, pero la luz que pasa bajo el portón es real. Alrededor del sol hay arañazos. Alguien intentó arrastrarse hasta él.» | El sol tallado en el mármol negro, rodeado de arañazos como de uñas que van hacia él, y la línea de luz real que pasa bajo el portón. |
 
-**Notas del guion que aún no tienen punto en el juego.** Se añadirán cuando el vestíbulo tenga jugadores dibujados y los pasillos su arte definitivo (I5-07); conviene encargarlas a la vez.
+**Ilustraciones disponibles para los tres puntos de examen que aún faltan.**
 
 | Id | Nota | Texto del guion | Ilustración |
 | --- | --- | --- | --- |
@@ -309,14 +309,14 @@ Variantes extra: **Tobías `saldado`** (porcelana entera con la palabra escrita 
 
 ## Figuras de exploración
 
-El encargo de las figuras secundarias se limita a poses estáticas. El farolero queda opcional hasta decidir si aparece físicamente en la entrada.
+Las cuatro figuras secundarias son poses estáticas con alfa. Amparo y los jugadores de porcelana están en el vestíbulo, Tobías en el pasillo del Custodio y Benavides en el del Recaudador. El recorte del farolero está listo para cuando se decida si se incorpora a la exploración.
 
 | Id | Prioridad | Descripción |
 | --- | :---: | --- |
 | `figura_klein` | 1 | Integrada como `klein_movimiento.webp` con reposo y caminata en ocho direcciones. Ver los prompts en su hoja de expresiones. |
 | `figura_amparo` | 2 | Doña Amparo sentada a un piano de cola pequeño (el piano puede ser pieza aparte). |
 | `figura_tobias` | 2 | Tobías de pie, mirando hacia arriba, con la gorra en la mano. |
-| `figura_benavides` | 2 | Benavides sentado en un banco, abrazando el portafolios. |
+| `figura_benavides` | 2 | Benavides sentado, abrazando el portafolios. El banco forma parte del recorte generado con ImageGen para el pasillo del Recaudador. |
 | `figura_jugador_porcelana` | 2 | Dos o tres jugadores sentados ante mesitas, con ropa de épocas distintas y manos de porcelana, para poblar el vestíbulo. |
 | `figura_farolero` | 3 | Para la sala de entrada, bajo la farola, si se decide que aparezca también en exploración. |
 
@@ -327,17 +327,19 @@ El encargo de las figuras secundarias se limita a poses estáticas. El farolero 
 | Id | Prioridad | Descripción |
 | --- | :---: | --- |
 | `marco_nvl` | 1 | **Disponible en Godot.** Filete fino de latón con un degradado oscuro bajo la narración para dejar legible el arte. |
-| `cuadro_adv` | 2 | Revisión del cuadro de diálogo actual: más oscuro, con un borde de latón gastado y una pequeña campana en la esquina de la placa del nombre. |
-| `tarjeta_galeria` | 3 | Marco para las miniaturas de la galería de CG; una cerradura de latón para las que aún no se han visto. |
+| `cuadro_adv` | 2 | **Integrado.** Fondo más oscuro, borde de latón gastado y [campana de la placa](../juego/casino/dialogos/arte/campana_adv.webp). |
+| `tarjeta_galeria` | 3 | **Archivo disponible.** [Miniatura de latón sobre verde oscuro](../juego/historia/ilustraciones/tarjeta_galeria.webp) para escenas aún sin desbloquear en la futura galería. |
 
 ---
 
 ## Orden de encargo
 
-| Lote | Piezas pendientes | Para qué |
+| Lote | Estado | Piezas |
 | --- | --- | --- |
-| **1 · Prólogo jugable** | **Completo.** Fondos, 14 CG de prioridad 1, retratos y marco de narración. | Prólogo P0–P6 y grabado de la puerta del vestíbulo. |
-| **2 · Jefes y eventos** | `sueno_hospicio`, las CG de prioridad 2, las 13 notas, el acabado de `cuadro_adv` y las cuatro figuras estáticas del vestíbulo. | Ilustrar los encuentros y las notas. Los cuatro pasillos ya tienen arte propio. |
-| **3 · Finales** | Los tres fondos y las CG de prioridad 3, y `tarjeta_galeria`. | Completar los desenlaces A–C y la galería. |
+| **1 · Prólogo jugable** | Integrado | Fondos, 14 CG, retratos y marco de narración. |
+| **2 · Jefes y eventos** | Arte completo | Hospicio, CG de encuentros y eventos, 13 notas, cuadro ADV y cuatro figuras del recorrido. |
+| **3 · Finales** | Arte completo | Tres fondos, CG de los desenlaces A–C y miniatura para la galería. |
 
-**Total pendiente.** 4 de 13 fondos (el hospicio y los tres fondos de finales), 18 CG de eventos y finales, 13 ilustraciones de notas (10 ya tienen punto en el juego y 3 corresponden a puntos futuros), cuatro figuras estáticas y dos piezas de interfaz. La figura opcional del farolero y las tres variantes del reloj con sellos se cuentan aparte.
+**Lote final.** 42 recursos: cuatro fondos, 18 CG, 13 notas, cinco figuras contando al farolero y dos piezas de interfaz. Las CG de los eventos y finales, los tres puntos de examen adicionales, el farolero de exploración y la galería esperan su puesta en escena.
+
+**Producción.** Las descripciones de las tablas sirvieron de encargo para ImageGen. El grabado de Ignacio fijó el tramado para las CG. El taller, el reloj, la calle y las salas existentes fijaron las paletas y el encuadre. Los retratos del elenco fijaron las caras y el arte de la anfitriona en el mapa sirvió de referencia para los recortes. La nota del reloj sin sellos reutiliza el grabado del prólogo. Los originales PNG de ImageGen se conservaron localmente y se importaron las versiones WebP del juego.

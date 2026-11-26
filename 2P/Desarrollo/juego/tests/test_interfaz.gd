@@ -85,6 +85,7 @@ func test_cambiar_el_dialogo_abierto_conserva_el_foco_original() -> void:
 	mesa.presentar_vista(vista)
 	mesa.boton_ayuda.grab_focus()
 	mesa.mostrar_ayuda()
+	var reglamento: Control = mesa.modal.contenido.get_node("Reglamento")
 	var audio := AudioCasino.new()
 	add_child_autofree(audio)
 	mesa.activar_audio(audio)
@@ -95,6 +96,10 @@ func test_cambiar_el_dialogo_abierto_conserva_el_foco_original() -> void:
 	mesa.cerrar_modal()
 	assert_eq(mesa.boton_ayuda.focus_mode, Control.FOCUS_ALL)
 	assert_eq(mesa.get_viewport().gui_get_focus_owner(), mesa.boton_ayuda)
+	# El contenido anterior sale del árbol de inmediato y queue_free() lo libera al final del fotograma.
+	await get_tree().process_frame
+	assert_freed(reglamento, "Reglamento sustituido")
+	assert_no_new_orphans("Al sustituir un diálogo de la mesa")
 
 func test_mano_larga_permanece_en_contenedor_desplazable() -> void:
 	var mesa = _mesa()

@@ -27,6 +27,11 @@ func montar(sala: String, origen: String, campana: CampanaCasino, nombre_nota: S
 		var galeria := Galeria.new()
 		galeria.pasillo = sala
 		_decorado.add_child(galeria)
+		match sala:
+			"pasillo_custodio":
+				_figura("tobias", Vector2(475, 366), 94)
+			"pasillo_recaudador":
+				_figura("benavides", Vector2(894, 365), 86)
 		for destino: String in PlanoGaleria.puertas(sala):
 			var accion := "Entrar · %s" % CampanaCasino.NOMBRES[destino]
 			_punto("puerta", PlanoGaleria.punto(sala, destino), accion, destino)
@@ -64,6 +69,8 @@ func _agregar_interacciones(sala: String, nombre_nota: String, campana: CampanaC
 	match sala:
 		"vestibulo":
 			_figura("anfitriona", Vector2(990, 231), 84)
+			_figura("amparo", Vector2(255, 316), 112)
+			_figura("jugador_porcelana", Vector2(316, 540), 106)
 			_punto("anfitriona", Vector2(985, 279), "Hablar")
 			_punto("nota", Vector2(640, 190), "Examinar el reloj")
 		"tienda":
