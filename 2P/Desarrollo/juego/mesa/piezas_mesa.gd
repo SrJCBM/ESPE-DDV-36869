@@ -52,7 +52,8 @@ static func boton_accion(padre: Node, nombre: String, rect: Rect2, primario: boo
 	fondo.name = "Fondo"
 	var atajo := Panel.new()
 	atajo.name = "Atajo"
-	# Una sola línea: tecla a la izquierda, acción al centro y, si hay coste real, su indicador a la derecha.
+	# Tecla a la izquierda; a su derecha, la acción y, si hay coste real, una línea propia
+	# debajo con el coste (I6-08): el nombre y el coste nunca se cruzan.
 	atajo.position = Vector2(12, (rect.size.y - 28) * 0.5)
 	atajo.size = Vector2(28, 28)
 	atajo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -65,19 +66,27 @@ static func boton_accion(padre: Node, nombre: String, rect: Rect2, primario: boo
 	var letra := etiqueta(atajo, tecla, Rect2(0, 0, 28, 28), 16, TINTA if primario else MARFIL)
 	letra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	letra.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var titulo := etiqueta(boton, "", Rect2(46, (rect.size.y - 30) * 0.5, rect.size.x - 120, 30), 17, TINTA if primario else MARFIL)
+	var titulo := etiqueta(boton, "", Rect2(46, (rect.size.y - 30) * 0.5, rect.size.x - 58, 30), 17, TINTA if primario else MARFIL)
 	titulo.name = "Etiqueta"
 	titulo.theme_type_variation = &"BoldLabel"
 	titulo.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var detalle := etiqueta(boton, "", Rect2(rect.size.x - 112, (rect.size.y - 24) * 0.5, 100, 24), 13, TINTA if primario else MUTED)
+	var detalle := etiqueta(boton, "", Rect2(46, rect.size.y * 0.5 + 2, rect.size.x - 58, 20), 13, TINTA if primario else MUTED)
 	detalle.name = "Coste"
-	detalle.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	detalle.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	detalle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	return boton
 
 static func texto_accion(boton: Button, titulo: String, detalle: String) -> void:
-	boton.get_node("Etiqueta").text = titulo
-	boton.get_node("Coste").text = detalle
+	var nombre: Label = boton.get_node("Etiqueta")
+	var coste: Label = boton.get_node("Coste")
+	nombre.text = titulo
+	coste.text = detalle
+	# Con coste, el nombre sube a la mitad superior y el coste ocupa la inferior; sin él, el
+	# nombre queda centrado.
+	var alto := boton.size.y
+	nombre.position.y = alto * 0.5 - 27 if not detalle.is_empty() else (alto - 30) * 0.5
+	coste.position.y = alto * 0.5 + 2
+	coste.visible = not detalle.is_empty()
 	boton.tooltip_text = "%s. %s" % [titulo, detalle]
 	for propiedad in boton.get_property_list():
 		if propiedad.name == "accessibility_name":

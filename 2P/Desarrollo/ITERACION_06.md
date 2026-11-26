@@ -13,7 +13,7 @@
 | I6-05 | Inventario, baraja, vitrina y recompensa | Por implementar | Presentar fichas, sellos y objetos con sus ilustraciones. Usar un álbum de cartas por palos con detalle al enfocar. En la vitrina se leen el precio y el estado de las piezas. En la recompensa, las tres cartas y «Omitir» tienen espacio propio. |
 | I6-06 | Encuentros de exploración | Propuesto | Dar un diálogo breve a Amparo, Tobías y Benavides con las líneas de la sección 10 del guion. Sobre su figura, la pista de E aparece por proximidad. Usar la porcelana para indicar su evolución por sellos cuando esa parte del guion se conecte. Coordinar con los menús posvictoria de I5-11. |
 | I6-07 | Prueba del recorrido y la lectura | Pendiente | Pedir a tres personas que abran una partida, lleguen al Custodio, resuelvan una Máscara, encuentren la tienda y expliquen qué cambiaría una compra. Anotar dónde se detienen, qué dato buscan y si necesitan abrir la ayuda. |
-| I6-08 | Superposiciones y encuadre | Por implementar | Reservar espacio medido para texto y acciones en inventario, recompensa y derrota. Corregir el coste sobre el nombre del botón de mesa y la cara recortada de Ignacio en ADV. |
+| I6-08 | Superposiciones y encuadre | Implementada y verificada · rama `kenned/i6-correcciones` | El panel compartido mide título y párrafo antes de colocar cartas y botones, y crece si hace falta. «Nuevo intento» en la derrota. El coste de la mesa va en su propia línea. La toma de Ignacio ya no muestra la cara recortada. Ver [avance de I6-08](#avance-de-i6-08). |
 | I6-09 | Escala y anclaje de sprites | Por implementar | Revisar las figuras al lado de Klein, de una puerta y del mobiliario. Ajustar pivote, perspectiva, colocación, sombra y huella de colisión en la misma pasada. |
 | I6-10 | Reacciones de los crupieres durante la mano | Propuesto para Kenned | Conectar las líneas de la sección 9 a hitos de la vista pública. El bocadillo se lee junto al retrato y el jugador puede seguir actuando. |
 | I6-11 | Derrota ilustrada | Propuesto para Kenned | Adaptar la escena de porcelana de la sección 14.4 y conectar el nuevo intento. Preparar el encargo de arte cuando quede elegido su encuadre. |
@@ -38,6 +38,24 @@ La mesa se organiza por lo que el jugador puede decidir en cada momento. En la e
 
 La fila fija de cinco patrones pasa a una consulta accesible por foco y teclado. Junto a la mano cabe, por ejemplo, **Mano larga · 4/5** cuando ese progreso ayude a tomar una decisión. Al plantarse se muestra el resultado y los patrones obtenidos en el desglose. Las cartas, el retrato y el tapete ganan superficie cuando hay espacio. A 1024 × 576, las cartas de una mano larga conservan tamaño legible mediante el desplazamiento horizontal. Se comprueba también a 1280 × 720, 1920 × 1080 y en una ventana panorámica. Las reglas y su balance son los de la campaña actual.
 
+## Avance de I6-08
+
+Implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-correcciones`, que parte de `8afcc6d`.
+
+| Pantalla | Causa | Corrección |
+| --- | --- | --- |
+| **Recompensa, inventario y derrota** | En `libro.gd` el párrafo tenía 124 px fijos desde y = 118 y la lista empezaba siempre en y = 196. Un párrafo de más de tres líneas quedaba detrás de las cartas o de los botones | El panel mide el título y el párrafo con la fuente real antes de colocar la lista. Crece centrado hasta 770 px si las cartas y los botones no caben, y si aun así no caben, la lista se desplaza. Las etiquetas reciben su ancho antes del texto, para que el salto de línea no las estire |
+| **Derrota** | La acción decía «Volver al vestíbulo», pero el juego reinicia en la entrada | La acción es **Nuevo intento** |
+| **Mesa** | En el botón de 230 px, el título iba de x = 46 a 156 y el coste, alineado a la derecha, de 118 a 218, así que «−1 campanada» pisaba «INICIAR MANO» | Con coste, el nombre ocupa la mitad superior y el coste la inferior, debajo del nombre. Sin coste, el nombre queda centrado. Vale también para «PEDIR / −1 ficha» en el Recaudador |
+| **Prólogo, toma de Ignacio** | La cara pequeña se recortaba de la parte alta del retrato y llegaba hasta la barra de Historial, Auto y Saltar | Si quien habla está en escena, su figura y la placa con su nombre lo identifican, así que no se muestra la cara. Cuando habla alguien fuera de escena, la cara mide 88 px y termina 18 px por encima de la barra |
+
+**Validación.**
+
+- `tests/qa_i6_08.gd` reproduce los seis casos (victoria del Custodio con su frase completa, inventario con un sello, mesa del Recaudador al iniciar y al pedir, derrota del Recaudador y toma de Ignacio) y guarda el antes y el después a 1024 × 576 y 1280 × 720. Las comparativas están en [`Diseno/recursos/i6/`](Diseno/recursos/i6/): [1024 × 576](Diseno/recursos/i6/i6-08_antes_despues_1024x576.jpg) y [1280 × 720](Diseno/recursos/i6/i6-08_antes_despues_1280x720.jpg).
+- `tests/test_superposiciones_i6.gd` (9 pruebas) comprueba que en los tres paneles el párrafo cabe entero y termina antes de la lista, que el panel no sale del lienzo y que el coste y el nombre del botón no se cruzan al iniciar ni al pedir. También comprueba que «Nuevo intento» lleva a la entrada y que en la toma de Ignacio no hay cara recortada.
+- Recompensa con ratón y con teclado: elegir una carta la añade una sola vez y una segunda elección se rechaza; «Continuar sin carta» no añade nada; Enter sobre la carta enfocada la elige y cierra el panel.
+- GUT: **296 pruebas y 2.693 aserciones**, todas pasan.
+
 ## Guion para los siguientes encargos
 
 - **I6-10 · Reacciones.** La [sección 9 del guion](Diseno/GUION_PROLOGO_Y_DIALOGOS.md#9-reacciones-de-los-jefes-durante-la-partida) ya contiene líneas para los cuatro jefes, incluidos Punto exacto, Al filo, Quiebra y `meta_cerca` cuando falta menos del 15 % para la meta. El primer tramo puede probarse en el Custodio con esos hitos. Usar la vista pública que emite `ControladorMesa.vista_actualizada`, priorizar un solo comentario por acción, retirarlo en tres segundos o al actuar y añadir el ajuste para desactivarlo. Todo se muestra después de resolver, sin pausar la mano, cambiar el foco ni anticipar el valor de una Máscara oculta. Mantener estos comentarios distintos de las preguntas posvictoria de [I5-11](ITERACION_05.md#i5-11--menús-posvictoria-de-los-jefes).
@@ -53,7 +71,7 @@ La fila fija de cinco patrones pasa a una consulta accesible por foco y teclado.
 
 ## Verificación local
 
-- Godot 4.7.2 y GUT. Pasaron 287 pruebas y 2.649 aserciones.
+- Godot 4.7.2 y GUT. Pasaron 287 pruebas y 2.649 aserciones. Tras I6-08: 296 pruebas y 2.693 aserciones.
 - Medición al 140 % de las intervenciones de los siete recursos de diálogo. Los 47 cruces detectados con la barra inferior bajaron a cero.
 - Capturas del inicio con y sin partida guardada y de «Cómo jugar» a 1024 × 576 y 1280 × 720. La segunda portada, los dos pasillos y el cuadro NVL ampliado se revisaron por separado.
 
