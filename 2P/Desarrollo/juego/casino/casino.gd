@@ -548,6 +548,7 @@ func _jugar() -> void:
 	add_child(mesa)
 	mesa.activar_audio(audio)
 	mesa.establecer_movimiento_reducido(AjustesJuego.movimiento_reducido())
+	mesa.set("comentarios", AjustesJuego.comentarios_crupieres())
 
 func _levantarse(victoria: bool, exactos: int) -> void:
 	var premio := campana.cerrar(victoria,exactos)

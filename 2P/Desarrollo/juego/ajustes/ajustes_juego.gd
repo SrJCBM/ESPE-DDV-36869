@@ -30,6 +30,19 @@ static func guardar_volumen(canal: StringName, nivel: int) -> void:
 	archivo.set_value("audio", str(canal), clampi(nivel, 0, 100))
 	archivo.save(ruta)
 
+## Comentarios de los crupieres durante la mano (I6-10). Activados por defecto.
+static func comentarios_crupieres() -> bool:
+	var archivo := ConfigFile.new()
+	if archivo.load(ruta) != OK:
+		return true
+	return bool(archivo.get_value("accesibilidad", "comentarios_crupieres", true))
+
+static func guardar_comentarios_crupieres(activos: bool) -> void:
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	archivo.set_value("accesibilidad", "comentarios_crupieres", activos)
+	archivo.save(ruta)
+
 ## Ajustes de lectura de las conversaciones (I5-10): velocidad del texto en caracteres por
 ## segundo (el máximo es instantáneo), espera del modo automático en segundos, tamaño del
 ## texto en porcentaje y opacidad del cuadro en porcentaje.

@@ -27,6 +27,11 @@ const MARFIL := Piezas.MARFIL
 const MUTED := Piezas.MUTED
 const TINTA := Piezas.TINTA
 const BASE := Vector2(1440, 810)
+const BocadilloCrupier := preload("res://mesa/interfaz/bocadillo_crupier.gd")
+## Reacciones del crupier durante la mano (I6-10, guion §9).
+const REACCIONES: ReaccionesCrupier = preload("res://datos/reacciones/reacciones.tres")
+## Encima del retrato, con la cola hacia su rostro.
+const LUGAR_BOCADILLO := Vector2(34, 132)
 
 signal salir_de_mesa(victoria: bool, exactos: int)
 var campana: CampanaCasino
@@ -36,6 +41,11 @@ var boton_lente: Button
 @export var conectar_controlador := true
 var controlador: Node
 var vista: Dictionary = {}
+var bocadillo: Control
+## Última línea dicha por disparador, para no repetirla.
+var _ultimas_reacciones := {}
+## Si es false, la mesa no comenta (Opciones · Comentarios de los crupieres).
+var comentarios := true
 var lienzo: Control
 var boton_iniciar_pedir: Button
 var boton_plantarse: Button
@@ -149,6 +159,9 @@ func _construir() -> void:
 		boton_lente = Piezas.boton_texto(lienzo, "boton_lente", "LENTE", Rect2(510, 66, 340, 36), _usar_lente, 15)
 	Piezas.imagen(lienzo, retrato, Rect2(22, 124, 356, 534), true)
 	_construir_regla()
+	bocadillo = BocadilloCrupier.new()
+	bocadillo.position = LUGAR_BOCADILLO
+	lienzo.add_child(bocadillo)
 	Piezas.etiqueta(lienzo, nombre, C.NOMBRE, 46, MARFIL, true)
 	_titulo_estado = Piezas.etiqueta(lienzo, "", C.ESTADO, 16, ORO)
 	# El tapete ilustrado es la prueba de estilo del Custodio; las demás mesas conservan el paño liso.
@@ -262,6 +275,24 @@ func _mostrar_carta_revelada(indice: int, datos: Dictionary) -> void:
 	_lectura.text = str(reveladas.suma) + (" + ?" if reveladas.ocultas > 0 else "")
 	_explicacion.text = "%s por revelar" % reveladas.ocultas if reveladas.ocultas > 0 else ""
 
+## Cualquier acción retira el comentario anterior; si la mano acaba de resolverse, el crupier
+## puede comentar el resultado. No toca el foco ni pausa la mano.
+func _reaccionar(previa: Dictionary, nueva: Dictionary) -> void:
+	if not is_instance_valid(bocadillo):
+		return
+	bocadillo.ocultar()
+	if not comentarios:
+		return
+	var id := ReaccionesCrupier.disparador(previa, nueva)
+	if id.is_empty():
+		return
+	var crupier: String = campana.activa if campana != null and not campana.activa.is_empty() else "custodio"
+	var linea := REACCIONES.linea(crupier, id, str(_ultimas_reacciones.get(id, "")))
+	if linea.is_empty():
+		return
+	_ultimas_reacciones[id] = linea
+	bocadillo.mostrar(CampanaCasino.NOMBRES.get(crupier, ""), linea)
+
 func _pintar_vista(nueva_vista: Dictionary) -> void:
 	if not is_instance_valid(lienzo):
 		return
@@ -275,6 +306,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 		if ultima.quiebra: audio.reproducir(&"quiebra")
 		elif nueva_vista.get("victoria", false) or "Punto exacto" in ultima.patrones: audio.reproducir(&"sello")
 	var puntos_previos: int = int(vista.get("puntos", 0))
+	_reaccionar(vista, nueva_vista)
 	vista = nueva_vista.duplicate(true)
 	eleccion_llave.presentar(vista)
 	var acciones: Dictionary = vista.get("acciones", {})

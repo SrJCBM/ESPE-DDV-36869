@@ -128,6 +128,23 @@ Ilustraciones a pantalla completa para la novela visual. Las escenas ya implemen
 
 ---
 
+### `cg_derrota_manos` · Fin del intento (I6-11, guion §14.4)
+
+Encuadre propuesto por Kenned para la derrota ilustrada. Una sola CG sirve para cualquiera de los cuatro crupieres, porque muestra a Klein y no la mesa concreta.
+
+| Aspecto | Indicación |
+| --- | --- |
+| **Plano** | Primer plano cenital a tres cuartos, desde los ojos de Klein: sus dos manos apoyadas sobre el tapete, con los puños de la levita y el borde de la mesa en el tercio inferior. Formato 16:9, 1920 × 1080. |
+| **Sujeto** | La porcelana avanza desde la punta de los dedos: dedos ya blancos, lisos y brillantes como loza, con una grieta fina en un nudillo; el dorso a medio cambiar; las muñecas todavía de carne, donde empieza el puño. La mano derecha intenta cerrarse y no puede. Sin sangre ni roturas violentas. |
+| **Mesa** | Tapete oscuro y desenfocado con ribete de latón, sin el color propio de ninguna sala. Junto a la mano izquierda, la última mano boca arriba y la ficha de marfil. Ninguna Máscara boca abajo, para no sugerir su valor. |
+| **Fondo** | Desenfocada, al fondo a la derecha, una vitrina vacía y limpia con una etiqueta en blanco (el nombre lo pone el juego). Un halo frío de vela sobre las manos; el resto, casi negro. |
+| **Espacio para el texto** | El tercio inferior queda oscuro y sin detalles importantes: ahí va la narración NVL. La vitrina y las manos en los dos tercios superiores. |
+| **Movimiento en el juego** | Acercamiento lento hacia las manos mientras se leen las dos frases del guion; al llegar a la vitrina, un fundido al ADV de la Anfitriona. |
+
+**Secuencia que montará I6-11:** sonido de quiebra, porcelana que cruje y campana con eco; las dos frases NVL de §14.4 sobre esta CG; la variante «vitrina vacía» (la de la Coleccionista depende de `moral.sombra`, que aún no existe); la Anfitriona en ADV, «Ya la estoy escribiendo, señor.»; y la acción **Nuevo intento**. Se conserva la línea del crupier de la derrota antes de la secuencia.
+
+**Variante para más adelante** (`cg_derrota_coleccionista`): el mismo encuadre con los guantes violeta de la Coleccionista entrando desde arriba para levantar las manos de Klein. Solo cuando exista la ruta de sombra.
+
 ## Notas examinables
 
 Al examinar un elemento de una sala con **E**, se abre una escena con su ilustración y la nota del [guion](GUION_PROLOGO_Y_DIALOGOS.md#11-notas-examinables) (I5-10). Las diez variantes de la primera tabla están integradas. Los archivos WebP de 1920 × 1080 están en `juego/historia/ilustraciones/`. El texto lo dibuja Godot.

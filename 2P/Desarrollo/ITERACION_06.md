@@ -15,8 +15,8 @@
 | I6-07 | Prueba del recorrido y la lectura | Pendiente | Pedir a tres personas que abran una partida, lleguen al Custodio, resuelvan una Máscara, encuentren la tienda y expliquen qué cambiaría una compra. Anotar dónde se detienen, qué dato buscan y si necesitan abrir la ayuda. |
 | I6-08 | Superposiciones y encuadre | Implementada y verificada · rama `kenned/i6-correcciones` | El panel compartido mide título y párrafo antes de colocar cartas y botones, y crece si hace falta. «Nuevo intento» en la derrota. El coste de la mesa va en su propia línea. La toma de Ignacio ya no muestra la cara recortada. Ver [avance de I6-08](#avance-de-i6-08). |
 | I6-09 | Escala y anclaje de sprites | Por implementar | Revisar las figuras al lado de Klein, de una puerta y del mobiliario. Ajustar pivote, perspectiva, colocación, sombra y huella de colisión en la misma pasada. |
-| I6-10 | Reacciones de los crupieres durante la mano | Propuesto para Kenned | Conectar las líneas de la sección 9 a hitos de la vista pública. El bocadillo se lee junto al retrato y el jugador puede seguir actuando. |
-| I6-11 | Derrota ilustrada | Propuesto para Kenned | Adaptar la escena de porcelana de la sección 14.4 y conectar el nuevo intento. Preparar el encargo de arte cuando quede elegido su encuadre. |
+| I6-10 | Reacciones de los crupieres durante la mano | Primer tramo implementado · rama `kenned/i6-reacciones` | El Custodio comenta Punto exacto, Al filo, Quiebra y la cercanía a la meta en un bocadillo junto a su retrato, sin pausar la mano ni quitar el foco. Ver [avance de I6-10](#avance-de-i6-10). |
+| I6-11 | Derrota ilustrada | Encuadre propuesto · arte de Julio | Encuadre de `cg_derrota_manos` en [ILUSTRACIONES_PENDIENTES.md](Diseno/ILUSTRACIONES_PENDIENTES.md#cg_derrota_manos--fin-del-intento-i6-11-guion-144): las manos de Klein volviéndose porcelana sobre el tapete, con la vitrina vacía al fondo. La secuencia se monta cuando llegue el arte. |
 
 ## Revisión de las pantallas
 
@@ -55,6 +55,31 @@ Implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-correcc
 - `tests/test_superposiciones_i6.gd` (9 pruebas) comprueba que en los tres paneles el párrafo cabe entero y termina antes de la lista, que el panel no sale del lienzo y que el coste y el nombre del botón no se cruzan al iniciar ni al pedir. También comprueba que «Nuevo intento» lleva a la entrada y que en la toma de Ignacio no hay cara recortada.
 - Recompensa con ratón y con teclado: elegir una carta la añade una sola vez y una segunda elección se rechaza; «Continuar sin carta» no añade nada; Enter sobre la carta enfocada la elige y cierra el panel.
 - GUT: **296 pruebas y 2.693 aserciones**, todas pasan.
+
+## Avance de I6-10
+
+Primer tramo implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-reacciones`, que parte de `kenned/i6-correcciones`.
+
+| Pieza | Resultado |
+| --- | --- |
+| **Líneas** | `datos/reacciones/reacciones.tres` (`ReaccionesCrupier`) guarda las variantes del Custodio de la §9.1 para Punto exacto, Al filo, Quiebra y `meta_cerca`. Los demás jefes y disparadores se añaden como datos |
+| **Cuándo** | Solo al resolver la mano, comparando la vista pública anterior con la nueva (la misma que emite `ControladorMesa.vista_actualizada`). La mano ya está revelada, así que ninguna reacción anticipa una Máscara oculta. Una por acción: si coinciden varias, gana la de mayor prioridad (Quiebra y Punto exacto 8, Al filo y `meta_cerca` 6). `meta_cerca` salta al cruzar el 85 % de la meta, sin victoria |
+| **Bocadillo** | `mesa/interfaz/bocadillo_crupier.gd`, sobre el retrato con la cola hacia su rostro: nombre del crupier y la frase. No recibe clics ni foco, la mano sigue activa, y se retira a los 3 s o con la siguiente acción. Nunca repite seguida la misma variante |
+| **Ajuste** | «Comentarios de los crupieres» en Opciones (Lectura y accesibilidad), activado por defecto y guardado en `user://ajustes.cfg` |
+
+**Pruebas.** `tests/test_reacciones_i6.gd` (10 pruebas):
+
+- disparadores y prioridades;
+- líneas de 90 caracteres como máximo y sin repetir la última;
+- Punto exacto en una mano real sin quitar el foco ni pausar la mano;
+- Quiebra que se retira al actuar;
+- el bocadillo desaparece a los 3 s;
+- ningún comentario al pedir con una Máscara oculta;
+- el ajuste lo desactiva y está en Opciones.
+
+Capturas a 1024 × 576 y 1280 × 720 con `tests/qa_i6_10.gd`. GUT: **306 pruebas y 2.736 aserciones**.
+
+**Siguiente.** Los demás disparadores del Custodio (sentarse, iniciar la mano, pedir arriesgado, campanadas bajas…) y los otros tres jefes, con la probabilidad del 35 % de la §9 para los comunes.
 
 ## Guion para los siguientes encargos
 
