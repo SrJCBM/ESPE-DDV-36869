@@ -119,6 +119,18 @@ La derrota usa la última vista de la mesa para la frase del crupier. El juego f
 
 Cada participante empieza con una partida nueva. Se le pide llegar a la primera mesa, resolver una mano con una Máscara, localizar la tienda después de conseguir el sello y explicar qué cambiaría una compra en su próxima mano. Se registra el primer punto de duda, si usa el plano o la ayuda, y cómo interpreta el coste y el efecto del objeto. Los resultados de las tres sesiones se añadirán aquí. El mismo recorrido cubre la orientación que quedó pendiente en I4.
 
+La [guía del piloto](Diseno/PILOTO_I6_07.md) reúne el guion que se lee a cada participante, las cinco tareas con su límite de tiempo y su pista mínima, la hoja de registro y el resumen de las tres sesiones. La versión de prueba se exporta a `juego/exportaciones/piloto_i6_07/` desde `main`, ya con las correcciones de la auditoría. Ahí mismo, `tests/qa_piloto_i6_07.gd` genera una partida de respaldo con el primer sello, por si alguien no gana al Custodio en el tiempo de la sesión.
+
+## Correcciones de la auditoría
+
+La auditoría de pantallas del 26 de noviembre encontró tres fallos en la mesa. Se corrigieron antes del piloto, con `tests/test_auditoria_i6.gd` (6 pruebas):
+
+| Id | Fallo | Corrección |
+| --- | --- | --- |
+| F1 | El bocadillo del crupier cortaba la segunda línea de las reacciones largas. | Julio ajustó el alto al número de renglones. La prueba nueva recorre todas las líneas del guion de los cuatro jefes y exige que se vean enteras. |
+| F2 | Si la última campanada terminaba con un patrón, el crupier lo festejaba sobre «Derrota · fin del intento». | Al terminar el intento, la única reacción posible es la de victoria o derrota. |
+| F3 | Con seis cartas o más, la mano resuelta escondía una carta tras la barra gris de Godot. | Al resolver, las cartas se encogen hasta caber todas. Durante la mano se conserva el desplazamiento desde la sexta, con una barra fina de latón. Con seis cartas, el subtítulo «Cuenta como N» de los Relojes se recorta: queda como ajuste menor de la carta. |
+
 ## Orden de trabajo
 
 1. Corregir los cruces de texto, botones y arte observados en las capturas (I6-08).
@@ -129,7 +141,7 @@ Cada participante empieza con una partida nueva. Se le pide llegar a la primera 
 
 ## Verificación local
 
-- Godot 4.7.2 y GUT. Pasaron **329 pruebas y 2.971 aserciones** en la entrega actual. La comprobación de colisiones ahora busca puntos libres a lo largo de cada borde para que el piano reubicado no invalide la prueba de la pared norte.
+- Godot 4.7.2 y GUT. Pasaron **329 pruebas y 2.971 aserciones** en la entrega actual, y **335 y 2.987** tras las correcciones de la auditoría. La comprobación de colisiones ahora busca puntos libres a lo largo de cada borde para que el piano reubicado no invalide la prueba de la pared norte.
 - Capturas de recompensa, inventario, baraja, vitrina, mesa y derrota a 1024 × 576 y 1280 × 720 con `tests/qa_i6_08.gd`. La exportación para Windows se generó con el preset del proyecto.
 - Medición al 140 % de las intervenciones de los siete recursos de diálogo. Los 47 cruces detectados con la barra inferior bajaron a cero.
 - Capturas del inicio con y sin partida guardada y de «Cómo jugar» a 1024 × 576 y 1280 × 720. La segunda portada, los dos pasillos y el cuadro NVL ampliado se revisaron por separado.
