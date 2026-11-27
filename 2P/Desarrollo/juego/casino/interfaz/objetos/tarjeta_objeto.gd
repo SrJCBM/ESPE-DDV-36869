@@ -127,7 +127,8 @@ static func inventario(campana: CampanaCasino, usos_mesa = null) -> Array[Dictio
 		else:
 			datos.nota = "Pasiva"
 		lista.append(datos)
-	if campana.lentes > 0 or en_mesa:
+	# Solo si se lleva alguna: una Lente que no se compró no debe aparecer como «Agotada».
+	if campana.lentes > 0:
 		var lente := CampanaCasino.TIENDA.buscar("lente")
 		lista.append({"id": "lente", "nombre": lente.nombre, "descripcion": lente.descripcion,
 			"maximo": 2, "usos": campana.lentes, "rotulo": "CARGAS"})

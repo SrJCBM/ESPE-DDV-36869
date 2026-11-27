@@ -21,6 +21,8 @@ const PORTADAS := [
 ]
 const INTERVALO_PORTADA := 14.0
 const FUNDIDO_PORTADA := 1.4
+## Cada portada se desliza despacio hacia la izquierda mientras está a la vista (px del lienzo).
+const PANEO_PORTADA := 72.0
 const BASE := Vector2(1440, 810)
 const MUTED := Color("b9ad91")
 ## Créditos (I5-10): el equipo y su parte, como en la exposición.
@@ -54,6 +56,8 @@ var _sombra_portada: TextureRect
 var _tempo_portada: Timer
 var _fundido_portada: Tween
 var _indice_portada := 0
+var _marco_portada: Control
+var _paneos := {}
 var _velo := ColorRect.new()
 var _panel := Panel.new()
 var _contenido := VBoxContainer.new()
@@ -77,6 +81,7 @@ func _ready() -> void:
 	_fondo_siguiente.hide()
 	_sombra_portada = _capa_portada()
 	_sombra_portada.stretch_mode = TextureRect.STRETCH_SCALE
+	_sombra_portada.size = BASE
 	var degradado := Gradient.new()
 	degradado.offsets = PackedFloat32Array([0.0, 0.34, 0.57, 1.0])
 	degradado.colors = PackedColorArray([Color(0.01, 0.02, 0.018, 0.78), Color(0.01, 0.02, 0.018, 0.57), Color(0.01, 0.02, 0.018, 0.08), Color.TRANSPARENT])
@@ -122,6 +127,7 @@ func abrir(nombre: String) -> void:
 	_velo.visible = not portada
 	if portada and not AjustesJuego.movimiento_reducido():
 		_tempo_portada.start()
+		_panear(_fondo)
 	_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if portada else Libro.caja(Color(0.06, 0.145, 0.12, 0.97), Libro.ORO))
 	negro_visible(en_inicio)
 	for hijo in _contenido.get_children():
@@ -213,33 +219,65 @@ func abrir(nombre: String) -> void:
 	_ajustar_marco()
 
 func _capa_portada() -> TextureRect:
+	if _marco_portada == null:
+		# Recorta lo que sobra de la imagen al deslizarse, también con ventanas de otra proporción.
+		_marco_portada = Control.new()
+		_marco_portada.name = "MarcoPortada"
+		_marco_portada.size = BASE
+		_marco_portada.clip_contents = true
+		_marco_portada.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_lienzo.add_child(_marco_portada)
 	var capa := TextureRect.new()
 	capa.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	capa.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	capa.size = BASE
+	capa.size = BASE + Vector2(PANEO_PORTADA, 0)
 	capa.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_lienzo.add_child(capa)
+	_marco_portada.add_child(capa)
 	return capa
+
+## Desliza la portada hacia la izquierda durante el tiempo que se ve, fundido incluido.
+func _panear(capa: TextureRect) -> void:
+	_parar_paneo(capa)
+	capa.position.x = 0.0
+	var tween := create_tween()
+	tween.tween_property(capa, "position:x", -PANEO_PORTADA, INTERVALO_PORTADA + FUNDIDO_PORTADA * 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_paneos[capa] = tween
+
+func _parar_paneo(capa: TextureRect) -> void:
+	var tween: Tween = _paneos.get(capa)
+	if tween != null and tween.is_valid():
+		tween.kill()
+	_paneos.erase(capa)
 
 func _rotar_portada() -> void:
 	if _tempo_portada.is_stopped() or not visible:
 		return
 	var siguiente := (_indice_portada + 1) % PORTADAS.size()
-	_fondo_siguiente.texture = PORTADAS[siguiente]
-	_fondo_siguiente.modulate.a = 0.0
-	_fondo_siguiente.show()
+	var entrante := _fondo_siguiente
+	var saliente := _fondo
+	entrante.texture = PORTADAS[siguiente]
+	entrante.modulate.a = 0.0
+	entrante.show()
+	_marco_portada.move_child(entrante, saliente.get_index() + 1)
+	_panear(entrante)
 	_fundido_portada = create_tween()
-	_fundido_portada.tween_property(_fondo_siguiente, "modulate:a", 1.0, FUNDIDO_PORTADA)
+	_fundido_portada.tween_property(entrante, "modulate:a", 1.0, FUNDIDO_PORTADA)
 	_fundido_portada.tween_callback(func() -> void:
 		_indice_portada = siguiente
-		_fondo.texture = _fondo_siguiente.texture
-		_fondo_siguiente.hide())
+		_parar_paneo(saliente)
+		saliente.hide()
+		_fondo = entrante
+		_fondo_siguiente = saliente)
 
 func _detener_portada() -> void:
 	_tempo_portada.stop()
 	if _fundido_portada != null and _fundido_portada.is_valid():
 		_fundido_portada.kill()
+	_fondo.modulate.a = 1.0
 	_fondo_siguiente.hide()
+	for capa in [_fondo, _fondo_siguiente]:
+		_parar_paneo(capa)
+		capa.position.x = 0.0
 
 func negro_visible(visible_negro: bool) -> void:
 	get_child(0).visible = visible_negro

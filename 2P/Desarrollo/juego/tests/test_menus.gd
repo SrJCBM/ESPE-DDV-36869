@@ -61,6 +61,26 @@ func test_la_portada_cambia_sin_robar_foco_y_respeta_movimiento_reducido() -> vo
 	assert_true(menu._tempo_portada.is_stopped())
 	assert_false(menu._fondo_siguiente.visible)
 
+func test_la_portada_se_desliza_hacia_la_izquierda_salvo_con_movimiento_reducido() -> void:
+	var juego = _casino()
+	juego.abrir_inicio()
+	var menu = juego.menu
+	var capa: TextureRect = menu._fondo
+	assert_true(menu._marco_portada.clip_contents, "Lo que sobra al deslizarse no se ve")
+	assert_gte(capa.size.x, menu.BASE.x + menu.PANEO_PORTADA, "La imagen es más ancha que el lienzo")
+	await get_tree().create_timer(0.3).timeout
+	assert_lt(capa.position.x, 0.0, "Se mueve despacio hacia la izquierda")
+	assert_gt(capa.position.x, -menu.PANEO_PORTADA)
+	menu._tempo_portada.timeout.emit()
+	await menu._fundido_portada.finished
+	assert_ne(menu._fondo, capa, "La siguiente portada entra")
+	assert_true(menu._paneos.has(menu._fondo), "y empieza su propio desplazamiento")
+	assert_false(capa.visible, "La anterior se retira")
+	AjustesJuego.guardar_movimiento_reducido(true)
+	menu.abrir("inicio")
+	assert_eq(menu._fondo.position.x, 0.0, "Con movimiento reducido, quieta")
+	assert_true(menu._paneos.is_empty())
+
 func test_esc_abre_la_pausa_y_otra_pulsacion_reanuda() -> void:
 	var juego = _casino()
 	_esc(juego)

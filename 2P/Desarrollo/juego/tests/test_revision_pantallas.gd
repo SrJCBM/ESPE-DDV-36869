@@ -97,6 +97,16 @@ func test_el_inventario_de_la_mesa_muestra_objetos_con_usos() -> void:
 	for t in tarjetas:
 		assert_true(Rect2(Vector2.ZERO, juego.mesa.modal.panel.size).encloses(Rect2(t.get_global_rect().position - juego.mesa.modal.panel.get_global_rect().position, t.size)), "%s cabe en el marco" % t.name)
 
+func test_solo_aparecen_los_objetos_que_se_llevan() -> void:
+	var juego = _casino()
+	juego.campana.amuletos.assign(["moneda"])
+	juego.campana.lentes = 0
+	_sentar(juego, "recaudador")
+	juego.mesa._ver_objetos()
+	var ids: Array = juego.mesa.modal.contenido.find_children("Objeto_*", "", true, false).map(func(t): return t.id)
+	assert_eq(ids, ["moneda"], "Con la Moneda elegida, ninguna Lente «Agotada» que no se compró")
+	juego.mesa.cerrar_modal()
+
 func test_las_pertenencias_usan_las_mismas_tarjetas() -> void:
 	var juego = _casino()
 	juego.campana.amuletos.assign(["prudente"])

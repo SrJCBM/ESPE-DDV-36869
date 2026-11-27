@@ -143,6 +143,10 @@ Al jugar la versión del piloto salieron otros seis ajustes. Se integraron en `m
 | Título «LA ÚLTIMA MESA» | En la esquina de la mesa, del casino y del libro desde I1. | Solo en el menú de inicio y en la ventana. |
 | Patrones | Consulta que se abría con T y tapaba la suma y el umbral. | Fila propia y siempre visible bajo la lectura. T lleva el foco a los patrones y Esc lo devuelve. Sin el patrón cercano sobre el tapete, que repetía el mismo progreso. |
 | Llaves | Ambas Llaves iniciales mostraban «Cambiar». Es correcto según R07. | Se mantiene R07. En la mesa del Custodio, la pista lo enseña: con dos Llaves iniciales, se puede cambiar cualquiera, pero solo una y antes de pedir; tras pedir, solo la recién recibida. |
+| Lente en el inventario de la mesa | Aparecía como «Agotada» (0 / 2) aunque se hubiera elegido otro objeto. | Solo aparece si se lleva alguna. |
+| Portadas del menú de inicio | Dos imágenes fijas que se fundían cada 14 s. | Cada una se desliza despacio hacia la izquierda (72 px) antes de fundirse con la siguiente; quietas con movimiento reducido. |
+
+Antes de compartir el piloto, `tests/test_entrega_i6_07.gd` recorre una campaña entera por los caminos del juego con cada objeto inicial: las cuatro mesas, levantarse con P, la recompensa con el teclado, una compra, guardar y continuar, el portón final y una derrota. Comprueba que el inventario de cada mesa y las pertenencias enseñen solo lo que se lleva y que no aparezca ningún error del motor. Con ella pasan 350 pruebas.
 
 ## Orden de trabajo
 
