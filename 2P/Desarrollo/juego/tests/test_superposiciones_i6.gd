@@ -48,20 +48,20 @@ func _vencer_al_custodio(juego) -> void:
 func test_la_recompensa_deja_leer_la_frase_completa_del_custodio() -> void:
 	var juego = _casino()
 	_vencer_al_custodio(juego)
-	assert_string_contains(juego.libro.cuerpo.text, "+10 fichas")
-	await _sin_cruces(juego, "Recompensa")
-	juego.libro.primero.pressed.emit()
-	assert_string_contains(juego.libro.cuerpo.text, "Él no olvida")
-	await _sin_cruces(juego, "Diálogo de victoria")
-	juego.libro.primero.pressed.emit()
-	assert_true(juego.campana.hay_recompensa())
+	await get_tree().process_frame
+	var pantalla = juego.recompensa
+	assert_string_contains(pantalla._premio.text, "+10 fichas")
+	assert_string_contains(pantalla.dicho.text, "Él no olvida", "La frase completa, sin pasar por «Leer al crupier»")
+	assert_lte(pantalla.dicho.get_line_count() * pantalla.dicho.get_line_height(), int(pantalla.dicho.size.y), "y cabe en el bocadillo")
+	for boton in [pantalla.boton_confirmar, pantalla.boton_omitir]:
+		assert_false(boton.text.contains("CRUPIER"), "No hay botón para volver al crupier")
 
 func test_la_recompensa_se_elige_u_omite_una_sola_vez() -> void:
 	var juego = _casino()
 	_vencer_al_custodio(juego)
 	var antes: int = juego.campana.baraja.size()
-	var fila = juego.libro.lista.get_children().filter(func(n): return n.has_signal("elegida"))[0]
-	fila.get_child(0).pressed.emit()
+	juego.recompensa.cartas[0].pressed.emit()
+	juego.recompensa.cartas[0].pressed.emit()
 	assert_eq(juego.campana.baraja.size(), antes + 1, "La carta elegida entra en la baraja")
 	assert_false(juego.campana.hay_recompensa())
 	assert_false(juego.campana.resolver_recompensa(1), "Una segunda elección no se aplica")
@@ -71,7 +71,7 @@ func test_omitir_la_recompensa_no_agrega_cartas() -> void:
 	var juego = _casino()
 	_vencer_al_custodio(juego)
 	var antes: int = juego.campana.baraja.size()
-	juego.libro.lista.get_children().filter(func(n): return n is Button).back().pressed.emit()
+	juego.recompensa.boton_omitir.pressed.emit()
 	assert_eq(juego.campana.baraja.size(), antes)
 	assert_false(juego.campana.hay_recompensa())
 
@@ -173,11 +173,15 @@ func test_la_recompensa_se_elige_con_el_teclado() -> void:
 	_vencer_al_custodio(juego)
 	await get_tree().process_frame
 	var antes: int = juego.campana.baraja.size()
-	var fila = juego.libro.lista.get_children().filter(func(n): return n.has_signal("elegida"))[0]
-	assert_true(fila.get_child(0).focus_mode != Control.FOCUS_NONE, "Las cartas se alcanzan con el teclado")
-	fila.get_child(1).grab_focus()
+	var pantalla = juego.recompensa
+	assert_true(pantalla.cartas[0].focus_mode != Control.FOCUS_NONE, "Las cartas se alcanzan con el teclado")
+	pantalla.cartas[1].grab_focus()
 	_tecla(juego, KEY_ENTER)
 	await get_tree().process_frame
-	assert_eq(juego.campana.baraja.size(), antes + 1, "Enter sobre la carta enfocada la elige")
+	assert_eq(pantalla.elegida, 1, "Enter sobre la carta enfocada la elige")
+	assert_true(juego.campana.hay_recompensa(), "pero todavía no la añade")
+	_tecla(juego, KEY_ENTER)
+	await get_tree().process_frame
+	assert_eq(juego.campana.baraja.size(), antes + 1, "Un segundo Enter la confirma")
 	assert_false(juego.campana.hay_recompensa())
-	assert_false(juego.libro.visible, "El panel se cierra tras elegir")
+	assert_false(pantalla.visible, "La pantalla se cierra tras elegir")

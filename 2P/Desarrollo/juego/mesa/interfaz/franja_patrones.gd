@@ -13,7 +13,7 @@ const Piezas := preload("res://mesa/piezas_mesa.gd")
 var _mano: HBoxContainer
 var _puede_resaltar: Callable
 var _vista: Dictionary = {}
-## La franja es una consulta (I6-04): solo se ve mientras la persona la tiene abierta.
+## Desde la revisión de pantallas la franja está siempre abierta mientras hay cartas en la mesa.
 var abierta := false
 var _raton := -1
 var _foco := -1
@@ -41,8 +41,13 @@ func presentar(vista: Dictionary) -> void:
 		get_child(indice).hide()
 	_refrescar()
 
-func ocultar_por_seleccion(ocultar: bool) -> void:
-	visible = abierta and not ocultar and not _vista.get("cartas", []).is_empty() and not _vista.get("patrones_visibles", []).is_empty()
+## Se mantiene visible al elegir una Llave para que la mesa no salte; solo deja de resaltar.
+func ocultar_por_seleccion(_ocultar: bool) -> void:
+	visible = abierta and not _vista.get("cartas", []).is_empty() and not _vista.get("patrones_visibles", []).is_empty()
+
+## Si el foco está en uno de los patrones.
+func tiene_foco() -> bool:
+	return get_children().any(func(boton: Control) -> bool: return boton.has_focus())
 
 func limpiar() -> void:
 	_raton = -1

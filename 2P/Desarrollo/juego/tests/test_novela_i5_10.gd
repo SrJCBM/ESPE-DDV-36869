@@ -241,8 +241,7 @@ func test_la_victoria_trae_la_linea_del_crupier() -> void:
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
 	juego.mesa.boton_plantarse.pressed.emit()
 	juego.mesa.boton_iniciar_pedir.pressed.emit()
-	juego.libro.primero.pressed.emit()
-	assert_string_contains(juego.libro.cuerpo.text, "Has contado bien")
+	assert_string_contains(juego.recompensa.dicho.text, "Has contado bien", "La frase de victoria acompaña la elección de carta")
 
 func test_la_historia_se_guarda_con_la_partida() -> void:
 	var campana := CampanaCasino.new()

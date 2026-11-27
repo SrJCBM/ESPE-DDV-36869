@@ -19,14 +19,11 @@ const LECTURA := Rect2(590, 604, 200, 44)
 const EXPLICACION := Rect2(792, 604, 190, 48)
 const RESULTADO := Rect2(431, 600, 540, 40)
 const RESULTADO_DETALLE := Rect2(432, 638, 540, 26)
-## Consulta de patrones: un botón al final de la lectura abre la franja en el mismo lugar.
-const CONSULTA := Rect2(990, 610, 132, 34)
-const FRANJA := Rect2(420, 602, 702, 62)
-const PATRONES := Rect2(431, 609, 680, 48)
-const DETALLE := Rect2(432, 672, 684, 44)
-## Con la consulta abierta, el botón pasa a la línea de detalle y el texto se acorta.
-const CONSULTA_ABIERTA := Rect2(990, 676, 132, 34)
-const DETALLE_CONSULTA := Rect2(432, 672, 548, 44)
+## Patrones siempre a la vista (revisión de pantallas, 26 nov 2026): su propia fila bajo la
+## lectura, sin taparla, y la línea de detalle o pista debajo.
+const FRANJA := Rect2(420, 664, 702, 54)
+const PATRONES := Rect2(431, 669, 680, 44)
+const DETALLE := Rect2(432, 722, 684, 40)
 ## Columna derecha: dial, boleto compacto y acciones apiladas con el mismo ancho.
 const DIAL := Rect2(1222, 104, 166, 166)
 const ETIQUETA_DIAL := Rect2(1190, 292, 240, 26)

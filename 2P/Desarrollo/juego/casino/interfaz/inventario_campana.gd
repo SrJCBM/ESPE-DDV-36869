@@ -4,6 +4,7 @@ extends VBoxContainer
 const Libro := preload("res://casino/interfaz/libro.gd")
 const Sellos := preload("res://casino/interfaz/hud/sellos_campana.gd")
 const Saldo := preload("res://casino/interfaz/hud/saldo_fichas.gd")
+const TarjetaObjeto := preload("res://casino/interfaz/objetos/tarjeta_objeto.gd")
 
 func presentar(campana: CampanaCasino) -> void:
 	add_theme_constant_override("separation", 14)
@@ -25,18 +26,23 @@ func presentar(campana: CampanaCasino) -> void:
 	add_child(cabecera)
 
 	add_child(Libro.rotulo("OBJETOS", 13, Libro.ORO))
-	var objetos := HBoxContainer.new()
-	objetos.add_theme_constant_override("separation", 10)
-	add_child(objetos)
-	var detalle := Libro.rotulo("", 17, Libro.PAPEL)
-	detalle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	detalle.custom_minimum_size = Vector2(320, 48)
-	for id in campana.amuletos:
-		_objeto(objetos, detalle, id)
-	if campana.lentes > 0:
-		_objeto(objetos, detalle, "lente", campana.lentes)
-	detalle.text = "Todavía no tienes objetos." if objetos.get_child_count() == 0 else "Elige un objeto para ver su efecto."
-	add_child(detalle)
+	var datos := TarjetaObjeto.inventario(campana)
+	if datos.is_empty():
+		var vacio := Libro.rotulo("Todavía no tienes objetos. La anfitriona los vende en su gabinete.", 17, Libro.PAPEL)
+		vacio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		vacio.custom_minimum_size = Vector2(320, 0)
+		add_child(vacio)
+		return
+	var rejilla := GridContainer.new()
+	rejilla.name = "Objetos"
+	rejilla.columns = 2
+	rejilla.add_theme_constant_override("h_separation", 12)
+	rejilla.add_theme_constant_override("v_separation", 12)
+	add_child(rejilla)
+	for objeto in datos:
+		var tarjeta := TarjetaObjeto.new()
+		tarjeta.configurar(objeto, 416.0)
+		rejilla.add_child(tarjeta)
 
 func _placa(titulo: String, valor: Control) -> PanelContainer:
 	var placa := PanelContainer.new()
@@ -50,23 +56,3 @@ func _placa(titulo: String, valor: Control) -> PanelContainer:
 	columna.add_child(valor)
 	placa.add_child(columna)
 	return placa
-
-func _objeto(fila: HBoxContainer, detalle: Label, id: String, cantidad := 1) -> void:
-	var producto := CampanaCasino.TIENDA.buscar(id)
-	if producto == null:
-		return
-	var boton := Button.new()
-	boton.custom_minimum_size = Vector2(112, 102)
-	boton.add_theme_stylebox_override("normal", Libro.caja(Color("19392f"), Color("645c44")))
-	boton.add_theme_stylebox_override("focus", Libro.caja(Color(0, 0, 0, 0), Libro.PAPEL))
-	boton.add_theme_stylebox_override("hover", Libro.caja(Color("2c493b"), Libro.ORO))
-	boton.accessibility_name = producto.nombre
-	boton.tooltip_text = producto.nombre
-	boton.icon = load("res://casino/arte/objeto_%s.webp" % id)
-	boton.expand_icon = true
-	boton.text = "×%s" % cantidad if cantidad > 1 else ""
-	fila.add_child(boton)
-	var mostrar := func() -> void: detalle.text = "%s · %s" % [producto.nombre, producto.descripcion]
-	boton.focus_entered.connect(mostrar)
-	boton.mouse_entered.connect(mostrar)
-	boton.pressed.connect(mostrar)

@@ -71,9 +71,9 @@ func test_cada_opcion_entrega_baraja_fichas_y_solo_ese_objeto(indice = use_param
 	juego.inventario()
 	var panel: Control = juego.libro.lista.get_child(0)
 	assert_eq(panel.find_child("Cifra", true, false).text, "10")
-	var objetos: Node = panel.get_child(2)
+	var objetos: Node = panel.find_child("Objetos", true, false)
 	assert_eq(objetos.get_child_count(), 1, "Solo el objeto elegido")
-	assert_eq(objetos.get_child(0).tooltip_text, CampanaCasino.TIENDA.buscar(id).nombre)
+	assert_eq(objetos.get_child(0).nombre.text, CampanaCasino.TIENDA.buscar(id).nombre)
 
 func test_la_oferta_muestra_icono_nombre_y_efecto_del_catalogo() -> void:
 	var juego = _casino()
@@ -143,10 +143,15 @@ func test_elegir_la_carta_la_suma_y_sale_en_la_siguiente_mesa() -> void:
 	var c: CampanaCasino = juego.campana
 	assert_true(c.hay_recompensa())
 	var opciones := c.opciones_recompensa()
-	var fila: Node = juego.libro.lista.get_children().filter(func(n: Node) -> bool: return n.has_signal("elegida"))[0]
-	assert_eq(fila.get_child_count(), 3, "Se reutiliza la fila de tres cartas")
-	fila.get_child(0).pressed.emit()
+	var pantalla = juego.recompensa
+	assert_true(pantalla.visible, "Tras levantarse se abre la pantalla de recompensa")
+	assert_eq(pantalla.cartas.size(), 3)
+	pantalla.cartas[0].pressed.emit()
+	assert_true(c.hay_recompensa(), "La primera pulsación solo elige la carta")
+	assert_false(pantalla.boton_confirmar.disabled)
+	pantalla.boton_confirmar.pressed.emit()
 	assert_false(c.hay_recompensa())
+	assert_false(pantalla.visible)
 	assert_eq(c.baraja.size(), 25)
 	var ganada: CartaEnPartida = c.baraja.back()
 	assert_eq([ganada.definicion.palo, ganada.definicion.valor_impreso], [opciones[0].palo, opciones[0].valor])
@@ -167,8 +172,8 @@ func test_omitir_conserva_la_baraja() -> void:
 	juego._cerrar()
 	var antes: Array = juego.campana.baraja.map(func(c: CartaEnPartida) -> String: return c.id_instancia)
 	_vencer_al_custodio(juego)
-	var omitir: Button = juego.libro.lista.get_child(-1)
-	assert_eq(omitir.text, "Omitir carta")
+	var omitir: Button = juego.recompensa.boton_omitir
+	assert_string_contains(omitir.text, "SEGUIR SIN CARTA")
 	omitir.pressed.emit()
 	assert_false(juego.campana.hay_recompensa())
 	assert_eq(juego.campana.baraja.map(func(c: CartaEnPartida) -> String: return c.id_instancia), antes)
@@ -334,12 +339,15 @@ func test_la_oferta_incluye_la_vela_y_muestra_su_efecto() -> void:
 	var opciones := c.opciones_recompensa()
 	assert_eq(opciones[2].palo, Palos.VELAS)
 	assert_eq(opciones[2].rasgo, CartaEnPartida.RASGO_RACHA_DOBLE)
-	var fila = load("res://casino/interfaz/cartas_recompensa.gd").new()
-	add_child_autofree(fila)
-	fila.presentar(opciones)
-	var carta: Button = fila.get_child(2)
+	var pantalla = load("res://casino/interfaz/recompensa/pantalla_recompensa.gd").new()
+	add_child_autofree(pantalla)
+	pantalla.movimiento_reducido = true
+	pantalla.presentar("custodio", "", 15, 1, opciones, c.baraja)
+	var carta: Button = pantalla.cartas[2]
 	assert_eq(carta._efecto.text, "RACHA ×2")
 	assert_string_contains(carta.tooltip_text, "Racha")
+	carta.focus_entered.emit()
+	assert_string_contains(pantalla.titulo_detalle.text, "Racha ×2", "El detalle nombra el rasgo")
 	assert_true(c.resolver_recompensa(2))
 	assert_eq(c.baraja.back().definicion.rasgo, CartaEnPartida.RASGO_RACHA_DOBLE)
 

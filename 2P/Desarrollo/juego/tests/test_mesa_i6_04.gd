@@ -1,7 +1,7 @@
 extends GutTest
 ## I6-04: la mesa se organiza por lo que se puede decidir. En la espera, tapete, objetivo e
-## Iniciar mano; durante la mano, cartas, lectura y el patrón cercano; los cinco patrones pasan a
-## una consulta por foco y teclado, y el coste se lee como una ficha con icono.
+## Iniciar mano; durante la mano, cartas, lectura y los cinco patrones en su propia fila (siempre
+## visibles desde la revisión de pantallas del 26 nov 2026), y el coste se lee como una ficha.
 
 func after_each() -> void:
 	await get_tree().process_frame
@@ -45,42 +45,33 @@ func test_en_la_espera_el_tapete_muestra_el_objetivo_y_no_hay_lectura_ni_patrone
 	assert_false(mesa.franja_patrones.visible)
 	assert_eq(mesa.get_viewport().gui_get_focus_owner(), mesa.boton_iniciar_pedir, "La primera acción tiene el foco")
 
-func test_durante_la_mano_la_franja_es_una_consulta_por_teclado() -> void:
+func test_durante_la_mano_los_patrones_se_ven_sin_tapar_la_lectura() -> void:
 	var juego = _mesa()
 	var mesa = juego.mesa
 	_cartas(juego, [["llaves", 4], ["velas", 6]])
 	mesa.boton_iniciar_pedir.pressed.emit()
-	assert_false(mesa.franja_patrones.visible, "Cerrada al empezar: la mano tiene el protagonismo")
-	assert_true(mesa.boton_patrones.visible)
-	assert_true(mesa._lectura.visible)
+	assert_true(mesa.franja_patrones.visible, "Los patrones están siempre a la vista")
+	assert_true(mesa._lectura.visible, "y la lectura también")
+	assert_false(mesa.boton_patrones.visible, "No hay botón para abrirlos")
+	for control in [mesa._lectura, mesa._lectura_titulo, mesa._explicacion, mesa._mensaje]:
+		assert_false(mesa.franja_patrones.get_global_rect().intersects(control.get_global_rect()), "%s no se cruza con la franja" % control.name)
 	_tecla(mesa, KEY_T)
-	assert_true(mesa.franja_patrones.visible, "T abre la consulta")
-	assert_false(mesa._lectura.visible, "La consulta ocupa el lugar de la lectura")
 	var foco: Control = mesa.get_viewport().gui_get_focus_owner()
-	assert_eq(foco.get_parent(), mesa.franja_patrones, "El foco pasa al primer patrón")
+	assert_eq(foco.get_parent(), mesa.franja_patrones, "T lleva el foco al primer patrón")
 	assert_false(mesa._mensaje.text.is_empty(), "El patrón enfocado se explica en la línea de detalle")
-	assert_false(mesa._mensaje.get_rect().intersects(mesa.boton_patrones.get_rect()), "El botón de cerrar no tapa el detalle")
-	for patron in mesa.franja_patrones.get_children():
-		assert_false(patron.get_global_rect().intersects(mesa.boton_patrones.get_global_rect()), "Ni ningún patrón")
 	_tecla(mesa, KEY_ESCAPE)
-	assert_false(mesa.franja_patrones.visible, "Esc la cierra")
-	assert_true(mesa._lectura.visible, "Vuelve la lectura")
-	assert_eq(mesa.get_viewport().gui_get_focus_owner(), mesa.boton_patrones, "El foco vuelve al botón")
-	mesa.boton_patrones.pressed.emit()
-	assert_true(mesa.franja_patrones.visible, "También con el ratón")
-	mesa.boton_patrones.pressed.emit()
-	assert_false(mesa.franja_patrones.visible)
+	assert_true(mesa.franja_patrones.visible, "Esc no los esconde")
+	assert_ne(mesa.get_viewport().gui_get_focus_owner().get_parent(), mesa.franja_patrones, "solo devuelve el foco a la acción")
 
-func test_abrir_la_ayuda_cierra_la_consulta() -> void:
+func test_tras_la_ayuda_los_patrones_siguen_a_la_vista() -> void:
 	var juego = _mesa()
 	var mesa = juego.mesa
 	_cartas(juego, [["llaves", 4], ["velas", 6]])
 	mesa.boton_iniciar_pedir.pressed.emit()
 	mesa.abrir_patrones()
 	mesa.mostrar_ayuda()
-	assert_false(mesa.franja_patrones.abierta)
 	mesa.cerrar_modal()
-	assert_false(mesa.franja_patrones.visible)
+	assert_true(mesa.franja_patrones.visible)
 
 func test_esc_cancela_la_llave_aunque_se_haya_consultado_patrones() -> void:
 	var juego = _mesa()
@@ -88,34 +79,33 @@ func test_esc_cancela_la_llave_aunque_se_haya_consultado_patrones() -> void:
 	_cartas(juego, [["llaves", 4], ["velas", 6], ["relojes", 2]])
 	mesa.boton_iniciar_pedir.pressed.emit()
 	_tecla(mesa, KEY_T)
-	assert_true(mesa.franja_patrones.visible)
 	_tecla(mesa, KEY_L)
-	assert_false(mesa.franja_patrones.visible)
 	assert_true(mesa.eleccion_llave.visible)
+	assert_true(mesa.franja_patrones.visible, "La franja no salta al elegir una Llave")
 	_tecla(mesa, KEY_T)
-	assert_false(mesa.franja_patrones.visible, "La consulta espera a que termine la elección")
+	assert_ne(mesa.get_viewport().gui_get_focus_owner().get_parent(), mesa.franja_patrones, "T espera a que termine la elección")
 	_tecla(mesa, KEY_ESCAPE)
 	assert_false(mesa.eleccion_llave.visible)
 	assert_true(mesa.vista.acciones.devolver, "No se gastó la devolución")
 
-func test_el_patron_cercano_se_lee_junto_a_la_mano() -> void:
+func test_el_progreso_de_los_patrones_no_se_repite_sobre_el_tapete() -> void:
 	var juego = _mesa()
 	var mesa = juego.mesa
 	_cartas(juego, [["velas", 9], ["relojes", 9]])
 	mesa.boton_iniciar_pedir.pressed.emit()
-	assert_eq(mesa._cercano.text, "Punto exacto · activo")
-	assert_true(mesa._cercano.get_rect().end.y <= mesa.tapete.get_rect().position.y + 1, "Sobre el tapete, junto al número de mano")
-	mesa.abrir_patrones()
-	assert_eq(mesa._cercano.text, "", "Con la consulta abierta no se repite")
+	assert_eq(mesa._cercano.text, "", "La franja ya muestra el progreso de cada patrón")
+	var textos: Array = mesa.franja_patrones.get_children().filter(func(b): return b.visible).map(func(b): return b.text)
+	assert_true(textos.any(func(t): return t.begins_with("Punto exacto")), "Punto exacto se lee en la franja")
 
-func test_mano_larga_a_una_carta_se_anuncia() -> void:
+func test_mano_larga_a_una_carta_se_lee_en_la_franja() -> void:
 	var juego = _mesa()
 	var mesa = juego.mesa
 	_cartas(juego, [["llaves", 2], ["velas", 3], ["relojes", 2], ["velas", 1], ["llaves", 1]])
 	mesa.boton_iniciar_pedir.pressed.emit()
 	mesa.boton_iniciar_pedir.pressed.emit()
 	mesa.boton_iniciar_pedir.pressed.emit()
-	assert_eq(mesa._cercano.text, "Mano larga · 4/5")
+	var larga: Array = mesa.franja_patrones.get_children().filter(func(b): return b.visible and b.text.begins_with("Mano larga"))
+	assert_string_contains(larga[0].text, "4/5")
 
 func test_una_mascara_oculta_no_se_anuncia_como_activa() -> void:
 	var juego = _mesa()

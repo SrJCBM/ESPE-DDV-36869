@@ -42,9 +42,7 @@ func test_los_patrones_quedan_fuera_del_tapete() -> void:
 	var mesa = _mesa()
 	mesa.controlador.procesar_comando(IniciarMano.new())
 	await get_tree().process_frame
-	assert_false(mesa.franja_patrones.visible, "I6-04: la franja es una consulta, cerrada al empezar")
-	mesa.abrir_patrones()
-	assert_true(mesa.franja_patrones.visible)
+	assert_true(mesa.franja_patrones.visible, "Revisión de pantallas: patrones siempre a la vista")
 	assert_gte(mesa.franja_patrones.get_rect().position.y, mesa.tapete.get_rect().end.y)
 
 func test_los_botones_solo_muestran_la_accion_y_un_coste_real() -> void:

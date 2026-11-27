@@ -19,6 +19,8 @@ const RevelacionMano := preload("res://mesa/interfaz/revelacion_mano.gd")
 const ManoMesa := preload("res://mesa/interfaz/mano_mesa.gd")
 const ModalMesa := preload("res://mesa/interfaz/modal_mesa.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
+const TarjetaObjeto := preload("res://casino/interfaz/objetos/tarjeta_objeto.gd")
+const SaldoFichas := preload("res://casino/interfaz/hud/saldo_fichas.gd")
 const DialCampanadas := preload("res://mesa/interfaz/dial_campanadas.gd")
 const C := preload("res://mesa/interfaz/composicion_mesa.gd")
 const TAPETES := {
@@ -152,8 +154,8 @@ func _construir() -> void:
 	lienzo.size = BASE
 	add_child(lienzo)
 	Piezas.imagen(lienzo, "res://mesa/arte/marco-casino.svg", Rect2(24, 24, 1391, 761))
-	Piezas.etiqueta(lienzo, "LA ÚLTIMA MESA", Rect2(40, 29, 490, 44), 29, ORO, true)
-	_subtitulo = Piezas.etiqueta(lienzo, "MESA I  /  EL PRIMER SELLO", Rect2(530, 39, 430, 22), 13, MUTED)
+	# El título del juego queda solo en el menú de inicio; la esquina nombra la mesa.
+	_subtitulo = Piezas.etiqueta(lienzo, "MESA I  /  EL PRIMER SELLO", Rect2(44, 41, 480, 22), 13, MUTED)
 	boton_reiniciar = Piezas.boton_texto(lienzo, "boton_reiniciar", "REINICIAR · R", Rect2(1025, 32, 158, 38), _solicitar_reinicio, 13)
 	boton_ayuda = Piezas.boton_texto(lienzo, "boton_ayuda", "CÓMO JUGAR · H", Rect2(1210, 32, 185, 38), mostrar_ayuda, 14)
 	boton_demostracion = Piezas.boton_texto(lienzo, "boton_demostracion", "DEMOSTRACIÓN GUIADA", Rect2(531, 68, 245, 25), _solicitar_demostracion, 11)
@@ -243,9 +245,8 @@ func _construir() -> void:
 	franja_patrones.detalle_cambiado.connect(_mostrar_detalle_patron)
 	franja_patrones.patron_solicitado.connect(_mostrar_patron)
 	franja_patrones.boton_creado.connect(modal.suspender_si_abierto)
-	boton_patrones = Piezas.boton_texto(lienzo, "boton_patrones", "PATRONES · T", C.CONSULTA, alternar_patrones, 13)
-	boton_patrones.tooltip_text = "Consultar los patrones y su progreso. T abre y cierra; Esc cierra."
-	Piezas.estilo_modal(boton_patrones)
+	# T lleva el foco a los patrones y lo devuelve a la acción; no hay botón que los abra.
+	boton_patrones = Piezas.boton_texto(lienzo, "boton_patrones", "PATRONES · T", Rect2(990, 610, 132, 34), alternar_patrones, 13)
 	boton_patrones.hide()
 	_lectura_titulo = Piezas.etiqueta(lienzo, "SIGUIENTE PASO", C.LECTURA_TITULO, 12, MUTED)
 	_lectura_titulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -419,54 +420,38 @@ func _presentar_lectura(cartas: Array) -> void:
 			_explicacion.text = conocidas + "\n%s %s" % [ocultas, "oculta" if ocultas == 1 else "ocultas"]
 	_explicacion.visible = not _explicacion.text.is_empty()
 
-## Consulta de patrones (I6-04): sustituye a la fila fija. Al abrirla, la franja ocupa el lugar
-## de la lectura y el foco pasa al primer patrón; al cerrarla, vuelve al botón.
+## Patrones siempre a la vista (revisión de pantallas): T lleva el foco al primer patrón y, si
+## ya estaba en ellos, lo devuelve a la acción. Esc también lo devuelve.
 func alternar_patrones() -> void:
-	if franja_patrones.abierta:
+	if franja_patrones.tiene_foco():
 		cerrar_patrones()
 	else:
 		abrir_patrones()
 
 func abrir_patrones() -> void:
-	if vista.get("cartas", []).is_empty() or modal.visible or revelacion.activa or not eleccion_llave.seleccionada.is_empty():
+	if not franja_patrones.visible or modal.visible or revelacion.activa or not eleccion_llave.seleccionada.is_empty():
 		return
-	franja_patrones.abierta = true
-	franja_patrones.ocultar_por_seleccion(not eleccion_llave.seleccionada.is_empty())
-	_sincronizar_consulta()
 	for boton in franja_patrones.get_children():
 		if boton.visible:
 			boton.grab_focus()
 			return
 
 func cerrar_patrones(enfocar := true) -> void:
-	if not franja_patrones.abierta:
-		return
-	franja_patrones.abierta = false
+	var tenia_foco := franja_patrones.tiene_foco()
 	franja_patrones.limpiar()
-	franja_patrones.ocultar_por_seleccion(false)
-	_sincronizar_consulta()
-	_presentar_lectura(vista.get("cartas", []))
-	_actualizar_orientacion()
-	if enfocar and boton_patrones.is_visible_in_tree():
-		boton_patrones.grab_focus()
+	if tenia_foco:
+		_actualizar_orientacion()
+		if enfocar: _enfocar_accion_legal()
 
-## Muestra la lectura o la consulta, nunca las dos, y el patrón cercano solo con la consulta cerrada.
+## La franja se ve siempre que hay cartas, en su propia fila: nunca tapa la lectura.
 func _sincronizar_consulta() -> void:
-	var hay_cartas: bool = not vista.get("cartas", []).is_empty()
-	if not hay_cartas:
-		franja_patrones.abierta = false
-		franja_patrones.ocultar_por_seleccion(false)
-	var abierta: bool = franja_patrones.visible
-	_franja_fondo.visible = abierta
-	boton_patrones.visible = hay_cartas
-	boton_patrones.text = "CERRAR · T" if abierta else "PATRONES · T"
-	boton_patrones.position = C.CONSULTA_ABIERTA.position if abierta else C.CONSULTA.position
-	_mensaje.size = C.DETALLE_CONSULTA.size if abierta else C.DETALLE.size
-	if abierta:
-		_lectura_titulo.hide()
-		_lectura.hide()
-		_explicacion.hide()
-	_cercano.text = "" if abierta else Lectura.patron_cercano(vista)
+	franja_patrones.abierta = not vista.get("cartas", []).is_empty()
+	franja_patrones.ocultar_por_seleccion(false)
+	_franja_fondo.visible = franja_patrones.visible
+	boton_patrones.hide()
+	_mensaje.size = C.DETALLE.size
+	# El progreso de cada patrón ya se lee en la franja: no se repite sobre el tapete.
+	_cercano.text = ""
 
 func _construir_regla() -> void:
 	_regla = PlacaRegla.new()
@@ -530,23 +515,63 @@ func _iniciar_o_pedir() -> void:
 	else:
 		_enviar(Iniciar.new())
 
+## Inventario de la mesa: fichas, cada objeto con su ilustración y sus usos en este encuentro, y
+## la regla del crupier. Se lee igual que las pertenencias del casino (tarjeta_objeto.gd).
 func _ver_objetos() -> void:
 	if campana == null or revelacion.activa or modal.visible: return
 	_abrir_modal("Inventario de la mesa")
-	var datos := PackedStringArray()
-	datos.append("Fichas: %s     ·     Lentes de humo: %s / 2" % [campana.saldo,campana.lentes])
-	datos.append("La Lente revela las Máscaras actuales. Úsala desde la mesa antes de plantarte.")
-	for id in campana.amuletos:
-		var objeto := CampanaCasino.TIENDA.buscar(id)
-		datos.append("%s  ·  %s" % [objeto.nombre,objeto.descripcion])
+	var cabecera := HBoxContainer.new()
+	cabecera.position = Vector2(32, 84)
+	cabecera.size = Vector2(696, 52)
+	cabecera.add_theme_constant_override("separation", 12)
+	modal.contenido.add_child(cabecera)
+	var fichas := SaldoFichas.new(32, 22)
+	fichas.presentar(campana.saldo)
+	cabecera.add_child(_placa_inventario("FICHAS", fichas))
+	var regla_texto := ""
 	match campana.activa:
-		"recaudador": datos.append("Comisión de la casa: una ficha al pedir.")
-		"coleccionista": datos.append("Cartas retenidas hasta superar esta mesa: %s." % vista.get("retenidas", 0))
-		"dueno": datos.append("Cada mano cerrada sin Quiebra reduce el umbral un punto, hasta 17.")
-	var ficha := Piezas.etiqueta(modal.contenido,"",Rect2(38,100,716,340),20,MARFIL)
-	ficha.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	ficha.text = "\n\n".join(datos)
+		"recaudador": regla_texto = "Comisión de la casa: cada carta que pides tras el reparto cuesta una ficha."
+		"coleccionista": regla_texto = "Cartas retenidas hasta superar esta mesa: %s." % vista.get("retenidas", 0)
+		"dueno": regla_texto = "Cada mano cerrada sin Quiebra reduce el umbral un punto, hasta 17."
+		_: regla_texto = "Esta mesa no añade reglas a las de la casa."
+	var regla := TarjetaObjeto.Libro.rotulo(regla_texto, 15, MARFIL)
+	regla.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	regla.custom_minimum_size = Vector2(470, 0)
+	cabecera.add_child(_placa_inventario("REGLA DE ESTA MESA", regla, true))
+	var datos := TarjetaObjeto.inventario(campana, controlador.usos_objetos())
+	var rejilla := GridContainer.new()
+	rejilla.columns = 2
+	rejilla.position = Vector2(32, 168)
+	rejilla.add_theme_constant_override("h_separation", 10)
+	rejilla.add_theme_constant_override("v_separation", 10)
+	modal.contenido.add_child(rejilla)
+	for objeto in datos:
+		var tarjeta := TarjetaObjeto.new()
+		tarjeta.configurar(objeto, 343.0)
+		rejilla.add_child(tarjeta)
+	if campana.amuletos.is_empty():
+		var vacio := Piezas.etiqueta(modal.contenido, "Aún no tienes amuletos. Se compran en el Gabinete de la anfitriona.", Rect2(32, 560, 696, 30), 15, Piezas.MUTED)
+		vacio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	modal.boton_cerrar()
+
+func _placa_inventario(titulo: String, valor: Control, expandir := false) -> PanelContainer:
+	var placa := PanelContainer.new()
+	if expandir: placa.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var estilo := StyleBoxFlat.new()
+	estilo.bg_color = Color("0b1c17")
+	estilo.border_color = Color("645c44")
+	estilo.set_border_width_all(1)
+	estilo.border_width_top = 2
+	estilo.set_content_margin_all(8)
+	estilo.content_margin_left = 14
+	estilo.content_margin_right = 14
+	placa.add_theme_stylebox_override("panel", estilo)
+	var columna := VBoxContainer.new()
+	columna.add_theme_constant_override("separation", 2)
+	columna.add_child(TarjetaObjeto.Libro.rotulo(titulo, 12, Piezas.ORO))
+	columna.add_child(valor)
+	placa.add_child(columna)
+	return placa
 
 func _usar_lente() -> void:
 	if not revelacion.activa and not modal.visible and campana != null:
@@ -683,7 +708,7 @@ func _cambio_eleccion_llave(activa: bool) -> void:
 
 func _actualizar_orientacion() -> void:
 	_mensaje.position = C.DETALLE.position
-	_mensaje.size = C.DETALLE_CONSULTA.size if franja_patrones.abierta else C.DETALLE.size
+	_mensaje.size = C.DETALLE.size
 	_mensaje.text = Lectura.pista(vista)
 	_mensaje.visible = not _mensaje.text.is_empty()
 	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "")
@@ -708,7 +733,7 @@ func _mostrar_detalle_patron(texto: String) -> void:
 	_actualizar_orientacion()
 	if not texto.is_empty():
 		_mensaje.position = C.DETALLE.position
-		_mensaje.size = C.DETALLE_CONSULTA.size if franja_patrones.abierta else C.DETALLE.size
+		_mensaje.size = C.DETALLE.size
 		_mensaje.text = texto
 		_mensaje.show()
 
@@ -738,7 +763,7 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		revelacion.terminar()
 		get_viewport().set_input_as_handled()
 		return
-	if evento.keycode == KEY_ESCAPE and franja_patrones.abierta:
+	if evento.keycode == KEY_ESCAPE and franja_patrones.tiene_foco():
 		cerrar_patrones()
 		get_viewport().set_input_as_handled()
 		return

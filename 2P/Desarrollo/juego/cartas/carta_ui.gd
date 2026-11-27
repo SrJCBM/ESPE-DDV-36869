@@ -140,6 +140,9 @@ func _actualizar() -> void:
 		tooltip_text = "%s. Valor oculto entre 1 y 10; se revela al plantarse. Activar para ampliar." % NOMBRES.get(palo, palo)
 	elif _devolucion_disponible:
 		tooltip_text = "Llave %s elegible. Activar para elegir; confirmar o cancelar en la mesa. No se devuelve hasta confirmar." % _valor.text
+	# Quien muestra la carta fuera de la mesa (p. ej. la recompensa) puede dar su propia ayuda.
+	if has_meta("ayuda") and not oculta:
+		tooltip_text = str(get_meta("ayuda"))
 	for propiedad in get_property_list():
 		if propiedad.name == "accessibility_name":
 			set("accessibility_name", tooltip_text)

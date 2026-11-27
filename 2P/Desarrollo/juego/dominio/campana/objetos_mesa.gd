@@ -30,3 +30,7 @@ func aplicar(campana: CampanaCasino, partida: EstadoPartida, resultado: Dictiona
 	if campana.amuletos.has("prudente") and _usos_prudente < CampanaCasino.USOS_PRUDENTE and resultado.total <= partida.umbral - 3:
 		partida.campanadas = mini(presupuesto, partida.campanadas + 1)
 		_usos_prudente += 1
+
+## Usos que le quedan a cada objeto limitado en este encuentro.
+func usos_restantes() -> Dictionary:
+	return {"moneda": 3 - _usos_moneda, "prudente": CampanaCasino.USOS_PRUDENTE - _usos_prudente}

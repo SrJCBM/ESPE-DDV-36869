@@ -59,14 +59,11 @@ func presentar(titulo: String, texto: String, retrato: String, al_cerrar: Callab
 		add_child(imagen)
 		x = 282
 	var ancho := 920 - x - 38
-	var marca := rotulo("LA ÚLTIMA MESA   /   REGISTRO DE LA CASA",13,ORO)
-	marca.position = Vector2(x,25)
-	add_child(marca)
 	# Con salto de línea, una etiqueta calcula su alto con el ancho que ya tiene: se fija el
 	# ancho antes del texto para que no se estire una palabra por línea.
 	nombre = rotulo("",43,PAPEL,true)
 	nombre.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	nombre.position = Vector2(x,50)
+	nombre.position = Vector2(x,30)
 	nombre.size = Vector2(ancho, 0)
 	add_child(nombre)
 	nombre.text = titulo

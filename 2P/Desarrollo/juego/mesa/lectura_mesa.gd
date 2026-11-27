@@ -73,7 +73,14 @@ static func pista(vista: Dictionary) -> String:
 		return "No quedan cartas disponibles. Plántate para cerrar la mano."
 	if int(vista.get("campanadas", 1)) == 0:
 		return "Última mano: puedes pedir gratis o plantarte."
-	if vista.get("numero_mano", 1) == 1 and not vista.get("llaves_disponibles", []).is_empty():
+	var llaves: Array = vista.get("llaves_disponibles", [])
+	# Tutorial de la regla R07 en la mesa de aprendizaje (el Custodio o la práctica): al repartir
+	# vale cualquier Llave inicial; tras pedir, solo la que acaba de llegar.
+	if not llaves.is_empty() and str(vista.get("mesa", "")) in ["", "custodio"]:
+		if vista.get("cartas", []).size() == 2:
+			return "Puedes cambiar una de tus dos Llaves iniciales, solo una y antes de pedir." if llaves.size() > 1 else "Puedes cambiar tu Llave inicial antes de pedir o plantarte."
+		return "Acabas de recibir una Llave: solo esa puede cambiarse, y antes de volver a pedir."
+	if vista.get("numero_mano", 1) == 1 and not llaves.is_empty():
 		return "Puedes cambiar una Llave antes de pedir o plantarte."
 	if int(intervalo.get("ocultas", 0)) > 0:
 		return "Plantarte revela las Máscaras y cierra la mano."

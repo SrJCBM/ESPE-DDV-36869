@@ -70,7 +70,10 @@ func _revisar() -> void:
 			juego.campana.azar_recompensas.seed = 11
 			juego.campana.iniciar("custodio")
 			var premio: int = juego.campana.cerrar(true, 1)
-			juego._ofrecer_recompensa(premio, "Se abre la puerta del este.")
+			juego.sala = "custodio"
+			juego._mostrar_recompensa(premio, juego._linea_crupier("victoria"))
+			juego.recompensa.revelar_ya()
+			if opciones.has("elegir"): juego.recompensa._pulsar(int(opciones.elegir))
 		"inicio":
 			juego.abrir_inicio()
 		"pausa", "opciones":

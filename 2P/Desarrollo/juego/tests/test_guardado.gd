@@ -190,10 +190,9 @@ func test_una_recompensa_pendiente_se_vuelve_a_ofrecer() -> void:
 	otro.continuar()
 	assert_eq(otro.campana.superadas, 1)
 	assert_eq(otro.campana.opciones_recompensa(), opciones)
-	assert_true(otro.libro.visible, "La oferta vuelve a abrirse")
-	var fila: Array = otro.libro.lista.get_children().filter(func(n: Node) -> bool: return n.has_signal("elegida"))
-	assert_eq(fila.size(), 1)
-	fila[0].get_child(1).pressed.emit()
+	assert_true(otro.recompensa.visible, "La oferta vuelve a abrirse")
+	otro.recompensa.cartas[1].pressed.emit()
+	otro.recompensa.boton_confirmar.pressed.emit()
 	assert_false(otro.campana.hay_recompensa())
 	assert_eq(otro.campana.baraja.size(), 25)
 

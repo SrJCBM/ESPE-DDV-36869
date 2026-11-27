@@ -210,6 +210,10 @@ func _plantarse() -> ResultadoAccion:
 	_resolver_mano()
 	return ResultadoAccion.aceptar()
 
+## Usos restantes de los objetos limitados en este encuentro (inventario de la mesa).
+func usos_objetos() -> Dictionary:
+	return _objetos.usos_restantes()
+
 func _llaves_disponibles() -> Array[String]:
 	var ids: Array[String] = []
 	if estado_activo.nombre != "decision" or partida.llave_usada or partida.disponibles() == 0:

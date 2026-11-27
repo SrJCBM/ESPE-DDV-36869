@@ -66,7 +66,7 @@ Implementado por Kenned el 26 de noviembre de 2026 en la rama `kenned/i6-mesa`, 
 | --- | --- |
 | **Espera** | El tapete con «La mesa te espera» y el objetivo: meta, umbral y campanadas, más una línea sobre el coste de cada mano. Sin lectura ni patrones. El foco está en **Iniciar mano**. |
 | **Mano** | El tapete crece (740 × 400) y las cartas llegan a 210 × 300. Hasta cinco cartas se ven siempre enteras, reducidas con su proporción. Desde la sexta conservan ese tamaño y la mano se desplaza hasta la última robada. A 1024 × 576 cada carta mide 90 px de ancho o más. Junto a «Mano N» aparece el patrón cercano, si ayuda a decidir: uno activo («Punto exacto · activo») o uno al que le falta una carta («Mano larga · 4/5»). Un patrón que depende de una Máscara oculta nunca se anuncia como activo. |
-| **Consulta de patrones** | La fila fija de cinco patrones pasa a un botón **PATRONES · T**. Al abrirla, la franja ocupa el lugar de la lectura y el foco pasa al primer patrón; enfocarlo resalta sus cartas y explica cómo conseguirlo. **T**, **Esc** o **CERRAR · T** la cierran y devuelven el foco al botón. Abrir la ayuda, el inventario o un desglose también la cierra. |
+| **Consulta de patrones** | La fila fija de cinco patrones pasa a un botón **PATRONES · T**. Al abrirla, la franja ocupa el lugar de la lectura y el foco pasa al primer patrón; enfocarlo resalta sus cartas y explica cómo conseguirlo. **T**, **Esc** o **CERRAR · T** la cierran y devuelven el foco al botón. Abrir la ayuda, el inventario o un desglose también la cierra. La [revisión de Kenned](#revisión-de-kenned-tras-jugar) la sustituyó por una fila siempre visible. |
 | **Resuelta** | Se lee la fórmula del resultado y los patrones obtenidos. **VER DESGLOSE** abre el detalle. |
 | **Costes** | Iniciar o pedir llevan una ficha con icono y cantidad en su propio espacio: la campana para «−1 campanada» y la ficha del casino para «−1 ficha». El texto completo queda como nombre accesible y en el tooltip. En el Recaudador, el saldo sigue en la cabecera y en la placa de la regla. |
 
@@ -131,6 +131,19 @@ La auditoría de pantallas del 26 de noviembre encontró tres fallos en la mesa.
 | F2 | Si la última campanada terminaba con un patrón, el crupier lo festejaba sobre «Derrota · fin del intento». | Al terminar el intento, la única reacción posible es la de victoria o derrota. |
 | F3 | Con seis cartas o más, la mano resuelta escondía una carta tras la barra gris de Godot. | Al resolver, las cartas se encogen hasta caber todas. Durante la mano se conserva el desplazamiento desde la sexta, con una barra fina de latón. Con seis cartas, el subtítulo «Cuenta como N» de los Relojes se recorta: queda como ajuste menor de la carta. |
 
+### Revisión de Kenned tras jugar
+
+Al jugar la versión del piloto salieron otros seis ajustes. Se integraron en `main` con `tests/test_revision_pantallas.gd` (7 pruebas):
+
+| Pantalla | Antes | Ahora |
+| --- | --- | --- |
+| Levantarse con P tras ganar | El juego se cerraba (`set_input_as_handled` sobre un viewport nulo). | La mesa toma el viewport antes de salir del árbol. |
+| Recompensa | Tres cartas pequeñas dentro del libro, con «Leer al crupier» y «Volver a las cartas». | Pantalla propia: retrato del crupier con su frase de victoria en un bocadillo, tres cartas grandes que llegan boca abajo y se voltean, y un panel que explica el efecto de la carta y muestra con barras cómo cambia el reparto de la baraja (D12). La primera pulsación elige y la segunda, o «Añadir a la baraja», confirma; Esc sigue sin carta. Las preguntas al crupier quedan para la revisita. |
+| Inventario de la mesa y pertenencias | Texto plano. | Tarjetas con la ilustración del objeto, su efecto y marcas de usos: lo que queda en esta mesa o lo que da por mesa, y las cargas de la Lente. La Corona se marca como pasiva. |
+| Título «LA ÚLTIMA MESA» | En la esquina de la mesa, del casino y del libro desde I1. | Solo en el menú de inicio y en la ventana. |
+| Patrones | Consulta que se abría con T y tapaba la suma y el umbral. | Fila propia y siempre visible bajo la lectura. T lleva el foco a los patrones y Esc lo devuelve. Sin el patrón cercano sobre el tapete, que repetía el mismo progreso. |
+| Llaves | Ambas Llaves iniciales mostraban «Cambiar». Es correcto según R07. | Se mantiene R07. En la mesa del Custodio, la pista lo enseña: con dos Llaves iniciales, se puede cambiar cualquiera, pero solo una y antes de pedir; tras pedir, solo la recién recibida. |
+
 ## Orden de trabajo
 
 1. Corregir los cruces de texto, botones y arte observados en las capturas (I6-08).
@@ -141,7 +154,7 @@ La auditoría de pantallas del 26 de noviembre encontró tres fallos en la mesa.
 
 ## Verificación local
 
-- Godot 4.7.2 y GUT. Pasaron **329 pruebas y 2.971 aserciones** en la entrega actual, y **335 y 2.987** tras las correcciones de la auditoría. La comprobación de colisiones ahora busca puntos libres a lo largo de cada borde para que el piano reubicado no invalide la prueba de la pared norte.
+- Godot 4.7.2 y GUT. Pasaron **329 pruebas y 2.971 aserciones** en la entrega actual; **335 y 2.987** tras las correcciones de la auditoría, y **343 y 3.008** tras la revisión de Kenned. Capturas de esa revisión con `tests/qa_revision_pantallas.gd` y `tests/qa_interfaz_i4.gd -- --vista=recompensa`. La comprobación de colisiones ahora busca puntos libres a lo largo de cada borde para que el piano reubicado no invalide la prueba de la pared norte.
 - Capturas de recompensa, inventario, baraja, vitrina, mesa y derrota a 1024 × 576 y 1280 × 720 con `tests/qa_i6_08.gd`. La exportación para Windows se generó con el preset del proyecto.
 - Medición al 140 % de las intervenciones de los siete recursos de diálogo. Los 47 cruces detectados con la barra inferior bajaron a cero.
 - Capturas del inicio con y sin partida guardada y de «Cómo jugar» a 1024 × 576 y 1280 × 720. La segunda portada, los dos pasillos y el cuadro NVL ampliado se revisaron por separado.

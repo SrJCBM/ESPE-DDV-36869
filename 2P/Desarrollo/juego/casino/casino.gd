@@ -5,7 +5,7 @@ const SalaExplorable := preload("res://casino/exploracion/sala_explorable.gd")
 const Libro := preload("res://casino/interfaz/libro.gd")
 const Mesa := preload("res://mesa/mesa.tscn")
 const VitrinaGabinete := preload("res://casino/interfaz/vitrina/vitrina_gabinete.gd")
-const CartasRecompensa := preload("res://casino/interfaz/cartas_recompensa.gd")
+const PantallaRecompensa := preload("res://casino/interfaz/recompensa/pantalla_recompensa.gd")
 const IndicadorObjetivo := preload("res://casino/interfaz/indicador_objetivo.gd")
 const Minimapa := preload("res://casino/interfaz/minimapa.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
@@ -90,6 +90,7 @@ var audio := AudioCasino.new()
 var indicador_objetivo := IndicadorObjetivo.new()
 var minimapa := Minimapa.new()
 var vitrina := VitrinaGabinete.new()
+var recompensa := PantallaRecompensa.new()
 var dialogo := DialogoNovela.new()
 ## Escena de cinemática (prólogo, llegada al vestíbulo): pantalla completa con fundidos.
 var cinematica := Cinematica.new()
@@ -130,9 +131,7 @@ func _ready() -> void:
 	mundo.add_child(visitante)
 	pagina.add_child(capa_superior)
 	capa_superior.position = mundo.position
-	var marca := Libro.rotulo("LA ÚLTIMA MESA",24,Libro.ORO,true)
-	marca.position = Vector2(80,6)
-	pagina.add_child(marca)
+	# Revisión de pantallas (26 nov 2026): el título del juego queda solo en el menú de inicio.
 	titulo = Libro.rotulo("",26,Libro.PAPEL,true)
 	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	titulo.position = Vector2(435,5)
@@ -159,6 +158,8 @@ func _ready() -> void:
 	pagina.add_child(libro)
 	pagina.add_child(vitrina)
 	vitrina.cerrada.connect(_cerrar)
+	pagina.add_child(recompensa)
+	recompensa.resuelta.connect(_resolver_recompensa)
 	pagina.add_child(cinematica)
 	historia.formatear = _formatear
 	cinematica.solicitud.connect(_solicitud)
@@ -303,7 +304,7 @@ func continuar() -> bool:
 		if PlanoSalas.limites(destino).has_point(punto):
 			visitante.position = punto
 	if campana.hay_recompensa():
-		_mostrar_recompensa("Elige una carta o continúa con tu baraja actual.", _linea_crupier("victoria"))
+		_mostrar_recompensa(0, _linea_crupier("victoria"))
 	return true
 
 func _notification(que: int) -> void:
@@ -316,7 +317,7 @@ func _cambiar_movimiento(reducido: bool) -> void:
 	_refrescar()
 
 func _actualizar_objetivo() -> void:
-	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not dialogo.visible and not cinematica.activa and not menu.visible and not vista_baraja.visible and not is_instance_valid(mesa)
+	var mostrar := not libro.visible and not velo.visible and not vitrina.visible and not recompensa.visible and not dialogo.visible and not cinematica.activa and not menu.visible and not vista_baraja.visible and not is_instance_valid(mesa)
 	indicador_objetivo.presentar(campana.objetivo(), mostrar)
 
 func _adaptar() -> void:
@@ -341,7 +342,7 @@ func cercano() -> Dictionary:
 
 func _process(_delta: float) -> void:
 	_actualizar_objetivo()
-	var modal := libro.visible or vitrina.visible or dialogo.visible or cinematica.activa or menu.visible or is_instance_valid(mesa)
+	var modal := libro.visible or vitrina.visible or recompensa.visible or dialogo.visible or cinematica.activa or menu.visible or is_instance_valid(mesa)
 	minimapa.visible = not modal
 	if modal:
 		return
@@ -364,7 +365,7 @@ func _pista(elegido: Dictionary) -> String:
 	return "E · " + str(elegido.accion)
 
 func _unhandled_key_input(evento: InputEvent) -> void:
-	if menu.visible or vista_baraja.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
+	if menu.visible or vista_baraja.visible or recompensa.visible or not evento is InputEventKey or not evento.pressed or evento.echo: return
 	if minimapa.ampliado:
 		if evento.keycode in [KEY_M, KEY_ESCAPE]:
 			_alternar_mapa()
@@ -612,7 +613,7 @@ func _levantarse(victoria: bool, exactos: int) -> void:
 		var ruta := "Dirígete al portón del norte." if campana.superadas == 4 else "La siguiente sala está abierta."
 		var dicho := _linea_crupier("victoria")
 		if campana.hay_recompensa():
-			_mostrar_recompensa("+%s fichas · Elige una carta" % premio, dicho)
+			_mostrar_recompensa(premio, dicho)
 		else:
 			_aviso("Mesa superada","%s\n\n+%s fichas · %s" % [dicho,premio,ruta])
 	else:
@@ -630,26 +631,16 @@ func _mostrar_derrota(ultima_mesa: Image) -> void:
 		escena.fondos.mesa.textura = ImageTexture.create_from_image(ultima_mesa)
 	reproducir_cinematica(escena, _nuevo_intento)
 
-func _mostrar_recompensa(mensaje: String, dicho := "") -> void:
-	_abrir("Una carta de la casa", mensaje, "", Callable())
-	var fila := CartasRecompensa.new()
-	libro.lista.add_child(fila)
-	fila.presentar(campana.opciones_recompensa())
-	fila.elegida.connect(_resolver_recompensa)
-	if not dicho.is_empty():
-		libro.opcion("Leer al crupier", _leer_victoria.bind(mensaje, dicho))
-	libro.opcion("Omitir carta", _resolver_recompensa.bind(-1))
-	if fila.get_child_count() > 0:
-		fila.get_child(0).grab_focus()
-
-func _leer_victoria(mensaje: String, dicho: String) -> void:
-	var volver := _mostrar_recompensa.bind(mensaje, dicho)
-	_abrir(CampanaCasino.NOMBRES[sala], dicho, "", volver)
-	libro.opcion("Volver a las cartas", volver)
+## La frase de victoria del crupier acompaña la elección; sus preguntas quedan para la revisita.
+func _mostrar_recompensa(premio: int, dicho := "") -> void:
+	_preparar_libro()
+	recompensa.movimiento_reducido = AjustesJuego.movimiento_reducido()
+	recompensa.presentar(sala, dicho, premio, campana.superadas, campana.opciones_recompensa(), campana.baraja)
 
 func _resolver_recompensa(indice: int) -> void:
 	if campana.resolver_recompensa(indice):
 		audio.reproducir(&"naipe" if indice >= 0 else &"interfaz")
+		recompensa.hide()
 		_cerrar()
 
 func _sonido() -> void:
@@ -689,6 +680,7 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 func _cerrar() -> void:
 	minimapa.ampliado = false
 	vitrina.hide()
+	recompensa.hide()
 	dialogo.hide()
 	dialogo.poner_anexo(null)
 	libro.hide()
