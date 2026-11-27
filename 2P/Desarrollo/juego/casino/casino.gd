@@ -90,6 +90,7 @@ var audio := AudioCasino.new()
 var indicador_objetivo := IndicadorObjetivo.new()
 var minimapa := Minimapa.new()
 var vitrina := VitrinaGabinete.new()
+var globo := GloboConsejo.new()
 var recompensa := PantallaRecompensa.new()
 var dialogo := DialogoNovela.new()
 ## Escena de cinemática (prólogo, llegada al vestíbulo): pantalla completa con fundidos.
@@ -160,6 +161,7 @@ func _ready() -> void:
 	vitrina.cerrada.connect(_cerrar)
 	pagina.add_child(recompensa)
 	recompensa.resuelta.connect(_resolver_recompensa)
+	pagina.add_child(globo)
 	pagina.add_child(cinematica)
 	historia.formatear = _formatear
 	cinematica.solicitud.connect(_solicitud)
@@ -498,6 +500,7 @@ func _configurar_lectura() -> void:
 	historia.configurar(ajustes)
 	if is_instance_valid(mesa):
 		mesa.set("comentarios", AjustesJuego.comentarios_crupieres())
+		mesa.set("consejos", AjustesJuego.consejos())
 
 func _sonar(id: String) -> void:
 	audio.reproducir(StringName(id))
@@ -591,6 +594,7 @@ func _jugar() -> void:
 	mesa = Mesa.instantiate()
 	mesa.set("campana",campana)
 	mesa.set("comentarios", AjustesJuego.comentarios_crupieres())
+	mesa.set("consejos", AjustesJuego.consejos())
 	mesa.connect("salir_de_mesa",_levantarse,CONNECT_ONE_SHOT)
 	add_child(mesa)
 	mesa.activar_audio(audio)
@@ -636,6 +640,10 @@ func _mostrar_recompensa(premio: int, dicho := "") -> void:
 	_preparar_libro()
 	recompensa.movimiento_reducido = AjustesJuego.movimiento_reducido()
 	recompensa.presentar(sala, dicho, premio, campana.superadas, campana.opciones_recompensa(), campana.baraja)
+	var primera: Control = recompensa.cartas[0]
+	var ultima: Control = recompensa.cartas[-1]
+	# La flecha apunta a la última carta para no tapar el título de la pantalla.
+	_consejo("recompensa", Rect2(primera.position, ultima.position + ultima.size - primera.position), Rect2(ultima.position, ultima.size))
 
 func _resolver_recompensa(indice: int) -> void:
 	if campana.resolver_recompensa(indice):
@@ -679,6 +687,7 @@ func _aviso(t: String, mensaje: String, foto := "") -> void:
 
 func _cerrar() -> void:
 	minimapa.ampliado = false
+	globo.ocultar()
 	vitrina.hide()
 	recompensa.hide()
 	dialogo.hide()
@@ -754,3 +763,19 @@ func tienda() -> void:
 		return
 	_preparar_libro()
 	vitrina.abrir(campana)
+	_consejo_tienda.call_deferred() # Tras colocar las fichas de la vitrina.
+
+func _consejo_tienda() -> void:
+	if not vitrina.visible:
+		return
+	var origen := pagina.get_global_transform().affine_inverse()
+	var objetos := (origen * vitrina.fichas[0].get_global_rect()).merge(origen * vitrina.fichas[-1].get_global_rect())
+	# A la derecha, sobre el detalle aún vacío, sin tapar el título del gabinete.
+	_consejo("tienda", objetos, Rect2(), true)
+
+## Consejo del tutorial en contexto fuera de la mesa: una vez y si Opciones lo permite.
+func _consejo(id: String, objetivo: Rect2, ancla := Rect2(), a_la_derecha := false) -> void:
+	if not AjustesJuego.consejos() or AjustesJuego.consejos_vistos().has(id):
+		return
+	AjustesJuego.marcar_consejo(id)
+	globo.senalar(id, Consejos.TEXTOS[id], objetivo, AjustesJuego.movimiento_reducido(), ancla, a_la_derecha)

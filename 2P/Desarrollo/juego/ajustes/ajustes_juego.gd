@@ -75,3 +75,39 @@ static func ajustes_dialogo() -> Dictionary:
 		"escala_texto": lectura("tamano_texto") / 100.0,
 		"opacidad": lectura("opacidad") / 100.0,
 	}
+
+## Consejos del tutorial en contexto (26 nov 2026). Activados por defecto; cada uno sale una vez.
+static func consejos() -> bool:
+	var archivo := ConfigFile.new()
+	if archivo.load(ruta) != OK:
+		return true
+	return bool(archivo.get_value("tutorial", "consejos", true))
+
+static func guardar_consejos(activos: bool) -> void:
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	archivo.set_value("tutorial", "consejos", activos)
+	archivo.save(ruta)
+
+static func consejos_vistos() -> Array:
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	var vistos = archivo.get_value("tutorial", "vistos", [])
+	return Array(vistos) if vistos is Array else []
+
+static func marcar_consejo(id: String) -> void:
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	var vistos := consejos_vistos()
+	if vistos.has(id):
+		return
+	vistos.append(id)
+	archivo.set_value("tutorial", "vistos", vistos)
+	archivo.save(ruta)
+
+## Vuelve a mostrar todos los consejos (Opciones › «Repetir los consejos»).
+static func reiniciar_consejos() -> void:
+	var archivo := ConfigFile.new()
+	archivo.load(ruta)
+	archivo.set_value("tutorial", "vistos", [])
+	archivo.save(ruta)

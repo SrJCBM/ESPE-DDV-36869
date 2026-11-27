@@ -18,6 +18,8 @@ const FILAS := [
 var movimiento: CheckButton
 ## Comentarios de los crupieres durante la mano (I6-10).
 var comentarios: CheckButton
+var consejos: CheckButton
+var repetir_consejos: Button
 ## Deslizadores de lectura por clave de AjustesJuego.LECTURA.
 var lectura := {}
 
@@ -52,6 +54,23 @@ func construir(audio: AudioCasino) -> void:
 		AjustesJuego.guardar_comentarios_crupieres(activos)
 		lectura_cambiada.emit())
 	derecha.add_child(comentarios)
+	consejos = CheckButton.new()
+	consejos.text = "Consejos para aprender a jugar"
+	consejos.button_pressed = AjustesJuego.consejos()
+	consejos.add_theme_font_override("font", Libro.SANS)
+	consejos.add_theme_font_size_override("font_size", 18)
+	consejos.add_theme_color_override("font_color", Libro.PAPEL)
+	consejos.toggled.connect(func(activos: bool) -> void: AjustesJuego.guardar_consejos(activos))
+	derecha.add_child(consejos)
+	repetir_consejos = Button.new()
+	repetir_consejos.text = "Repetir los consejos"
+	repetir_consejos.add_theme_font_override("font", Libro.SANS)
+	repetir_consejos.add_theme_font_size_override("font_size", 16)
+	repetir_consejos.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	repetir_consejos.pressed.connect(func() -> void:
+		AjustesJuego.reiniciar_consejos()
+		repetir_consejos.text = "Saldrán de nuevo")
+	derecha.add_child(repetir_consejos)
 
 func _columna(padre: Container, titulo: String) -> VBoxContainer:
 	var columna := VBoxContainer.new()

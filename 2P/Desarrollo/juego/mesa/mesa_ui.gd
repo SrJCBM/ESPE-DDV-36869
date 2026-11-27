@@ -52,6 +52,9 @@ var bocadillo: Control
 ## Última línea dicha por disparador, para no repetirla.
 var _ultimas_reacciones := {}
 var _azar_reacciones := RandomNumberGenerator.new()
+## Tutorial en contexto (Consejos): solo cuando el casino lo activa según Opciones.
+var consejos := false
+var globo: GloboConsejo
 ## Si es false, la mesa no comenta (Opciones · Comentarios de los crupieres).
 var comentarios := true:
 	set(activos):
@@ -277,11 +280,14 @@ func _construir() -> void:
 	modal.name = "Modal"
 	modal.foco_requerido.connect(_enfocar_accion_legal)
 	lienzo.add_child(modal)
+	globo = GloboConsejo.new()
+	lienzo.add_child(globo)
 
 func presentar_vista(nueva_vista: Dictionary) -> void:
 	revelacion.presentar(vista, nueva_vista, movimiento_reducido)
 
 func _iniciar_revelacion() -> void:
+	globo.ocultar()
 	franja_patrones.limpiar()
 	eleccion_llave.cancelar(false)
 	_titulo_estado.text = "LA CASA REVELA TU MANO"
@@ -334,6 +340,8 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 		if ultima.quiebra: audio.reproducir(&"quiebra")
 		elif nueva_vista.get("victoria", false) or "Punto exacto" in ultima.patrones: audio.reproducir(&"sello")
 	var puntos_previos: int = int(vista.get("puntos", 0))
+	var vista_previa := vista
+	globo.ocultar()
 	_reaccionar(vista, nueva_vista)
 	vista = nueva_vista.duplicate(true)
 	eleccion_llave.presentar(vista)
@@ -384,6 +392,29 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 			_enfocar_accion_legal()
 	if recien_resuelta and not movimiento_reducido and not modal.visible:
 		_respuesta.celebrar(vista, mano.fila.get_children(), puntos_previos)
+	_mostrar_consejo(vista_previa, vista)
+
+## Un consejo del tutorial, una sola vez, señalando la parte de la mesa de la que habla.
+func _mostrar_consejo(previa: Dictionary, nueva: Dictionary) -> void:
+	if not consejos or modal.visible:
+		return
+	var id := Consejos.en_mesa(previa, nueva, AjustesJuego.consejos_vistos())
+	if id.is_empty():
+		return
+	var objetivo: Rect2
+	match id:
+		"umbral": objetivo = Rect2(32, 664, 340, 100)
+		"pedir": objetivo = _rect_en_lienzo(boton_iniciar_pedir).merge(_rect_en_lienzo(boton_plantarse))
+		"llave", "mascara": objetivo = C.MANO
+		"quiebra": objetivo = C.RESULTADO
+		"patron": objetivo = _rect_en_lienzo(franja_patrones)
+		"campanadas": objetivo = _rect_en_lienzo(dial)
+		_: return
+	AjustesJuego.marcar_consejo(id)
+	globo.senalar(id, Consejos.TEXTOS[id], objetivo, movimiento_reducido)
+
+func _rect_en_lienzo(control: Control) -> Rect2:
+	return lienzo.get_global_transform().affine_inverse() * control.get_global_rect()
 
 func _presentar_lectura(cartas: Array) -> void:
 	var intervalo: Dictionary = vista.get("intervalo", {})
@@ -606,6 +637,7 @@ func _demostracion() -> void:
 		controlador.cargar_demostracion()
 
 func _abrir_modal(titulo: String, caja: Rect2 = ModalMesa.MARCO_NORMAL) -> void:
+	globo.ocultar()
 	revelacion.terminar()
 	_respuesta.detener()
 	dial.detener()

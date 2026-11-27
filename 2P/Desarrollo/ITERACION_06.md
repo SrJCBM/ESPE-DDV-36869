@@ -148,6 +148,24 @@ Al jugar la versión del piloto salieron otros seis ajustes. Se integraron en `m
 
 Antes de compartir el piloto, `tests/test_entrega_i6_07.gd` recorre una campaña entera por los caminos del juego con cada objeto inicial: las cuatro mesas, levantarse con P, la recompensa con el teclado, una compra, guardar y continuar, el portón final y una derrota. Comprueba que el inventario de cada mesa y las pertenencias enseñen solo lo que se lleva y que no aparezca ningún error del motor. Con ella pasan 350 pruebas.
 
+### Tutorial en contexto
+
+Para que alguien de 13 años aprenda jugando, sin pantallas de reglas: nueve frases de ocho palabras como máximo (`casino/interfaz/consejos/consejos.gd`). Cada una sale una sola vez, en el momento en que hace falta, en un globo que señala con una flecha la parte de la pantalla de la que habla y la enmarca. El globo no bloquea el ratón ni el teclado y desaparece al actuar. Cuando coinciden varios, sale el más importante y el resto espera a que su situación vuelva a darse. No sale ninguno sobre el final del intento.
+
+| Momento (la primera vez) | Frase | Señala |
+| --- | --- | --- |
+| Al sentarse a una mesa | «Acércate al Umbral sin pasarte.» | El umbral |
+| Primera mano repartida | «P: otra carta. S: plantarte y cobrar.» | Pedir y Plantarse |
+| Primera Llave que se puede cambiar | «Puedes cambiar una Llave antes de pedir.» | La mano |
+| Primera Máscara boca abajo | «Las Máscaras se descubren al plantarte.» | La mano |
+| Primera quiebra | «Te pasaste: esta mano vale 0.» | El resultado |
+| Primer patrón | «¡Patrón! Multiplica tus puntos.» | La fila de patrones |
+| Quedan dos campanadas | «Cada mano gasta una campanada.» | El dial |
+| Primera recompensa | «Elige una carta para tu baraja.» | Las tres cartas |
+| Se abre la tienda | «Gasta fichas en objetos y cartas.» | La vitrina |
+
+Opciones › «Consejos para aprender a jugar» los apaga y «Repetir los consejos» vuelve a mostrarlos. Los consejos vistos se guardan en los ajustes. Las pruebas usan su propio archivo de ajustes (`tests/preparar_pruebas.gd`, activado desde `.gutconfig.json`; en el panel de GUT del editor hay que ponerlo como Pre-Run Hook). Las cubre `tests/test_consejos.gd`.
+
 ## Orden de trabajo
 
 1. Corregir los cruces de texto, botones y arte observados en las capturas (I6-08).
