@@ -101,3 +101,18 @@ func test_f3_durante_la_mano_la_barra_lleva_el_estilo_de_la_mesa() -> void:
 	var barra: HScrollBar = juego.mesa.mano.scroll.get_h_scroll_bar()
 	assert_true(barra.has_theme_stylebox_override("grabber"), "La barra no usa el gris por defecto de Godot")
 	assert_true(barra.has_theme_stylebox_override("scroll"))
+
+func test_levantarse_con_p_tras_ganar_no_falla() -> void:
+	var juego = _mesa_del_custodio()
+	var mesa = juego.mesa
+	mesa.vista["terminado"] = true
+	mesa.vista["victoria"] = true
+	mesa.boton_iniciar_pedir.disabled = false
+	var tecla := InputEventKey.new()
+	tecla.keycode = KEY_P
+	tecla.physical_keycode = KEY_P
+	tecla.pressed = true
+	mesa._unhandled_key_input(tecla)
+	assert_null(juego.mesa, "Klein se levanta de la mesa")
+	assert_eq(juego.campana.superadas, 1, "con el sello del Custodio")
+	assert_engine_error_count(0, "sin el error de set_input_as_handled sobre null")

@@ -746,6 +746,8 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		eleccion_llave.cancelar()
 		get_viewport().set_input_as_handled()
 		return
+	# Levantarse con P tras el final saca la mesa del árbol: el viewport se toma antes de actuar.
+	var puerto := get_viewport()
 	match evento.keycode:
 		KEY_P: _iniciar_o_pedir()
 		KEY_S: _plantarse()
@@ -756,4 +758,4 @@ func _unhandled_key_input(evento: InputEvent) -> void:
 		KEY_V: _sonido()
 		KEY_R: _solicitar_reinicio()
 		_: return
-	get_viewport().set_input_as_handled()
+	puerto.set_input_as_handled()
