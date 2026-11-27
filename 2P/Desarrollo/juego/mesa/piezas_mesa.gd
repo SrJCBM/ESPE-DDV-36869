@@ -18,7 +18,7 @@ static func etiqueta(padre: Node, texto: String, rect: Rect2, tamano: int, color
 	nueva.position = rect.position
 	nueva.size = rect.size
 	nueva.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	nueva.add_theme_font_size_override("font_size", tamano)
+	nueva.add_theme_font_size_override("font_size", Tipografia.tamano(tamano))
 	nueva.add_theme_color_override("font_color", color)
 	if display:
 		nueva.theme_type_variation = &"DisplayLabel"
@@ -42,7 +42,7 @@ static func boton_texto(padre: Node, nombre: String, texto: String, rect: Rect2,
 	boton.text = texto
 	boton.position = rect.position
 	boton.size = rect.size
-	boton.add_theme_font_size_override("font_size", tamano)
+	boton.add_theme_font_size_override("font_size", Tipografia.tamano(tamano))
 	boton.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	boton.pressed.connect(accion)
 	padre.add_child(boton)

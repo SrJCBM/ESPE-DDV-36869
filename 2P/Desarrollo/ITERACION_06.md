@@ -166,6 +166,28 @@ Para que alguien de 13 años aprenda jugando, sin pantallas de reglas: nueve fra
 
 Opciones › «Consejos para aprender a jugar» los apaga y «Repetir los consejos» vuelve a mostrarlos. Los consejos vistos se guardan en los ajustes. Las pruebas usan su propio archivo de ajustes (`tests/preparar_pruebas.gd`, activado desde `.gutconfig.json`; en el panel de GUT del editor hay que ponerlo como Pre-Run Hook). Las cubre `tests/test_consejos.gd`.
 
+El consejo del patrón sale también si el primer patrón llega en la mano que gana la mesa; tras una derrota no sale ninguno.
+
+### Revisión de interfaz y código
+
+Cambios tras la auditoría del 27 nov 2026. El equilibrio de objetos y mesas queda para I7.
+
+| Problema | Cambio |
+|---|---|
+| Rótulos de 11 a 15 puntos en el lienzo | `Tipografia.MINIMA` = 16, aplicado por `Libro.rotulo`, `Piezas.etiqueta` y `Piezas.boton_texto`. Equivale a unos 21 px a 1080p. |
+| Atajos escritos en el código, sin mando | Acciones en el mapa de entrada del proyecto, con tecla y botón de mando. La cruceta y el stick mueven al visitante. Los textos que nombran un atajo lo leen de `Acciones`. |
+| Cuatro `_adaptar()` que escalaban a mano | El proyecto escala el lienzo de 1440 × 810 (modo `canvas_items`, aspecto `keep`). La ventana sigue abriendo a 1280 × 720. |
+| Pantalla abierta decidida con cadenas de `visible` | `PilaPantallas`: cada pantalla se registra una vez y solo la de arriba recibe la entrada. |
+| El casino recalculaba objetivo, minimapa y pista en cada fotograma | Se recalculan cuando el visitante se mueve o cuando se abre o se cierra una pantalla. |
+| `casino.gd` con guion, notas y baraja | El guion pasa a `GuionCasino`, las notas a `NotasCasino` y la baraja visible a `CampanaCasino.proyeccion_baraja()`. El inventario de la mesa pasa a `inventario_mesa.gd`. |
+| Límites de la Moneda y la Lente repetidos en tres archivos | Viven en el catálogo de la tienda (`usos_por_mesa`, `maximo_llevado`, `fichas_por_uso`). La campaña, la mesa y el inventario los leen de ahí. |
+| Fichas restadas desde varios sitios | Solo cambian con `campana.ingresar()` y `campana.gastar()`, que no dejan el saldo en negativo. |
+| Ajustes leídos del disco en cada consulta | Se leen una vez. Cada cambio se escribe al momento. |
+| Texto repetido | La mano vacía muestra solo meta y umbral. La pista de abajo se oculta mientras se ve un consejo. La recompensa muestra solo las fichas ganadas. |
+| La Lente decía «1 / 2» | Dice «1», lo que llevas. |
+
+La vista de la mesa sigue siendo un diccionario. Pasarla a una clase con tipo afecta al controlador, a la mesa y a 19 archivos de prueba, así que se deja para un cambio aparte. Lo cubren `tests/test_revision_interfaz.gd` y las capturas de `tests/qa_revision_interfaz.gd`.
+
 ## Orden de trabajo
 
 1. Corregir los cruces de texto, botones y arte observados en las capturas (I6-08).

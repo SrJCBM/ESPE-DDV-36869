@@ -71,7 +71,7 @@ func _suspender(control: Control) -> void:
 		control.focus_mode = Control.FOCUS_NONE
 
 func boton_cerrar(texto := "VOLVER A LA MESA") -> Button:
-	var boton := Piezas.boton_texto(contenido, "boton_cerrar_modal", texto + "  ·  Esc", Rect2(32, 618, 696, 42), cerrar)
+	var boton := Piezas.boton_texto(contenido, "boton_cerrar_modal", "%s  ·  %s" % [texto, Acciones.tecla(Acciones.VOLVER)], Rect2(32, 618, 696, 42), cerrar)
 	Piezas.estilo_modal(boton)
 	boton.grab_focus()
 	return boton

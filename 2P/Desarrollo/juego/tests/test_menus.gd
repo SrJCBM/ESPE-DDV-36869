@@ -6,10 +6,10 @@ var _ruta_original := ""
 func before_each() -> void:
 	_ruta_original = AjustesJuego.ruta
 	AjustesJuego.ruta = "user://ajustes_prueba_menus.cfg"
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 
 func after_each() -> void:
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	AjustesJuego.ruta = _ruta_original
 	await get_tree().process_frame
 

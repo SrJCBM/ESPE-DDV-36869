@@ -278,11 +278,11 @@ func _gui_input(evento: InputEvent) -> void:
 	if evento is InputEventMouseButton and evento.pressed:
 		accept_event()
 
-func _unhandled_key_input(evento: InputEvent) -> void:
-	if not visible or not evento is InputEventKey or not evento.pressed or evento.echo:
+func _unhandled_input(evento: InputEvent) -> void:
+	if not visible or not Acciones.es_pulsacion(evento):
 		return
-	if evento.keycode in [KEY_ESCAPE, KEY_B]:
+	if evento.is_action_pressed(Acciones.VOLVER) or (evento is InputEventKey and evento.keycode == KEY_B):
 		cerrar()
-	elif evento.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE, KEY_E]:
+	elif evento.is_action_pressed(Acciones.ACEPTAR) or evento.is_action_pressed(Acciones.INTERACTUAR):
 		boton_volver.pressed.emit()
 	get_viewport().set_input_as_handled()

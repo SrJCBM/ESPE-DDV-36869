@@ -9,10 +9,10 @@ var _ruta_original := ""
 func before_each() -> void:
 	_ruta_original = AjustesJuego.ruta
 	AjustesJuego.ruta = "user://ajustes_prueba_auditoria.cfg"
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 
 func after_each() -> void:
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	AjustesJuego.ruta = _ruta_original
 	await get_tree().process_frame
 
@@ -112,7 +112,7 @@ func test_levantarse_con_p_tras_ganar_no_falla() -> void:
 	tecla.keycode = KEY_P
 	tecla.physical_keycode = KEY_P
 	tecla.pressed = true
-	mesa._unhandled_key_input(tecla)
+	mesa._unhandled_input(tecla)
 	assert_null(juego.mesa, "Klein se levanta de la mesa")
 	assert_eq(juego.campana.superadas, 1, "con el sello del Custodio")
 	assert_engine_error_count(0, "sin el error de set_input_as_handled sobre null")

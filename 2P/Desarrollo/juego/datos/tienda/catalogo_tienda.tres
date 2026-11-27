@@ -9,6 +9,7 @@ id = "lente"
 nombre = "Lente de humo"
 precio = 6
 descripcion = "Revela todas las Máscaras ocultas de la mano. Se consume al usarla."
+maximo_llevado = 2
 
 [sub_resource type="Resource" id="corona"]
 script = ExtResource("2_objeto")
@@ -23,6 +24,7 @@ id = "prudente"
 nombre = "Sello del prudente"
 precio = 12
 descripcion = "Recupera una campanada al quedar tres o más por debajo. Una vez por mesa."
+usos_por_mesa = 1
 
 [sub_resource type="Resource" id="moneda"]
 script = ExtResource("2_objeto")
@@ -30,6 +32,8 @@ id = "moneda"
 nombre = "Moneda mellada"
 precio = 10
 descripcion = "Gana dos fichas por un Punto exacto. Tres veces por mesa."
+usos_por_mesa = 3
+fichas_por_uso = 2
 
 [sub_resource type="Resource" id="eliminar"]
 script = ExtResource("2_objeto")

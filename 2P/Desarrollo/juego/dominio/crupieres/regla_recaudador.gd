@@ -5,7 +5,7 @@ extends ReglaCrupier
 const ENTREGA := 15
 
 func al_sentarse(campana: CampanaCasino) -> void:
-	campana.saldo += ENTREGA
+	campana.ingresar(ENTREGA)
 
 func cobra_por_pedir() -> bool:
 	return true

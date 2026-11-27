@@ -76,7 +76,7 @@ func _dibujar_sala() -> void:
 	var jugador := PLANO.position + _posicion * factor
 	draw_circle(jugador, 5, Color("132b24"))
 	draw_circle(jugador, 3.3, PAPEL)
-	_centrar("M · Plano", Vector2(AREA.get_center().x, 195), AREA.size.x, 14)
+	_centrar(Acciones.rotulo_previo("Plano", Acciones.MAPA), Vector2(AREA.get_center().x, 195), AREA.size.x, Tipografia.MINIMA)
 
 func _dibujar_plano() -> void:
 	draw_rect(Rect2(0, 0, 1440, 810), Color(0.02, 0.05, 0.04, 0.82))
@@ -96,7 +96,7 @@ func _dibujar_plano() -> void:
 		draw_rect(caja, Color("365143") if sala == _sala else Color("132b24"))
 		draw_rect(caja, Libro.ORO if sala == _sala else CONEXION, false, 2 if sala == _sala else 1)
 		_centrar(NOMBRES[sala], centro + Vector2(0, 5), caja.size.x, 17)
-	_centrar("M / Esc · Volver", Vector2(720, 674), 250, 16)
+	_centrar("%s / %s · Volver" % [Acciones.tecla(Acciones.MAPA), Acciones.tecla(Acciones.VOLVER)], Vector2(720, 674), 250, 16)
 
 func _unir(origen: String, destino: String) -> void:
 	draw_line(CENTROS[origen], CENTROS[destino], CONEXION, 2, true)

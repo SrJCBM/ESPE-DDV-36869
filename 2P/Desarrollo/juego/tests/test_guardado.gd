@@ -16,7 +16,7 @@ func before_each() -> void:
 func after_each() -> void:
 	PartidaGuardada.borrar()
 	PartidaGuardada.ruta = _ruta_original
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	AjustesJuego.ruta = _ruta_ajustes
 	await get_tree().process_frame
 

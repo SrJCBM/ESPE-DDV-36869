@@ -36,7 +36,7 @@ func presentar(superadas: int, reducido := false) -> void:
 	for i in range(SELLOS.size()):
 		var obtenido := i < ganados
 		var recuadro := recuadros[i]
-		recuadro.modulate = Color.WHITE if obtenido else Color(0.55, 0.55, 0.55, 0.28)
+		recuadro.modulate = Color.WHITE if obtenido else Color(0.6, 0.6, 0.6, 0.45)
 		recuadro.tooltip_text = "%s · %s" % [SELLOS[i].nombre, "conseguido" if obtenido else "pendiente"]
 		recuadro.set_meta("obtenido", obtenido)
 	if _mostrados >= 0 and ganados > _mostrados and ganados > 0:

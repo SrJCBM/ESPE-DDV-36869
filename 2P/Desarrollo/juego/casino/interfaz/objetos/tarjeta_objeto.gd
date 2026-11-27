@@ -15,7 +15,8 @@ var cifra_usos: Label
 var marcas: Array[Panel] = []
 
 ## datos: id, nombre, descripcion; usos y maximo (maximo 0 = objeto pasivo, sin marcas);
-## rotulo: texto sobre las marcas; nota: estado breve a la derecha (p. ej. «Pasiva»).
+## rotulo: texto sobre las marcas; nota: estado breve a la derecha (p. ej. «Pasiva»);
+## cantidad: true para un consumible, que muestra cuántos llevas y no un máximo.
 func configurar(datos: Dictionary, ancho := 412.0) -> void:
 	id = str(datos.get("id", ""))
 	name = "Objeto_%s" % id
@@ -100,7 +101,7 @@ func configurar(datos: Dictionary, ancho := 412.0) -> void:
 			marca.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			pie.add_child(marca)
 			marcas.append(marca)
-		cifra_usos = Libro.rotulo("%s / %s" % [usos, maximo], 13, Libro.PAPEL)
+		cifra_usos = Libro.rotulo(str(usos) if datos.get("cantidad", false) else "%s / %s" % [usos, maximo], 16, Libro.PAPEL)
 		pie.add_child(cifra_usos)
 	tooltip_text = "%s · %s" % [nombre.text, efecto.text]
 	accessibility_name = tooltip_text + ("" if maximo == 0 else ". %s: %s de %s" % [str(datos.get("rotulo", "Usos")).capitalize(), usos, maximo])
@@ -114,15 +115,14 @@ func usos_encendidos() -> int:
 static func inventario(campana: CampanaCasino, usos_mesa = null) -> Array[Dictionary]:
 	var lista: Array[Dictionary] = []
 	var en_mesa: bool = usos_mesa is Dictionary
-	var maximos := {"moneda": 3, "prudente": CampanaCasino.USOS_PRUDENTE}
 	for id in campana.amuletos:
 		var producto := CampanaCasino.TIENDA.buscar(id)
 		if producto == null:
 			continue
 		var datos := {"id": id, "nombre": producto.nombre, "descripcion": producto.descripcion}
-		if maximos.has(id):
-			datos.maximo = maximos[id]
-			datos.usos = int(usos_mesa.get(id, maximos[id])) if en_mesa else maximos[id]
+		if producto.usos_por_mesa > 0:
+			datos.maximo = producto.usos_por_mesa
+			datos.usos = int(usos_mesa.get(id, producto.usos_por_mesa)) if en_mesa else producto.usos_por_mesa
 			datos.rotulo = "EN ESTA MESA" if en_mesa else "POR MESA"
 		else:
 			datos.nota = "Pasiva"
@@ -131,5 +131,5 @@ static func inventario(campana: CampanaCasino, usos_mesa = null) -> Array[Dictio
 	if campana.lentes > 0:
 		var lente := CampanaCasino.TIENDA.buscar("lente")
 		lista.append({"id": "lente", "nombre": lente.nombre, "descripcion": lente.descripcion,
-			"maximo": 2, "usos": campana.lentes, "rotulo": "CARGAS"})
+			"maximo": campana.lentes, "usos": campana.lentes, "rotulo": "LLEVAS", "cantidad": true})
 	return lista

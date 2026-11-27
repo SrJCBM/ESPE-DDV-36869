@@ -20,7 +20,7 @@ func _textos(nodo: Node) -> PackedStringArray:
 func test_sin_interaccion_cerca_no_hay_pista_ni_tira_de_teclas() -> void:
 	var juego = _casino()
 	juego.visitante.position = Vector2(400, 450)
-	juego._process(0.0)
+	juego.actualizar_exploracion()
 	assert_eq(juego.pista.text, "", "El objetivo ya dice adónde ir")
 	for texto in _textos(juego.pagina):
 		assert_false(texto.contains("WASD"), "La tira fija de teclas se retira")
@@ -29,14 +29,14 @@ func test_cerca_de_algo_aparece_una_sola_accion_breve() -> void:
 	var juego = _casino()
 	juego.entrar("vestibulo")
 	juego.visitante.position = Vector2(985, 300)
-	juego._process(0.0)
+	juego.actualizar_exploracion()
 	assert_eq(juego.pista.text, "E · Hablar")
 	juego._entregar()
 	juego._cerrar()
 	juego.campana.superadas = 1
 	juego.entrar("tienda")
 	juego.visitante.position = Vector2(645, 310)
-	juego._process(0.0)
+	juego.actualizar_exploracion()
 	assert_eq(juego.pista.text, "E · Abrir vitrina")
 
 func test_las_puertas_solo_muestran_el_control_al_acercarse() -> void:
@@ -45,10 +45,10 @@ func test_las_puertas_solo_muestran_el_control_al_acercarse() -> void:
 	juego._cerrar()
 	juego.entrar("pasillo_custodio", "vestibulo")
 	juego.visitante.position = PlanoGaleria.punto("pasillo_custodio", "pasillo_recaudador") + Vector2(-20, 0)
-	juego._process(0.0)
+	juego.actualizar_exploracion()
 	assert_eq(juego.pista.text, "E · Examinar la puerta")
 	juego.visitante.position = PlanoGaleria.punto("pasillo_custodio", "custodio") + Vector2(0, 20)
-	juego._process(0.0)
+	juego.actualizar_exploracion()
 	assert_eq(juego.pista.text, "E · Entrar")
 
 func test_la_presentacion_del_crupier_muestra_tres_cifras_y_tomar_asiento() -> void:

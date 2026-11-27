@@ -26,5 +26,5 @@ func _generar() -> void:
 	juego.guardar()
 	var datos := PartidaGuardada.cargar()
 	print("partida de respaldo: sala=%s superadas=%d saldo=%d" % [datos.get("sala"), datos.campana.get("superadas", -1), datos.campana.get("saldo", -1)])
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	quit()

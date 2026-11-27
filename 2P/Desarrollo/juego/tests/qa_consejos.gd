@@ -61,5 +61,5 @@ func _r() -> void:
 	j.entrar("tienda")
 	j.tienda()
 	await _foto("8_tienda")
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	quit()

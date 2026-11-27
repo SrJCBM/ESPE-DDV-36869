@@ -1,5 +1,7 @@
+class_name MesaUI
 extends Control
-## Adaptador visual: toda decisión y cálculo pertenece al controlador.
+## Adaptador visual: toda decisión y cálculo pertenece al controlador. El lienzo mide BASE y el
+## proyecto lo escala a la ventana; los atajos se leen del mapa de entrada (Acciones).
 
 const Controlador = preload("res://mesa/controlador_mesa.gd")
 const Iniciar = preload("res://dominio/comandos/iniciar_mano.gd")
@@ -19,8 +21,7 @@ const RevelacionMano := preload("res://mesa/interfaz/revelacion_mano.gd")
 const ManoMesa := preload("res://mesa/interfaz/mano_mesa.gd")
 const ModalMesa := preload("res://mesa/interfaz/modal_mesa.gd")
 const HudCampana := preload("res://casino/interfaz/hud/hud_campana.gd")
-const TarjetaObjeto := preload("res://casino/interfaz/objetos/tarjeta_objeto.gd")
-const SaldoFichas := preload("res://casino/interfaz/hud/saldo_fichas.gd")
+const InventarioMesa := preload("res://mesa/interfaz/inventario_mesa.gd")
 const DialCampanadas := preload("res://mesa/interfaz/dial_campanadas.gd")
 const C := preload("res://mesa/interfaz/composicion_mesa.gd")
 const TAPETES := {
@@ -112,8 +113,6 @@ var _nota_umbral: Label
 
 func _ready() -> void:
 	_construir()
-	resized.connect(_adaptar)
-	_adaptar()
 	if conectar_controlador:
 		controlador = Controlador.new()
 		if campana != null: controlador.configurar_campana(campana)
@@ -122,13 +121,6 @@ func _ready() -> void:
 		controlador.vista_actualizada.connect(presentar_vista)
 		presentar_vista(controlador.obtener_vista())
 	boton_iniciar_pedir.grab_focus()
-
-func _adaptar() -> void:
-	if not is_instance_valid(lienzo):
-		return
-	var factor: float = minf(size.x / BASE.x, size.y / BASE.y)
-	lienzo.scale = Vector2.ONE * factor
-	lienzo.position = (size - BASE * factor) * 0.5
 
 func activar_audio(servicio: AudioCasino) -> void:
 	# El volumen vive en Opciones del menú de pausa (I4-07); V sigue abriendo el panel aquí.
@@ -159,9 +151,9 @@ func _construir() -> void:
 	Piezas.imagen(lienzo, "res://mesa/arte/marco-casino.svg", Rect2(24, 24, 1391, 761))
 	# El título del juego queda solo en el menú de inicio; la esquina nombra la mesa.
 	_subtitulo = Piezas.etiqueta(lienzo, "MESA I  /  EL PRIMER SELLO", Rect2(44, 41, 480, 22), 13, MUTED)
-	boton_reiniciar = Piezas.boton_texto(lienzo, "boton_reiniciar", "REINICIAR · R", Rect2(1025, 32, 158, 38), _solicitar_reinicio, 13)
-	boton_ayuda = Piezas.boton_texto(lienzo, "boton_ayuda", "CÓMO JUGAR · H", Rect2(1210, 32, 185, 38), mostrar_ayuda, 14)
-	boton_demostracion = Piezas.boton_texto(lienzo, "boton_demostracion", "DEMOSTRACIÓN GUIADA", Rect2(531, 68, 245, 25), _solicitar_demostracion, 11)
+	boton_reiniciar = Piezas.boton_texto(lienzo, "boton_reiniciar", Acciones.rotulo("REINICIAR", Acciones.REINICIAR), Rect2(1025, 32, 158, 38), _solicitar_reinicio)
+	boton_ayuda = Piezas.boton_texto(lienzo, "boton_ayuda", Acciones.rotulo("CÓMO JUGAR", Acciones.AYUDA), Rect2(1200, 32, 195, 38), mostrar_ayuda)
+	boton_demostracion = Piezas.boton_texto(lienzo, "boton_demostracion", "DEMOSTRACIÓN GUIADA", Rect2(531, 66, 245, 30), _solicitar_demostracion)
 	boton_demostracion.tooltip_text = "Cargar una secuencia preparada para aprender las reglas. Reinicia el intento."
 	var retrato := "res://recursos/arte/custodio-grabado.png"
 	var nombre := "El Custodio"
@@ -170,7 +162,7 @@ func _construir() -> void:
 		if campana.activa != "custodio": retrato = "res://casino/arte/personaje_%s.webp" % campana.activa
 		boton_demostracion.hide()
 		boton_reiniciar.hide()
-		Piezas.boton_texto(lienzo,"bolsa_campana","OBJETOS · I",Rect2(1025,32,158,38),_ver_objetos,15)
+		Piezas.boton_texto(lienzo, "bolsa_campana", Acciones.rotulo("OBJETOS", Acciones.INVENTARIO), Rect2(1025, 32, 158, 38), _ver_objetos)
 		_subtitulo.hide()
 		hud = HudCampana.new()
 		hud.position = Vector2(560, 30)
@@ -249,7 +241,7 @@ func _construir() -> void:
 	franja_patrones.patron_solicitado.connect(_mostrar_patron)
 	franja_patrones.boton_creado.connect(modal.suspender_si_abierto)
 	# T lleva el foco a los patrones y lo devuelve a la acción; no hay botón que los abra.
-	boton_patrones = Piezas.boton_texto(lienzo, "boton_patrones", "PATRONES · T", Rect2(990, 610, 132, 34), alternar_patrones, 13)
+	boton_patrones = Piezas.boton_texto(lienzo, "boton_patrones", Acciones.rotulo("PATRONES", Acciones.PATRONES), Rect2(990, 610, 150, 34), alternar_patrones)
 	boton_patrones.hide()
 	_lectura_titulo = Piezas.etiqueta(lienzo, "SIGUIENTE PASO", C.LECTURA_TITULO, 12, MUTED)
 	_lectura_titulo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -259,8 +251,8 @@ func _construir() -> void:
 	_mensaje = Piezas.etiqueta(lienzo, "", C.DETALLE, 16, MUTED)
 	_mensaje.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	# Acciones apiladas a la derecha, bajo el boleto: solo la acción, su atajo y un coste real.
-	boton_iniciar_pedir = Piezas.boton_accion(lienzo, "boton_iniciar_pedir", C.PEDIR, true, _iniciar_o_pedir, "P")
-	boton_plantarse = Piezas.boton_accion(lienzo, "boton_plantarse", C.PLANTARSE, false, _plantarse, "S")
+	boton_iniciar_pedir = Piezas.boton_accion(lienzo, "boton_iniciar_pedir", C.PEDIR, true, _iniciar_o_pedir, Acciones.tecla(Acciones.PEDIR))
+	boton_plantarse = Piezas.boton_accion(lienzo, "boton_plantarse", C.PLANTARSE, false, _plantarse, Acciones.tecla(Acciones.PLANTARSE))
 	Piezas.texto_accion(boton_plantarse, "PLANTARSE", "")
 	_mazo = Piezas.etiqueta(lienzo, "", Rect2(40, 780, 350, 24), 12, MUTED)
 	_mazo.name = "Mazo"
@@ -369,7 +361,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	boton_plantarse.disabled = not bool(acciones.get("plantarse", false))
 	if campana != null:
 		hud.presentar(campana, movimiento_reducido)
-		boton_lente.text = "LENTE DE HUMO ×%s" % campana.lentes
+		boton_lente.text = "USAR LENTE DE HUMO (%s)" % campana.lentes
 		boton_lente.visible = campana.lentes > 0
 		boton_lente.disabled = fase != "decision" or int(vista.intervalo.ocultas) == 0
 	boton_reiniciar.disabled = not bool(acciones.get("reiniciar", true))
@@ -384,7 +376,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	_presentar_lectura(cartas)
 	_actualizar_orientacion()
 	franja_patrones.presentar(vista)
-	mano.objetivo.text = "Meta %s  ·  umbral %s  ·  %s campanadas\nCada mano nueva cuesta una campanada." % [vista.get("meta", 200), vista.get("umbral", 17), vista.get("campanadas", 10)]
+	mano.objetivo.text = "Meta %s  ·  umbral %s" % [vista.get("meta", 200), vista.get("umbral", 17)]
 	_sincronizar_consulta()
 	if not modal.visible:
 		var actual := get_viewport().gui_get_focus_owner()
@@ -411,7 +403,9 @@ func _mostrar_consejo(previa: Dictionary, nueva: Dictionary) -> void:
 		"campanadas": objetivo = _rect_en_lienzo(dial)
 		_: return
 	AjustesJuego.marcar_consejo(id)
-	globo.senalar(id, Consejos.TEXTOS[id], objetivo, movimiento_reducido)
+	globo.senalar(id, Consejos.texto(id), objetivo, movimiento_reducido)
+	# El globo ya lo dice: la pista de abajo no lo repite mientras se ve.
+	_mensaje.hide()
 
 func _rect_en_lienzo(control: Control) -> Rect2:
 	return lienzo.get_global_transform().affine_inverse() * control.get_global_rect()
@@ -546,63 +540,12 @@ func _iniciar_o_pedir() -> void:
 	else:
 		_enviar(Iniciar.new())
 
-## Inventario de la mesa: fichas, cada objeto con su ilustración y sus usos en este encuentro, y
-## la regla del crupier. Se lee igual que las pertenencias del casino (tarjeta_objeto.gd).
+## Inventario de la mesa: fichas, la regla del crupier y los objetos (inventario_mesa.gd).
 func _ver_objetos() -> void:
 	if campana == null or revelacion.activa or modal.visible: return
 	_abrir_modal("Inventario de la mesa")
-	var cabecera := HBoxContainer.new()
-	cabecera.position = Vector2(32, 84)
-	cabecera.size = Vector2(696, 52)
-	cabecera.add_theme_constant_override("separation", 12)
-	modal.contenido.add_child(cabecera)
-	var fichas := SaldoFichas.new(32, 22)
-	fichas.presentar(campana.saldo)
-	cabecera.add_child(_placa_inventario("FICHAS", fichas))
-	var regla_texto := ""
-	match campana.activa:
-		"recaudador": regla_texto = "Comisión de la casa: cada carta que pides tras el reparto cuesta una ficha."
-		"coleccionista": regla_texto = "Cartas retenidas hasta superar esta mesa: %s." % vista.get("retenidas", 0)
-		"dueno": regla_texto = "Cada mano cerrada sin Quiebra reduce el umbral un punto, hasta 17."
-		_: regla_texto = "Esta mesa no añade reglas a las de la casa."
-	var regla := TarjetaObjeto.Libro.rotulo(regla_texto, 15, MARFIL)
-	regla.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	regla.custom_minimum_size = Vector2(470, 0)
-	cabecera.add_child(_placa_inventario("REGLA DE ESTA MESA", regla, true))
-	var datos := TarjetaObjeto.inventario(campana, controlador.usos_objetos())
-	var rejilla := GridContainer.new()
-	rejilla.columns = 2
-	rejilla.position = Vector2(32, 168)
-	rejilla.add_theme_constant_override("h_separation", 10)
-	rejilla.add_theme_constant_override("v_separation", 10)
-	modal.contenido.add_child(rejilla)
-	for objeto in datos:
-		var tarjeta := TarjetaObjeto.new()
-		tarjeta.configurar(objeto, 343.0)
-		rejilla.add_child(tarjeta)
-	if campana.amuletos.is_empty():
-		var vacio := Piezas.etiqueta(modal.contenido, "Aún no tienes amuletos. Se compran en el Gabinete de la anfitriona.", Rect2(32, 560, 696, 30), 15, Piezas.MUTED)
-		vacio.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	InventarioMesa.construir(modal.contenido, campana, controlador.usos_objetos(), vista)
 	modal.boton_cerrar()
-
-func _placa_inventario(titulo: String, valor: Control, expandir := false) -> PanelContainer:
-	var placa := PanelContainer.new()
-	if expandir: placa.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var estilo := StyleBoxFlat.new()
-	estilo.bg_color = Color("0b1c17")
-	estilo.border_color = Color("645c44")
-	estilo.set_border_width_all(1)
-	estilo.border_width_top = 2
-	estilo.set_content_margin_all(8)
-	estilo.content_margin_left = 14
-	estilo.content_margin_right = 14
-	placa.add_theme_stylebox_override("panel", estilo)
-	var columna := VBoxContainer.new()
-	columna.add_theme_constant_override("separation", 2)
-	columna.add_child(TarjetaObjeto.Libro.rotulo(titulo, 12, Piezas.ORO))
-	columna.add_child(valor)
-	placa.add_child(columna)
-	return placa
 
 func _usar_lente() -> void:
 	if not revelacion.activa and not modal.visible and campana != null:
@@ -783,36 +726,38 @@ func _confirmar(titulo: String, mensaje: String, accion: Callable) -> void:
 	_abrir_modal(titulo, Rect2(310, 170, 820, 470))
 	modal.pedir_confirmacion(mensaje, accion)
 
-func _unhandled_key_input(evento: InputEvent) -> void:
-	if not evento is InputEventKey or not evento.pressed or evento.echo:
+## Atajos de la mesa por acción del mapa de entrada (teclado o mando). Volver cierra primero lo
+## que esté abierto; si no hay nada, la pausa sigue hasta el casino.
+func _unhandled_input(evento: InputEvent) -> void:
+	if not Acciones.es_pulsacion(evento):
 		return
+	var volver := evento.is_action_pressed(Acciones.VOLVER)
 	if modal.visible:
-		if evento.keycode == KEY_ESCAPE:
+		if volver:
 			cerrar_modal()
 			get_viewport().set_input_as_handled()
 		return
-	if revelacion.activa and evento.keycode == KEY_ESCAPE:
+	if volver and revelacion.activa:
 		revelacion.terminar()
-		get_viewport().set_input_as_handled()
-		return
-	if evento.keycode == KEY_ESCAPE and franja_patrones.tiene_foco():
+	elif volver and franja_patrones.tiene_foco():
 		cerrar_patrones()
-		get_viewport().set_input_as_handled()
-		return
-	if evento.keycode == KEY_ESCAPE and not eleccion_llave.seleccionada.is_empty():
+	elif volver and not eleccion_llave.seleccionada.is_empty():
 		eleccion_llave.cancelar()
-		get_viewport().set_input_as_handled()
+	else:
+		# Levantarse tras el final saca la mesa del árbol: el viewport se toma antes de actuar.
+		var puerto := get_viewport()
+		for atajo: Array in _atajos():
+			if evento.is_action_pressed(atajo[0]):
+				atajo[1].call()
+				puerto.set_input_as_handled()
+				return
 		return
-	# Levantarse con P tras el final saca la mesa del árbol: el viewport se toma antes de actuar.
-	var puerto := get_viewport()
-	match evento.keycode:
-		KEY_P: _iniciar_o_pedir()
-		KEY_S: _plantarse()
-		KEY_L: mostrar_devolucion()
-		KEY_H: mostrar_ayuda()
-		KEY_T: alternar_patrones()
-		KEY_I: _ver_objetos()
-		KEY_V: _sonido()
-		KEY_R: _solicitar_reinicio()
-		_: return
-	puerto.set_input_as_handled()
+	get_viewport().set_input_as_handled()
+
+func _atajos() -> Array:
+	return [
+		[Acciones.PEDIR, _iniciar_o_pedir], [Acciones.PLANTARSE, _plantarse],
+		[Acciones.DEVOLVER_LLAVE, mostrar_devolucion], [Acciones.AYUDA, mostrar_ayuda],
+		[Acciones.PATRONES, alternar_patrones], [Acciones.INVENTARIO, _ver_objetos],
+		[Acciones.SONIDO, _sonido], [Acciones.REINICIAR, _solicitar_reinicio],
+	]

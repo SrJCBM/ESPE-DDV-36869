@@ -67,7 +67,7 @@ func test_escape_cancela_seleccion_y_carta_comun_conserva_ampliacion() -> void:
 	var evento := InputEventKey.new()
 	evento.keycode = KEY_ESCAPE
 	evento.pressed = true
-	mesa._unhandled_key_input(evento)
+	mesa._unhandled_input(evento)
 	assert_false(mesa.eleccion_llave.visible)
 	assert_false(mesa.modal.visible)
 	mesa.mano.fila.get_child(1).pressed.emit()

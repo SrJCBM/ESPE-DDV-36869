@@ -1,5 +1,7 @@
 extends CharacterBody2D
 signal pisada
+## Cada vez que cambia de sitio; el casino recalcula entonces la pista y el minimapa.
+signal movido
 ## El origen del visitante está a la altura de sus pies.
 const FIGURA := preload("res://casino/arte/klein_movimiento.webp")
 ## Filas en orden horario desde el este. Columna 0 en reposo y 1–4 para caminar.
@@ -30,6 +32,7 @@ func _physics_process(_delta: float) -> void:
 	var distancia := desplazamiento.length() / maxf(global_scale.x, 0.001)
 	if not bloqueado and distancia > 0.1:
 		rumbo = desplazamiento.normalized()
+		movido.emit()
 		_distancia_ciclo = fposmod(_distancia_ciclo + distancia, DISTANCIA_PISADA * 2.0)
 		_fotograma = 1 + int(_distancia_ciclo * FOTOGRAMAS_CAMINATA / (DISTANCIA_PISADA * 2.0))
 		_distancia_paso += distancia

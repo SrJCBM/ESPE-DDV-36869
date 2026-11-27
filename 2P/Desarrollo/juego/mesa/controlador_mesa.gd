@@ -171,7 +171,7 @@ func _pedir_carta() -> ResultadoAccion:
 	if not impedimento.is_empty():
 		return ResultadoAccion.rechazar(impedimento)
 	if _cobra_comision():
-		campana.saldo -= 1
+		campana.gastar(1)
 	_llaves_habilitadas.clear()
 	var carta := partida.robar()
 	partida.mano.append(carta)

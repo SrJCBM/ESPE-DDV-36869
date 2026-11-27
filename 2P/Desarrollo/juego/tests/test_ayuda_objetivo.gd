@@ -173,6 +173,7 @@ func test_indicador_deja_pasar_clics_y_no_tapa_el_juego() -> void:
 	for nodo in nodos: assert_eq(nodo.mouse_filter, Control.MOUSE_FILTER_IGNORE, str(nodo.name))
 	juego.campana.recibir_invitacion()
 	juego.campana.superadas = 2
+	juego._refrescar() # El objetivo se actualiza por eventos, no en cada fotograma.
 	await get_tree().process_frame
 	var caja: Rect2 = juego.indicador_objetivo.get_rect()
 	assert_eq(juego.indicador_objetivo.texto.text, "Encuentra la mesa de la Coleccionista")

@@ -133,7 +133,7 @@ func _texto(padre: Node, contenido: String, rect: Rect2, tamano := 19, color := 
 	etiqueta.position = rect.position
 	etiqueta.size = rect.size
 	etiqueta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	etiqueta.add_theme_font_size_override("font_size", tamano)
+	etiqueta.add_theme_font_size_override("font_size", Tipografia.tamano(tamano))
 	etiqueta.add_theme_color_override("font_color", color)
 	etiqueta.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if display: etiqueta.theme_type_variation = &"DisplayLabel"

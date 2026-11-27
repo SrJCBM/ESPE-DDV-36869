@@ -59,7 +59,7 @@ func _crear_boton(indice: int) -> Button:
 	var boton := Button.new()
 	# 5 × 131 + 4 × 6 = 679: los cinco caben en los 680 de la franja.
 	boton.custom_minimum_size = Vector2(131, 43)
-	boton.add_theme_font_size_override("font_size", 14)
+	boton.add_theme_font_size_override("font_size", Tipografia.MINIMA)
 	boton.clip_text = true
 	boton.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	boton.pressed.connect(patron_solicitado.emit.bind(indice))

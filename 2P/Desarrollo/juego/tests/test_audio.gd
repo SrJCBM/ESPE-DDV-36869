@@ -21,5 +21,5 @@ func test_canales_y_volumen_silenciado_persisten() -> void:
 		AudioServer.set_bus_volume_db(indice, anterior)
 	assert_true(AjustesJuego.movimiento_reducido())
 	assert_eq(AudioCasino.volumen(&"Musica"), 50)
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	AjustesJuego.ruta = ruta_original

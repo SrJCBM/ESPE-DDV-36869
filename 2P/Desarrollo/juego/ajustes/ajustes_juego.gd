@@ -3,45 +3,56 @@ extends RefCounted
 ## Preferencias que se conservan entre sesiones, como pide el documento de diseño.
 ## La campaña se guarda aparte, en PartidaGuardada (I5).
 ## Sin Autoload: las mesas y las pruebas no dependen de un estado global; solo los puntos de entrada lo leen.
+## El archivo se lee una vez y queda en memoria; cada cambio se escribe en el disco al momento.
 
 ## Las pruebas la redirigen a otro archivo para no tocar las preferencias de quien juega.
-static var ruta := "user://ajustes.cfg"
+static var ruta := "user://ajustes.cfg":
+	set(nueva):
+		ruta = nueva
+		_archivo = null
+
+static var _archivo: ConfigFile
+
+## Olvida lo leído; la próxima consulta vuelve al disco (p. ej., si alguien borró el archivo).
+static func recargar() -> void:
+	_archivo = null
+
+## Borra el archivo y lo leído: todo vuelve a lo predeterminado (pruebas y capturas).
+static func borrar() -> void:
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(ruta))
+	_archivo = null
+
+static func _leer(seccion: String, clave: String, predeterminado: Variant) -> Variant:
+	return _cargado().get_value(seccion, clave, predeterminado)
+
+static func _escribir(seccion: String, clave: String, valor: Variant) -> void:
+	_cargado().set_value(seccion, clave, valor)
+	_archivo.save(ruta)
+
+static func _cargado() -> ConfigFile:
+	if _archivo == null:
+		_archivo = ConfigFile.new()
+		_archivo.load(ruta) # Sin archivo, todo vale lo predeterminado.
+	return _archivo
 
 static func movimiento_reducido() -> bool:
-	var archivo := ConfigFile.new()
-	if archivo.load(ruta) != OK:
-		return false
-	return bool(archivo.get_value("accesibilidad", "movimiento_reducido", false))
+	return bool(_leer("accesibilidad", "movimiento_reducido", false))
 
 static func guardar_movimiento_reducido(reducido: bool) -> void:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta) # Conserva las demás preferencias si el archivo ya existe.
-	archivo.set_value("accesibilidad", "movimiento_reducido", reducido)
-	archivo.save(ruta)
+	_escribir("accesibilidad", "movimiento_reducido", reducido)
 
 static func volumen(canal: StringName, predeterminado: int) -> int:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	return clampi(int(archivo.get_value("audio", str(canal), predeterminado)), 0, 100)
+	return clampi(int(_leer("audio", str(canal), predeterminado)), 0, 100)
 
 static func guardar_volumen(canal: StringName, nivel: int) -> void:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	archivo.set_value("audio", str(canal), clampi(nivel, 0, 100))
-	archivo.save(ruta)
+	_escribir("audio", str(canal), clampi(nivel, 0, 100))
 
 ## Comentarios de los crupieres durante la mano (I6-10). Activados por defecto.
 static func comentarios_crupieres() -> bool:
-	var archivo := ConfigFile.new()
-	if archivo.load(ruta) != OK:
-		return true
-	return bool(archivo.get_value("accesibilidad", "comentarios_crupieres", true))
+	return bool(_leer("accesibilidad", "comentarios_crupieres", true))
 
 static func guardar_comentarios_crupieres(activos: bool) -> void:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	archivo.set_value("accesibilidad", "comentarios_crupieres", activos)
-	archivo.save(ruta)
+	_escribir("accesibilidad", "comentarios_crupieres", activos)
 
 ## Ajustes de lectura de las conversaciones (I5-10): velocidad del texto en caracteres por
 ## segundo (el máximo es instantáneo), espera del modo automático en segundos, tamaño del
@@ -55,16 +66,11 @@ const LECTURA := {
 
 static func lectura(clave: String) -> int:
 	var limites: Dictionary = LECTURA[clave]
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	return clampi(int(archivo.get_value("lectura", clave, limites.predeterminado)), limites.minimo, limites.maximo)
+	return clampi(int(_leer("lectura", clave, limites.predeterminado)), limites.minimo, limites.maximo)
 
 static func guardar_lectura(clave: String, valor: int) -> void:
 	var limites: Dictionary = LECTURA[clave]
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	archivo.set_value("lectura", clave, clampi(valor, limites.minimo, limites.maximo))
-	archivo.save(ruta)
+	_escribir("lectura", clave, clampi(valor, limites.minimo, limites.maximo))
 
 ## Los ajustes de lectura en el formato de `DialogoNovela.configurar`.
 static func ajustes_dialogo() -> Dictionary:
@@ -78,36 +84,22 @@ static func ajustes_dialogo() -> Dictionary:
 
 ## Consejos del tutorial en contexto (26 nov 2026). Activados por defecto; cada uno sale una vez.
 static func consejos() -> bool:
-	var archivo := ConfigFile.new()
-	if archivo.load(ruta) != OK:
-		return true
-	return bool(archivo.get_value("tutorial", "consejos", true))
+	return bool(_leer("tutorial", "consejos", true))
 
 static func guardar_consejos(activos: bool) -> void:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	archivo.set_value("tutorial", "consejos", activos)
-	archivo.save(ruta)
+	_escribir("tutorial", "consejos", activos)
 
 static func consejos_vistos() -> Array:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	var vistos = archivo.get_value("tutorial", "vistos", [])
-	return Array(vistos) if vistos is Array else []
+	var vistos = _leer("tutorial", "vistos", [])
+	return Array(vistos).duplicate() if vistos is Array else []
 
 static func marcar_consejo(id: String) -> void:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
 	var vistos := consejos_vistos()
 	if vistos.has(id):
 		return
 	vistos.append(id)
-	archivo.set_value("tutorial", "vistos", vistos)
-	archivo.save(ruta)
+	_escribir("tutorial", "vistos", vistos)
 
 ## Vuelve a mostrar todos los consejos (Opciones › «Repetir los consejos»).
 static func reiniciar_consejos() -> void:
-	var archivo := ConfigFile.new()
-	archivo.load(ruta)
-	archivo.set_value("tutorial", "vistos", [])
-	archivo.save(ruta)
+	_escribir("tutorial", "vistos", [])

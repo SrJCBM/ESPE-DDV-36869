@@ -32,9 +32,9 @@ const CREDITOS := [
 	["Kenned", "Programación, navegación, experiencia de usuario y narrativa"],
 ]
 const GUIA_RAPIDA := [
-	["Moverte", "WASD o flechas para caminar. E para hablar, entrar o examinar."],
+	["Moverte", "WASD o flechas para caminar. {interactuar} para hablar, entrar o examinar."],
 	["Jugar una mano", "Iniciar cuesta una campanada. Pide cartas sin pasar el umbral. Plántate para revelar las Máscaras y puntuar."],
-	["Salir del casino", "Gana tres sellos y derrota al Dueño. Abre el plano con M. La tienda está junto al Recaudador."],
+	["Salir del casino", "Gana tres sellos y derrota al Dueño. Abre el plano con {mapa}. La tienda está junto al Recaudador."],
 ]
 
 var audio: AudioCasino
@@ -192,9 +192,9 @@ func abrir(nombre: String) -> void:
 			_titulo("Cómo jugar", 40)
 			for fila: Array in GUIA_RAPIDA:
 				_contenido.add_child(Libro.rotulo(fila[0], 22, Libro.ORO, true))
-				_texto(fila[1], false)
+				_texto(str(fila[1]).format({"interactuar": Acciones.tecla(Acciones.INTERACTUAR), "mapa": Acciones.tecla(Acciones.MAPA)}), false)
 			_separador()
-			_nota("I · Pertenencias     H · Reglas de la mesa     V · Sonido     Esc · Pausa")
+			_nota("     ".join([Acciones.rotulo_previo("Pertenencias", Acciones.INVENTARIO), Acciones.rotulo_previo("Reglas de la mesa", Acciones.AYUDA), Acciones.rotulo_previo("Sonido", Acciones.SONIDO), Acciones.rotulo_previo("Pausa", Acciones.PAUSA)]))
 			_boton("Volver", abrir.bind(_raiz))
 		"inventario":
 			_marco(Rect2(370, 140, 700, 530))
@@ -358,10 +358,10 @@ func _boton(texto: String, accion: Callable) -> void:
 		boton.grab_focus()
 
 ## Esc: desde una subpantalla vuelve a la raíz; desde la pausa reanuda; en el inicio, nada.
-func _unhandled_key_input(evento: InputEvent) -> void:
-	if not visible or not evento is InputEventKey or not evento.pressed or evento.echo:
+func _unhandled_input(evento: InputEvent) -> void:
+	if not visible or not Acciones.es_pulsacion(evento):
 		return
-	if evento.keycode == KEY_ESCAPE:
+	if evento.is_action_pressed(Acciones.VOLVER) or evento.is_action_pressed(Acciones.PAUSA):
 		if pantalla == "pausa":
 			reanudar.emit()
 		elif pantalla == "confirmar":

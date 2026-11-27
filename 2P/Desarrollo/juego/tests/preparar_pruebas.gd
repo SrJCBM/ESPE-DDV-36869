@@ -7,5 +7,5 @@ extends GutHookScript
 func run() -> void:
 	AjustesJuego.ruta = "user://ajustes_pruebas.cfg"
 	PartidaGuardada.ruta = "user://partida_pruebas.json"
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(PartidaGuardada.ruta))

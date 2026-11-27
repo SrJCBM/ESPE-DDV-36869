@@ -144,7 +144,7 @@ func test_reglamento_cambia_paginas_sin_tocar_partida_y_conserva_opcion_de_movim
 	mesa.cerrar_modal()
 	await get_tree().process_frame
 	assert_true(AjustesJuego.movimiento_reducido(), "La elección queda guardada")
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	AjustesJuego.ruta = ruta_original
 
 func test_actualizar_misma_mano_conserva_cartas_y_foco() -> void:
@@ -382,7 +382,7 @@ func test_atajos_no_modifican_partida_detras_de_ayuda() -> void:
 		var evento := InputEventKey.new()
 		evento.keycode = codigo
 		evento.pressed = true
-		mesa._unhandled_key_input(evento)
+		mesa._unhandled_input(evento)
 		assert_eq(mesa.controlador.obtener_vista(), antes)
 		assert_true(mesa.modal.contenido.has_node("Reglamento"))
 	mesa.cerrar_modal()

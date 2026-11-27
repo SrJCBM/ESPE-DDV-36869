@@ -25,7 +25,7 @@ func _esc(juego) -> void:
 	var tecla := InputEventKey.new()
 	tecla.keycode = KEY_ESCAPE
 	tecla.pressed = true
-	juego.vitrina._unhandled_key_input(tecla)
+	juego.vitrina._unhandled_input(tecla)
 
 func test_cada_ficha_muestra_imagen_nombre_y_precio_sin_abrirla() -> void:
 	var juego = _casino_en_tienda()

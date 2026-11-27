@@ -60,7 +60,7 @@ func test_esc_sigue_sin_carta_y_no_hay_leer_al_crupier() -> void:
 	var evento := InputEventKey.new()
 	evento.keycode = KEY_ESCAPE
 	evento.pressed = true
-	juego.recompensa._unhandled_key_input(evento)
+	juego.recompensa._unhandled_input(evento)
 	assert_false(juego.campana.hay_recompensa())
 	assert_eq(juego.campana.baraja.size(), antes)
 	assert_false(juego.recompensa.visible)
@@ -83,7 +83,7 @@ func test_el_inventario_de_la_mesa_muestra_objetos_con_usos() -> void:
 	juego.campana.amuletos.assign(["corona", "moneda"])
 	juego.campana.lentes = 1
 	_sentar(juego, "recaudador")
-	juego.mesa.controlador._objetos._usos_moneda = 1
+	juego.mesa.controlador._objetos.usos["moneda"] = 1
 	juego.mesa._ver_objetos()
 	var tarjetas: Array = juego.mesa.modal.contenido.find_children("Objeto_*", "", true, false)
 	var por_id := {}

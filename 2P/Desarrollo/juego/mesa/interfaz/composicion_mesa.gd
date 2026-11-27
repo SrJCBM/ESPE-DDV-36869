@@ -14,7 +14,7 @@ const MANO := Rect2(410, 210, 700, 372)
 ## proporción para verse enteras; desde la sexta, la mano se desplaza (mano_mesa.gd).
 const ALTO_CARTA := 300.0
 ## Lectura de la mano en una sola línea bajo el tapete: intervalo o suma junto al umbral.
-const LECTURA_TITULO := Rect2(431, 606, 160, 40)
+const LECTURA_TITULO := Rect2(431, 602, 160, 48)
 const LECTURA := Rect2(590, 604, 200, 44)
 const EXPLICACION := Rect2(792, 604, 190, 48)
 const RESULTADO := Rect2(431, 600, 540, 40)

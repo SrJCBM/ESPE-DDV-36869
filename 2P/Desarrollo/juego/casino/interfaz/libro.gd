@@ -33,7 +33,7 @@ static func rotulo(texto: String, puntos: int, color: Color, titulo := false) ->
 	var etiqueta := Label.new()
 	etiqueta.text = texto
 	etiqueta.add_theme_font_override("font", SERIF if titulo else SANS)
-	etiqueta.add_theme_font_size_override("font_size",puntos)
+	etiqueta.add_theme_font_size_override("font_size", Tipografia.tamano(puntos))
 	etiqueta.add_theme_color_override("font_color",color)
 	etiqueta.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return etiqueta

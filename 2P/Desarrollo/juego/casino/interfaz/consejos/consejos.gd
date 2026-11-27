@@ -6,7 +6,7 @@ extends RefCounted
 
 const TEXTOS := {
 	"umbral": "Acércate al Umbral sin pasarte.",
-	"pedir": "P: otra carta. S: plantarte y cobrar.",
+	"pedir": "{pedir}: otra carta. {plantarse}: plantarte y cobrar.",
 	"llave": "Puedes cambiar una Llave antes de pedir.",
 	"mascara": "Las Máscaras se descubren al plantarte.",
 	"quiebra": "Te pasaste: esta mano vale 0.",
@@ -16,16 +16,24 @@ const TEXTOS := {
 	"tienda": "Gasta fichas en objetos y cartas.",
 }
 
+## Texto del consejo con las teclas vigentes del mapa de entrada en lugar de {acción}.
+static func texto(id: String) -> String:
+	return str(TEXTOS.get(id, "")).format({
+		"pedir": Acciones.tecla(Acciones.PEDIR), "plantarse": Acciones.tecla(Acciones.PLANTARSE),
+	})
+
 ## Consejo de la mesa que toca tras pasar de `previa` a `nueva`, o "" si no hay ninguno nuevo.
 ## Solo uno a la vez, por orden de importancia; los que esperan salen la próxima vez que se dé
 ## su situación.
 static func en_mesa(previa: Dictionary, nueva: Dictionary, vistos: Array) -> String:
-	if nueva.get("terminado", false):
-		return ""
 	var candidatos: Array[String] = []
 	var fase := str(nueva.get("fase", ""))
 	var ultima: Dictionary = nueva.get("ultima_mano", {})
 	var recien_resuelta := str(previa.get("fase", "")) == "decision" and fase != "decision" and not ultima.is_empty()
+	if nueva.get("terminado", false):
+		# Sobre la derrota no hay nada que enseñar; un patrón en la mano que gana, sí.
+		var patron: bool = recien_resuelta and nueva.get("victoria", false) and not (ultima.get("patrones", []) as Array).is_empty()
+		return "patron" if patron and not vistos.has("patron") else ""
 	if recien_resuelta:
 		if ultima.get("quiebra", false):
 			candidatos.append("quiebra")

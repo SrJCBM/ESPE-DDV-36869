@@ -1,10 +1,11 @@
 extends RefCounted
-## Efectos y límites de uso del inventario durante un encuentro.
+## Efectos y límites de uso del inventario durante un encuentro. Los límites salen del catálogo
+## de la tienda (ObjetoTienda.usos_por_mesa, fichas_por_uso).
 
 var mascaras_vistas: Dictionary = {}
 var exactos := 0
-var _usos_prudente := 0
-var _usos_moneda := 0
+## id del objeto → veces que se aplicó en este encuentro.
+var usos: Dictionary = {}
 
 func usar_lente(campana: CampanaCasino, mano: Array[CartaEnPartida]) -> bool:
 	if campana.lentes <= 0 or EvaluadorMano.intervalo(mano, false, mascaras_vistas).ocultas == 0:
@@ -24,13 +25,21 @@ func aplicar(campana: CampanaCasino, partida: EstadoPartida, resultado: Dictiona
 		resultado.puntos = resultado.total * resultado.multiplicador
 	if resultado.total == partida.umbral:
 		exactos += 1
-		if campana.amuletos.has("moneda") and _usos_moneda < 3:
-			campana.saldo += 2
-			_usos_moneda += 1
-	if campana.amuletos.has("prudente") and _usos_prudente < CampanaCasino.USOS_PRUDENTE and resultado.total <= partida.umbral - 3:
+		if _gastar_uso(campana, "moneda"):
+			campana.ingresar(CampanaCasino.TIENDA.buscar("moneda").fichas_por_uso)
+	if resultado.total <= partida.umbral - 3 and _gastar_uso(campana, "prudente"):
 		partida.campanadas = mini(presupuesto, partida.campanadas + 1)
-		_usos_prudente += 1
 
-## Usos que le quedan a cada objeto limitado en este encuentro.
-func usos_restantes() -> Dictionary:
-	return {"moneda": 3 - _usos_moneda, "prudente": CampanaCasino.USOS_PRUDENTE - _usos_prudente}
+## Usos que le quedan a cada objeto limitado que se lleva, en este encuentro.
+func usos_restantes(campana: CampanaCasino = null) -> Dictionary:
+	var restantes := {}
+	for producto in CampanaCasino.TIENDA.objetos:
+		if producto.usos_por_mesa > 0 and (campana == null or campana.amuletos.has(producto.id)):
+			restantes[producto.id] = producto.usos_por_mesa - int(usos.get(producto.id, 0))
+	return restantes
+
+func _gastar_uso(campana: CampanaCasino, id: String) -> bool:
+	if not campana.amuletos.has(id) or int(usos.get(id, 0)) >= CampanaCasino.usos_por_mesa(id):
+		return false
+	usos[id] = int(usos.get(id, 0)) + 1
+	return true

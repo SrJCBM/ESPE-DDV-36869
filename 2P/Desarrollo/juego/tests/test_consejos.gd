@@ -7,10 +7,10 @@ var _ruta_original := ""
 func before_each() -> void:
 	_ruta_original = AjustesJuego.ruta
 	AjustesJuego.ruta = "user://ajustes_prueba_consejos.cfg"
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 
 func after_each() -> void:
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	AjustesJuego.ruta = _ruta_original
 	await get_tree().process_frame
 
@@ -61,6 +61,9 @@ func test_orden_y_una_vez() -> void:
 	var fin := patron.duplicate()
 	fin.terminado = true
 	assert_eq(Consejos.en_mesa(decision, fin, []), "", "Nada sobre el final del intento")
+	fin.victoria = true
+	assert_eq(Consejos.en_mesa(decision, fin, []), "patron", "Un patrón en la mano ganadora sí se explica")
+	assert_eq(Consejos.en_mesa(decision, fin, ["patron"]), "", "Solo una vez")
 
 func test_la_primera_mesa_ensena_el_umbral_y_luego_los_botones() -> void:
 	var juego = _casino()

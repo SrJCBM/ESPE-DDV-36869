@@ -134,7 +134,7 @@ func _actualizar() -> void:
 	if not str(_vista.get("nota", "")).is_empty():
 		_efecto.text = str(_vista.nota)
 	if _devolucion_disponible:
-		_efecto.text = "LLAVE ELEGIDA" if _seleccionada else "Cambiar · L"
+		_efecto.text = "LLAVE ELEGIDA" if _seleccionada else Acciones.rotulo("Cambiar", Acciones.DEVOLVER_LLAVE)
 	tooltip_text = "%s. %s. %s. Activar para ampliar." % [NOMBRES.get(palo, palo), "Valor oculto" if oculta else "Valor %s" % _valor.text, _efecto.text]
 	if oculta:
 		tooltip_text = "%s. Valor oculto entre 1 y 10; se revela al plantarse. Activar para ampliar." % NOMBRES.get(palo, palo)

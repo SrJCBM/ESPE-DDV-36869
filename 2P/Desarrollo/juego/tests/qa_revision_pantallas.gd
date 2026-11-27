@@ -61,7 +61,7 @@ func _r() -> void:
 	r.campana.lentes = 1
 	r.campana.saldo = 42
 	await _mesa(r, "recaudador")
-	r.mesa.controlador._objetos._usos_moneda = 1
+	r.mesa.controlador._objetos.usos["moneda"] = 1
 	r.mesa._ver_objetos()
 	await _foto("4_inventario_mesa")
 	r.mesa.cerrar_modal()

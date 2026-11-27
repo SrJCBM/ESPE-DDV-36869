@@ -189,9 +189,9 @@ func _construir_detalle() -> void:
 		y += 22.0
 
 func _construir_botones() -> void:
-	boton_confirmar = _boton("AÑADIR A LA BARAJA  ·  Enter", Vector2(CONTENIDO.position.x, 676), Vector2(400, 52), true)
+	boton_confirmar = _boton("AÑADIR A LA BARAJA  ·  %s" % Acciones.tecla(Acciones.ACEPTAR), Vector2(CONTENIDO.position.x, 676), Vector2(400, 52), true)
 	boton_confirmar.pressed.connect(_confirmar)
-	boton_omitir = _boton("SEGUIR SIN CARTA  ·  Esc", Vector2(CONTENIDO.position.x + 420, 676), Vector2(400, 52), false)
+	boton_omitir = _boton("SEGUIR SIN CARTA  ·  %s" % Acciones.tecla(Acciones.VOLVER), Vector2(CONTENIDO.position.x + 420, 676), Vector2(400, 52), false)
 	boton_omitir.pressed.connect(func() -> void: resuelta.emit(-1))
 
 func _boton(texto: String, posicion: Vector2, medida: Vector2, primario: bool) -> Button:
@@ -201,7 +201,7 @@ func _boton(texto: String, posicion: Vector2, medida: Vector2, primario: bool) -
 	boton.size = medida
 	boton.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	boton.add_theme_font_override("font", Libro.SANS)
-	boton.add_theme_font_size_override("font_size", 15)
+	boton.add_theme_font_size_override("font_size", Tipografia.MINIMA)
 	var color := Color("efe2c4") if primario else Color("17342a")
 	var texto_color := Color("1a120b") if primario else Libro.PAPEL
 	var normal := Libro.caja(color, Color("8a6f3e") if primario else Color("645c44"))
@@ -227,7 +227,8 @@ func presentar(jefe: String, frase: String, premio: int, superadas: int, opcione
 	_nombre_jefe.text = str(CampanaCasino.NOMBRES.get(jefe, "")).to_upper()
 	_ajustar_dicho(frase)
 	_cabecera.text = "MESA SUPERADA  ·  SELLO %s DE 4" % ["I", "II", "III", "IV"][clampi(superadas - 1, 0, 3)]
-	_premio.text = ("+%s fichas  ·  " % premio if premio > 0 else "") + "Elige una carta para tu baraja o sigue con la que tienes."
+	# Los botones ya dicen qué hacer: arriba solo queda lo que se ha ganado.
+	_premio.text = "+%s fichas" % premio if premio > 0 else ""
 	_baraja.clear()
 	for palo in Palos.TODOS: _baraja[palo] = 0
 	for carta in baraja:
@@ -376,13 +377,13 @@ func _mostrar(indice: int) -> void:
 		cifra.text = str(actual) if p != palo else "%s→%s" % [actual, nuevo]
 		cifra.add_theme_color_override("font_color", Libro.ORO if p == palo else Libro.PAPEL)
 
-func _unhandled_key_input(evento: InputEvent) -> void:
-	if not visible or not evento is InputEventKey or not evento.pressed or evento.echo:
+func _unhandled_input(evento: InputEvent) -> void:
+	if not visible or not Acciones.es_pulsacion(evento):
 		return
 	var puerto := get_viewport()
-	if evento.keycode == KEY_ESCAPE:
+	if evento.is_action_pressed(Acciones.VOLVER):
 		resuelta.emit(-1)
-	elif evento.keycode in [KEY_1, KEY_2, KEY_3] and evento.keycode - KEY_1 < cartas.size():
+	elif evento is InputEventKey and evento.keycode in [KEY_1, KEY_2, KEY_3] and evento.keycode - KEY_1 < cartas.size():
 		cartas[evento.keycode - KEY_1].grab_focus()
 		_pulsar(evento.keycode - KEY_1)
 	else:

@@ -15,8 +15,8 @@ func _init() -> void:
 	horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	follow_focus = true
 	clip_contents = true
-	# Cuatro columnas: con el margen de los botones, cinco no caben en el marco de la vitrina.
-	rejilla.columns = 4
+	# Tres columnas: con la letra mínima de 16, cuatro no caben en el marco de la vitrina.
+	rejilla.columns = 3
 	rejilla.add_theme_constant_override("h_separation", 6)
 	rejilla.add_theme_constant_override("v_separation", 6)
 	add_child(rejilla)
@@ -31,9 +31,9 @@ func presentar(servicio: String, campana: CampanaCasino) -> void:
 		# Sin saldo, el motivo de la carta sería el mismo para todas: se informa en el detalle.
 		if motivo == "Fichas insuficientes.": motivo = ""
 		var boton := Button.new()
-		boton.custom_minimum_size = Vector2(84, 58)
+		boton.custom_minimum_size = Vector2(116, 58)
 		boton.text = "%s\n%s" % [_valor(carta), Palos.NOMBRES.get(carta.definicion.palo, "")]
-		boton.add_theme_font_size_override("font_size", 14)
+		boton.add_theme_font_size_override("font_size", Tipografia.MINIMA)
 		boton.add_theme_stylebox_override("normal", Libro.caja(Color("2a1c12"), Color("6b5634")))
 		var foco := Libro.caja(Color("3a2818"), Color("e2c27e"))
 		boton.add_theme_stylebox_override("focus", foco)

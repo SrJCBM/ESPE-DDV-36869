@@ -77,7 +77,7 @@ func _ready() -> void:
 	confirmacion.position = Vector2(156, 690)
 	confirmacion.size = Vector2(700, 30)
 	add_child(confirmacion)
-	var salir := Libro.rotulo("Esc · volver al mostrador", 15, Color("b9a98a"))
+	var salir := Libro.rotulo("%s · volver al mostrador" % Acciones.tecla(Acciones.VOLVER), 16, Color("b9a98a"))
 	salir.position = Vector2(1040, 700)
 	add_child(salir)
 
@@ -175,10 +175,10 @@ func _volver_al_catalogo() -> void:
 			return
 	fichas[0].grab_focus()
 
-func _unhandled_key_input(evento: InputEvent) -> void:
-	if not visible or not evento is InputEventKey or not evento.pressed or evento.echo:
+func _unhandled_input(evento: InputEvent) -> void:
+	if not visible or not Acciones.es_pulsacion(evento):
 		return
-	if evento.keycode == KEY_ESCAPE:
+	if evento.is_action_pressed(Acciones.VOLVER):
 		if _producto.is_empty(): cerrar()
 		else: _volver_al_catalogo()
 		get_viewport().set_input_as_handled()

@@ -18,7 +18,7 @@ func before_each() -> void:
 func after_each() -> void:
 	PartidaGuardada.borrar()
 	PartidaGuardada.ruta = _ruta_partida
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(AjustesJuego.ruta))
+	AjustesJuego.borrar()
 	AjustesJuego.ruta = _ruta_ajustes
 	await get_tree().process_frame
 
@@ -35,7 +35,7 @@ func _tecla(nodo: Node, codigo: Key) -> void:
 	evento.keycode = codigo
 	evento.physical_keycode = codigo
 	evento.pressed = true
-	nodo._unhandled_key_input(evento)
+	nodo._unhandled_input(evento)
 
 func _sentar(juego, jefe: String) -> void:
 	juego.entrar(jefe)

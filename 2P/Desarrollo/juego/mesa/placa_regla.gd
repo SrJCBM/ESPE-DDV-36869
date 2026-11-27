@@ -28,14 +28,14 @@ func _init() -> void:
 	add_child(columna)
 	var rotulo := Label.new()
 	rotulo.text = "REGLA DE LA MESA"
-	rotulo.add_theme_font_size_override("font_size", 11)
+	rotulo.add_theme_font_size_override("font_size", Tipografia.MINIMA)
 	rotulo.add_theme_color_override("font_color", Piezas.ORO)
 	columna.add_child(rotulo)
 	texto = Label.new()
 	texto.name = "TextoRegla"
 	texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	texto.custom_minimum_size = Vector2(328, 0)
-	texto.add_theme_font_size_override("font_size", 15)
+	texto.add_theme_font_size_override("font_size", Tipografia.MINIMA)
 	texto.add_theme_color_override("font_color", Piezas.MARFIL)
 	columna.add_child(texto)
 	hide()

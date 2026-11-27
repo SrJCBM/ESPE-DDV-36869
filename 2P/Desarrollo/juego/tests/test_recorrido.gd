@@ -101,17 +101,17 @@ func test_m_se_abre_el_plano_y_escape_devuelve_el_control() -> void:
 	var juego = _con_invitacion()
 	juego.entrar("pasillo_custodio", "vestibulo")
 	juego.visitante.position = Vector2(640, 450)
-	juego._process(0.0)
+	juego.actualizar_exploracion()
 	assert_eq(juego.minimapa._sala, "pasillo_custodio")
 	assert_eq(juego.minimapa._posicion, juego.visitante.position)
 	var tecla := InputEventKey.new()
 	tecla.keycode = KEY_M
 	tecla.pressed = true
-	juego._unhandled_key_input(tecla)
+	juego._unhandled_input(tecla)
 	assert_true(juego.minimapa.ampliado)
 	assert_true(juego.visitante.bloqueado)
 	tecla.keycode = KEY_ESCAPE
-	juego._unhandled_key_input(tecla)
+	juego._unhandled_input(tecla)
 	assert_false(juego.minimapa.ampliado)
 	assert_false(juego.visitante.bloqueado)
 	assert_false(juego.menu.visible)

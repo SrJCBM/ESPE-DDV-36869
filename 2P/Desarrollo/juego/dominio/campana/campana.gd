@@ -4,8 +4,6 @@ extends RefCounted
 
 const MESAS := ["custodio", "recaudador", "coleccionista", "dueno"]
 const NOMBRES := {"entrada":"Entrada al casino", "vestibulo":"Vestíbulo", "pasillo_custodio":"Pasillo del Custodio", "pasillo_recaudador":"Pasillo del Recaudador", "pasillo_coleccionista":"Pasillo de la Coleccionista","pasillo_dueno":"Pasillo del Dueño", "tienda":"Gabinete de la anfitriona", "custodio":"El Custodio", "recaudador":"El Recaudador", "coleccionista":"La Coleccionista", "dueno":"El Dueño de la Casa"}
-## Usos por mesa del Sello del prudente (BALANCE_CAMPANA.md).
-const USOS_PRUDENTE := 1
 ## Objetos que la anfitriona ofrece gratis al aceptar la invitación (I5). Uno por intento.
 const OBJETOS_INICIALES := ["lente", "prudente", "moneda"]
 ## Sellos que exige cada espacio que no es una mesa (I5). Todos piden además la invitación;
@@ -35,6 +33,25 @@ var variante_vela := true
 var historia := {}
 var _recompensas: Array[CartaDef] = []
 var azar_recompensas := RandomNumberGenerator.new()
+
+## Límites de los objetos: se leen del catálogo de la tienda, nunca se repiten en el código.
+static func usos_por_mesa(id: String) -> int:
+	var producto := TIENDA.buscar(id)
+	return producto.usos_por_mesa if producto != null else 0
+
+static func maximo_llevado(id: String) -> int:
+	var producto := TIENDA.buscar(id)
+	return producto.maximo_llevado if producto != null else 0
+
+## Las fichas solo cambian por estos dos métodos, para que nadie las deje en negativo.
+func ingresar(fichas: int) -> void:
+	saldo += maxi(0, fichas)
+
+func gastar(fichas: int) -> bool:
+	if fichas < 0 or saldo < fichas:
+		return false
+	saldo -= fichas
+	return true
 
 func recibir_invitacion() -> void:
 	if recibida: return
@@ -111,7 +128,7 @@ static func desde_datos(datos: Dictionary) -> CampanaCasino:
 	c.recibida = bool(datos.get("recibida", false))
 	c.saldo = maxi(0, int(datos.get("saldo", 0)))
 	c.superadas = clampi(int(datos.get("superadas", 0)), 0, MESAS.size())
-	c.lentes = clampi(int(datos.get("lentes", 0)), 0, 2)
+	c.lentes = clampi(int(datos.get("lentes", 0)), 0, maximo_llevado("lente"))
 	c.variante_vela = bool(datos.get("variante_vela", true))
 	for id in datos.get("amuletos", []):
 		if TIENDA.buscar(str(id)) != null and str(id) != "lente" and not c.amuletos.has(str(id)):
@@ -135,6 +152,27 @@ static func desde_datos(datos: Dictionary) -> CampanaCasino:
 		for clave in relato:
 			c.historia[str(clave)] = str(relato[clave])
 	return c
+
+## Proyección pública de la baraja: ordenada por palo y valor, nunca por el mazo. Durante una
+## mano (`en_mano`) las Máscaras van boca abajo, sin valor ni ajuste, para no delatar las de la mano.
+func proyeccion_baraja(en_mano: bool) -> Dictionary:
+	var cartas := []
+	for carta in baraja:
+		var id := carta.id_instancia
+		var oculta := en_mano and carta.definicion.palo == Palos.MASCARAS
+		var ajuste := 0 if oculta else int(ajustadas.get(id, 0))
+		var notas := PackedStringArray()
+		if not oculta and carta.definicion.rasgo == CartaEnPartida.RASGO_RACHA_DOBLE: notas.append("RACHA ×2")
+		if ganadas.has(id): notas.append("GANADA")
+		if ajuste != 0: notas.append("AJUSTE %+d" % ajuste)
+		cartas.append({
+			"palo": carta.definicion.palo, "oculta": oculta,
+			"valor": null if oculta else carta.definicion.valor_impreso as Variant,
+			"valor_efectivo": null if oculta else carta.valor_efectivo() as Variant,
+			"rasgo": "" if oculta else carta.definicion.rasgo, "nota": " · ".join(notas),
+			"ganada": ganadas.has(id), "ajuste": ajuste,
+		})
+	return {"cartas": cartas, "retiradas": retiradas.duplicate(true), "en_mano": en_mano}
 
 static func _carta_valida(d: Dictionary) -> bool:
 	return Palos.es_valido(str(d.get("palo", ""))) and int(d.get("valor", 0)) >= 1 and int(d.get("valor", 0)) <= 10
@@ -168,7 +206,7 @@ func cerrar(victoria: bool, exactos: int) -> int:
 	if derrota: return 0
 	superadas += 1
 	var premio := 10 + 5 * exactos
-	saldo += premio
+	ingresar(premio)
 	if superadas < MESAS.size():
 		_recompensas = OfertaCartas.generar(azar_recompensas, variante_vela)
 	return premio
@@ -198,7 +236,7 @@ func impedimento(id: String, carta: CartaEnPartida = null) -> String:
 	var producto := TIENDA.buscar(id)
 	if producto == null or not recibida or derrota or not activa.is_empty() or hay_recompensa(): return "Compra no disponible."
 	if saldo < producto.precio: return "Fichas insuficientes."
-	if id == "lente" and lentes >= 2: return "Ya llevas dos consumibles."
+	if producto.maximo_llevado > 0 and lentes >= producto.maximo_llevado: return "Ya llevas %s, el máximo." % producto.maximo_llevado
 	if amuletos.has(id): return "Ya llevas este amuleto."
 	if id in ["eliminar", "subir", "bajar"]:
 		if not baraja.has(carta): return "Selecciona una carta de tu baraja."
@@ -209,7 +247,7 @@ func impedimento(id: String, carta: CartaEnPartida = null) -> String:
 
 func comprar(id: String, carta: CartaEnPartida = null) -> bool:
 	if not impedimento(id, carta).is_empty(): return false
-	saldo -= TIENDA.buscar(id).precio
+	gastar(TIENDA.buscar(id).precio)
 	match id:
 		"lente": lentes += 1
 		"eliminar":

@@ -31,7 +31,7 @@ func _tecla(mesa, codigo: Key) -> void:
 	var evento := InputEventKey.new()
 	evento.keycode = codigo
 	evento.pressed = true
-	mesa._unhandled_key_input(evento)
+	mesa._unhandled_input(evento)
 
 func test_en_la_espera_el_tapete_muestra_el_objetivo_y_no_hay_lectura_ni_patrones() -> void:
 	var mesa = _mesa().mesa
@@ -39,7 +39,7 @@ func test_en_la_espera_el_tapete_muestra_el_objetivo_y_no_hay_lectura_ni_patrone
 	assert_true(mesa.mano.objetivo.is_visible_in_tree(), "El objetivo de la mesa va dentro del tapete")
 	assert_string_contains(mesa.mano.objetivo.text, "Meta 200")
 	assert_string_contains(mesa.mano.objetivo.text, "umbral 17")
-	assert_string_contains(mesa.mano.objetivo.text, "10 campanadas")
+	assert_false(mesa.mano.objetivo.text.contains("campanadas"), "Las campanadas ya se leen en el dial")
 	assert_false(mesa._lectura.visible)
 	assert_false(mesa.boton_patrones.visible, "Sin cartas no hay patrones que consultar")
 	assert_false(mesa.franja_patrones.visible)

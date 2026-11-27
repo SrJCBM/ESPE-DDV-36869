@@ -370,14 +370,13 @@ func test_examinar_abre_una_escena_con_la_ilustracion_y_la_descripcion() -> void
 	assert_false(juego.visitante.bloqueado, "Al cerrar se vuelve a explorar")
 
 func test_cada_nota_jugable_tiene_una_ilustracion_importada() -> void:
-	var Casino := load("res://casino/casino.gd")
-	for sala: String in Casino.NOTAS:
-		assert_true(Casino.ILUSTRACIONES_NOTAS.has("nota_" + sala), sala)
+	for sala: String in NotasCasino.NOTAS:
+		assert_true(NotasCasino.ILUSTRACIONES_NOTAS.has("nota_" + sala), sala)
 		assert_true(ResourceLoader.exists("res://historia/ilustraciones/nota_%s.webp" % sala, "Texture2D"), sala)
-	for variante: String in Casino.NOTAS_VARIANTES:
-		assert_true(Casino.ILUSTRACIONES_NOTAS.has("nota_" + variante), variante)
+	for variante: String in NotasCasino.NOTAS_VARIANTES:
+		assert_true(NotasCasino.ILUSTRACIONES_NOTAS.has("nota_" + variante), variante)
 		assert_true(ResourceLoader.exists("res://historia/ilustraciones/nota_%s.webp" % variante, "Texture2D"), variante)
-	var conversacion: Conversacion = Casino.conversacion_nota("nota_tienda", "La vitrina de humo", "Texto")
+	var conversacion: Conversacion = NotasCasino.conversacion_nota("nota_tienda", "La vitrina de humo", "Texto")
 	assert_eq(conversacion.errores(), PackedStringArray())
 
 func test_las_notas_cambian_segun_la_historia() -> void:

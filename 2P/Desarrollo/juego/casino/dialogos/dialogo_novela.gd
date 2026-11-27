@@ -227,7 +227,7 @@ func _ready() -> void:
 	texto_nvl.add_theme_constant_override("line_spacing", 6)
 	texto_nvl.hide()
 	add_child(texto_nvl)
-	indicacion = Libro.rotulo("E · continuar", 14, MUTED)
+	indicacion = Libro.rotulo("%s · continuar" % Acciones.tecla(Acciones.INTERACTUAR), 16, MUTED)
 	indicacion.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	indicacion.position = CAJA.end - Vector2(236, 34)
 	indicacion.size = Vector2(210, 22)
@@ -308,7 +308,7 @@ func _boton_barra(texto_boton: String, accion: Callable) -> Button:
 	boton.focus_mode = Control.FOCUS_NONE
 	boton.flat = true
 	boton.add_theme_font_override("font", Libro.SANS)
-	boton.add_theme_font_size_override("font_size", 14)
+	boton.add_theme_font_size_override("font_size", Tipografia.MINIMA)
 	boton.add_theme_color_override("font_color", MUTED)
 	boton.add_theme_color_override("font_hover_color", Libro.PAPEL)
 	boton.add_theme_color_override("font_pressed_color", Libro.ORO)
@@ -709,7 +709,8 @@ func completar() -> void:
 	# Con movimiento reducido la línea ya se completó al mostrarse: no se repiten las respuestas.
 	_quitar_respuestas()
 	if _opciones.is_empty():
-		indicacion.text = "E · continuar" if not conversacion.siguiente(actual, evaluar).is_empty() else "E · cerrar"
+		var tecla := Acciones.tecla(Acciones.INTERACTUAR)
+		indicacion.text = "%s · %s" % [tecla, "continuar" if not conversacion.siguiente(actual, evaluar).is_empty() else "cerrar"]
 		indicacion.show()
 		return
 	var junto_a_personajes := not presentes.is_empty()
@@ -760,7 +761,9 @@ func _process(delta: float) -> void:
 	var adelantar := saltando or Input.is_key_pressed(KEY_CTRL)
 	if adelantar:
 		_espera += delta
-		if not _opciones.is_empty() and not escribiendo():
+		if not _opciones.is_empty():
+			# En una elección el salto se detiene ya, con la línea completa: nunca a medias.
+			if escribiendo(): completar()
 			_detener_salto()
 		elif _espera >= PASO_SALTO:
 			_espera = 0.0
@@ -864,16 +867,16 @@ func _gui_input(evento: InputEvent) -> void:
 		avanzar()
 		accept_event()
 
-func _unhandled_key_input(evento: InputEvent) -> void:
-	if not visible or not evento is InputEventKey or not evento.pressed or evento.echo:
+func _unhandled_input(evento: InputEvent) -> void:
+	if not visible or not Acciones.es_pulsacion(evento):
 		return
 	if panel_historial.visible:
-		if evento.keycode in [KEY_ESCAPE, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] or evento.is_action_pressed("interactuar"):
+		if evento.is_action_pressed(Acciones.VOLVER) or evento.is_action_pressed(Acciones.ACEPTAR) or evento.is_action_pressed(Acciones.INTERACTUAR):
 			cerrar_historial()
-	elif evento.keycode == KEY_ESCAPE:
+	elif evento.is_action_pressed(Acciones.VOLVER):
 		if not permitir_saltar:
 			cerrar()
-	elif evento.is_action_pressed("interactuar") or evento.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]:
+	elif evento.is_action_pressed(Acciones.INTERACTUAR) or evento.is_action_pressed(Acciones.ACEPTAR):
 		var foco := get_viewport().gui_get_focus_owner()
 		if foco in botones and not escribiendo():
 			elegir(botones.find(foco))
