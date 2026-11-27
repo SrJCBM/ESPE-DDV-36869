@@ -51,8 +51,10 @@ static func disparadores(previa: Dictionary, nueva: Dictionary) -> Array[String]
 static func _al_resolver(previa: Dictionary, nueva: Dictionary) -> Array[String]:
 	var ultima: Dictionary = nueva.ultima_mano
 	var candidatos: Array[String] = []
+	# El fin del intento es la única reacción: no se celebra la última mano sobre una derrota.
 	if nueva.get("terminado", false):
 		candidatos.append("victoria" if nueva.get("victoria", false) else "derrota")
+		return candidatos
 	if ultima.get("quiebra", false):
 		candidatos.append("quiebra")
 	else:

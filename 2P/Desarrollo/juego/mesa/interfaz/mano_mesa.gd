@@ -20,6 +20,8 @@ var alto_carta := 286.0
 ## Proporción de la carta (ancho / alto) y número de cartas que siempre se ven a la vez.
 const PROPORCION := 0.7
 const VISIBLES := 5
+## Mano resuelta: ya no hay decisiones, así que todas las cartas se ven a la vez (auditoría F3).
+var _completa := false
 
 func configurar(dialogo_abierto: Callable) -> void:
 	_dialogo_abierto = dialogo_abierto
@@ -32,6 +34,7 @@ func _ready() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
+	_estilizar_barra(scroll.get_h_scroll_bar())
 	var centro := CenterContainer.new()
 	centro.custom_minimum_size = Vector2(718, 311)
 	centro.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -50,8 +53,12 @@ func _ready() -> void:
 	objetivo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	objetivo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
-func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool) -> void:
+func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool, completa := false) -> void:
 	_revision += 1
+	_completa = completa
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if completa else ScrollContainer.SCROLL_MODE_AUTO
+	if completa:
+		scroll.scroll_horizontal = 0
 	var hay_dialogo: bool = _dialogo_abierto.call()
 	var existentes: Dictionary = {}
 	for nodo in fila.get_children():
@@ -82,7 +89,7 @@ func presentar(cartas: Array, llaves: Array, movimiento_reducido: bool) -> void:
 		fila.remove_child(nodo)
 		nodo.queue_free()
 	var ultima := str(cartas.back().get("id", "")) if not cartas.is_empty() else ""
-	if cartas.size() >= 6 and ultima != _ultima_carta and not hay_dialogo:
+	if cartas.size() >= 6 and ultima != _ultima_carta and not hay_dialogo and not completa:
 		_desplazar_al_final(_revision)
 	_ultima_carta = ultima
 
@@ -108,13 +115,32 @@ func colocar(zona: Rect2, alto: float) -> void:
 ## Tamaño de cada carta para una mano de `cantidad` cartas, con su proporción. Hasta tres van a
 ## tamaño completo; con cuatro o cinco se reducen para que toda la mano se vea sin desplazarse
 ## (Mano larga se decide mirando las cinco). Desde la sexta conservan el tamaño de cinco y la
-## mano se desplaza en horizontal hasta la última carta robada.
+## mano se desplaza en horizontal hasta la última carta robada. Una mano resuelta se encoge
+## hasta que caben todas: es el resultado que se acaba de puntuar.
 func medida_carta(cantidad: int) -> Vector2:
 	var completo := floorf(alto_carta * PROPORCION)
 	var separacion := float(fila.get_theme_constant("separation"))
-	var ajuste := clampi(cantidad, 1, VISIBLES)
+	var ajuste := maxi(cantidad, 1) if _completa else clampi(cantidad, 1, VISIBLES)
 	var ancho := minf(completo, floorf((scroll.size.x - separacion * (ajuste - 1)) / ajuste))
 	return Vector2(ancho, minf(alto_carta, floorf(ancho / PROPORCION)))
+
+## Barra fina de latón en lugar del gris por defecto de Godot.
+func _estilizar_barra(barra: HScrollBar) -> void:
+	var carril := StyleBoxFlat.new()
+	carril.bg_color = Color(0.03, 0.08, 0.06, 0.55)
+	carril.set_corner_radius_all(3)
+	carril.content_margin_top = 3
+	carril.content_margin_bottom = 3
+	var asa := StyleBoxFlat.new()
+	asa.bg_color = Color(Piezas.ORO, 0.75)
+	asa.set_corner_radius_all(3)
+	var asa_activa := asa.duplicate()
+	asa_activa.bg_color = Piezas.ORO
+	barra.add_theme_stylebox_override("scroll", carril)
+	barra.add_theme_stylebox_override("scroll_focus", carril)
+	barra.add_theme_stylebox_override("grabber", asa)
+	barra.add_theme_stylebox_override("grabber_highlight", asa_activa)
+	barra.add_theme_stylebox_override("grabber_pressed", asa_activa)
 
 func revelar(indice: int, datos: Dictionary) -> Dictionary:
 	fila.get_child(indice).presentar(datos)

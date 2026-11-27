@@ -371,7 +371,7 @@ func _pintar_vista(nueva_vista: Dictionary) -> void:
 	_titulo_estado.text = "VICTORIA · EL PRIMER SELLO ES TUYO" if vista.get("victoria", false) else ("DERROTA · FIN DEL INTENTO" if terminada else ("MANO %s" % vista.get("numero_mano", 1) if fase == "decision" else ""))
 	if campana != null and vista.get("victoria", false): _titulo_estado.text = "VICTORIA · MESA SUPERADA"
 	var cartas: Array = vista.get("cartas", [])
-	mano.presentar(cartas, vista.get("llaves_disponibles", []), movimiento_reducido)
+	mano.presentar(cartas, vista.get("llaves_disponibles", []), movimiento_reducido, fase != "decision" and not cartas.is_empty())
 	_presentar_lectura(cartas)
 	_actualizar_orientacion()
 	franja_patrones.presentar(vista)
